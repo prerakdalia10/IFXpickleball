@@ -17,6 +17,7 @@ h2{margin-bottom:1rem}
 /* ── Buttons ── */
 .start-btn{width:100%;padding:1.2rem;font-size:1.1rem;font-weight:700;border:none;border-radius:var(--r);cursor:pointer;margin-bottom:.8rem}
 .start-btn.new{background:var(--green);color:#111}
+.start-btn.umpire{background:var(--yellow);color:#111}
 .start-btn.watch{background:var(--blue);color:#111}
 .start-btn.hist{background:var(--card2);color:var(--text)}
 
@@ -37,12 +38,10 @@ input:focus,select:focus{border-color:var(--green)}
 .tag.live{background:var(--green);color:#111;animation:pulse 1.5s infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
 
-/* Score call */
 .score-call{text-align:center;background:var(--card);border-radius:var(--r);padding:.8rem;margin-bottom:1rem}
 .score-call .call{font-size:2rem;font-weight:900;letter-spacing:2px;font-variant-numeric:tabular-nums}
 .score-call .call-label{font-size:.75rem;color:var(--dim);margin-top:.3rem}
 
-/* Serving info */
 .serving-info{text-align:center;background:var(--card2);border-radius:var(--r);padding:.6rem;margin-bottom:1rem;font-size:.9rem}
 .serving-info .serve-team{color:var(--yellow);font-weight:700}
 .serving-info .serve-num{color:var(--green);font-weight:700}
@@ -57,7 +56,6 @@ input:focus,select:focus{border-color:var(--green)}
 .t1 .points{color:var(--green)}
 .t2 .points{color:var(--blue)}
 
-/* Action buttons */
 .rally-btns{display:flex;gap:.6rem;margin-bottom:.8rem}
 .rally-btn{flex:1;padding:1.1rem .5rem;font-size:1.1rem;font-weight:800;border:none;border-radius:var(--r);cursor:pointer;text-align:center;line-height:1.3}
 .btn-point{background:var(--green);color:#111}
@@ -68,7 +66,6 @@ input:focus,select:focus{border-color:var(--green)}
 .btn-undo{background:var(--card2);color:var(--text)}
 .btn-end{background:var(--red);color:#fff}
 
-/* Share box */
 .share-box{background:var(--card2);border-radius:var(--r);padding:1rem;text-align:center;margin-bottom:.8rem}
 .share-box p{font-size:.85rem;color:var(--dim);margin-bottom:.5rem}
 .share-box input{margin-bottom:.5rem;text-align:center;border:1px solid var(--green);background:var(--card)}
@@ -77,25 +74,30 @@ input:focus,select:focus{border-color:var(--green)}
 .winner{margin-top:1rem;text-align:center;padding:1rem;border-radius:var(--r);font-size:1.3rem;font-weight:800;background:linear-gradient(135deg,#ffd600,#ff6d00);color:#111}
 .winner.hide{display:none}
 
-/* ── Watch page ── */
-.watch-input{display:flex;gap:.5rem;margin-bottom:1rem}
-.watch-input input{flex:1;margin-bottom:0}
-.watch-input button{padding:.7rem 1.2rem;background:var(--blue);color:#111;border:none;border-radius:var(--r);font-weight:700;cursor:pointer;white-space:nowrap}
-
-/* ── History ── */
-.game-card{background:var(--card);border-radius:var(--r);padding:.8rem 1rem;margin-bottom:.6rem;display:flex;justify-content:space-between;align-items:center}
+/* ── Game cards ── */
+.game-card{background:var(--card);border-radius:var(--r);padding:.8rem 1rem;margin-bottom:.6rem;display:flex;justify-content:space-between;align-items:center;cursor:pointer;transition:transform .15s,box-shadow .15s}
+.game-card:hover{transform:translateY(-2px);box-shadow:0 4px 20px rgba(0,0,0,.3)}
 .game-card .teams{font-weight:600;font-size:.95rem}
 .game-card .meta{font-size:.75rem;color:var(--dim);margin-top:.2rem}
 .game-card .fscore{font-size:1.2rem;font-weight:800;font-variant-numeric:tabular-nums}
 .game-card .s1{color:var(--green)}.game-card .s2{color:var(--blue)}
+.game-card .live-dot{display:inline-block;width:8px;height:8px;background:var(--green);border-radius:50%;margin-right:4px;animation:pulse 1.5s infinite}
 .empty{color:var(--dim);font-style:italic;text-align:center;padding:2rem 0}
+
 .back-btn{display:inline-block;margin-bottom:1rem;padding:.5rem 1rem;background:var(--card2);color:var(--text);border:none;border-radius:var(--r);cursor:pointer;font-size:.9rem}
 .clear-btn{margin-top:1rem;padding:.6rem 1rem;background:var(--card2);color:var(--red);border:none;border-radius:var(--r);cursor:pointer;font-size:.85rem;width:100%}
 
-/* Loading */
+/* Password box */
+.pw-box{background:var(--card);border-radius:var(--r);padding:1.5rem;text-align:center;margin-top:1rem}
+.pw-box input{text-align:center;font-size:1.1rem;letter-spacing:2px}
+.pw-box .error{color:var(--red);font-size:.85rem;margin-top:.5rem;display:none}
+
 .loading{text-align:center;padding:3rem 1rem;color:var(--dim)}
 .loading .spin{display:inline-block;width:30px;height:30px;border:3px solid var(--card2);border-top:3px solid var(--green);border-radius:50%;animation:spin .8s linear infinite;margin-bottom:.5rem}
 @keyframes spin{to{transform:rotate(360deg)}}
+
+.role-badge{display:inline-block;font-size:.7rem;padding:.2rem .6rem;border-radius:999px;margin-left:.5rem;font-weight:700;vertical-align:middle}
+.role-badge.umpire-role{background:var(--yellow);color:#111}
 
 @media(max-width:400px){
   .points{font-size:3.5rem}
@@ -106,20 +108,46 @@ input:focus,select:focus{border-color:var(--green)}
 <body>
 
 <header>
-  <h1>🏓 Pickleball Scorecard</h1>
+  <h1>🏓 Pickleball Scorecard <span class="role-badge" id="role-badge" style="display:none"></span></h1>
 </header>
 
-<!-- PAGE: HOME -->
+<!-- PAGE: HOME (Spectator default) -->
 <div class="page active" id="pg-home">
   <br>
-  <button class="start-btn new" onclick="showPage('setup')">▶ New Game (Umpire)</button>
-  <button class="start-btn watch" onclick="showPage('watch')">👀 Watch Live Score</button>
+  <button class="start-btn watch" onclick="showPage('live-list')">👀 Watch Live Scores</button>
   <button class="start-btn hist" onclick="showPage('history');loadHistory()">📋 Past Games</button>
+  <hr style="border-color:var(--card2);margin:1.5rem 0">
+  <button class="start-btn umpire" onclick="showPage('umpire-login')">🔒 Umpire Login</button>
+</div>
+
+<!-- PAGE: UMPIRE LOGIN -->
+<div class="page" id="pg-umpire-login">
+  <button class="back-btn" onclick="showPage('home')">← Back</button>
+  <h2>🔒 Umpire Login</h2>
+  <div class="pw-box">
+    <p style="color:var(--dim);margin-bottom:1rem">Enter the umpire password to access scoring controls.</p>
+    <label>Password</label>
+    <input type="password" id="pw-input" placeholder="Enter password" maxlength="30"/>
+    <br>
+    <button class="start-btn new" onclick="umpireLogin()">Login →</button>
+    <div class="error" id="pw-error">❌ Wrong password. Try again.</div>
+  </div>
+</div>
+
+<!-- PAGE: UMPIRE DASHBOARD -->
+<div class="page" id="pg-umpire-dash">
+  <button class="back-btn" onclick="umpireLogout()">← Logout</button>
+  <h2>🏓 Umpire Dashboard</h2>
+  <button class="start-btn new" onclick="showPage('setup')">▶ Start New Game</button>
+  <div>
+    <div class="section-label">Live Games (tap to score)</div>
+    <div id="umpire-game-list"></div>
+  </div>
 </div>
 
 <!-- PAGE: SETUP -->
 <div class="page" id="pg-setup">
-  <button class="back-btn" onclick="showPage('home')">← Back</button>
+  <button class="back-btn" onclick="showPage('umpire-dash')">← Back</button>
   <h2>Game Setup — Doubles</h2>
 
   <div class="section-label">Team 1</div>
@@ -174,36 +202,43 @@ input:focus,select:focus{border-color:var(--green)}
     </div>
   </div>
 
-  <div class="rally-btns" id="rally-btns">
+  <!-- Umpire-only controls -->
+  <div class="rally-btns" id="rally-btns" style="display:none">
     <button class="rally-btn btn-point" onclick="rallyPoint()">✅ POINT<br><small>(serving team scores)</small></button>
     <button class="rally-btn btn-sideout" onclick="rallySideOut()">🔄 SIDE OUT<br><small>(rally lost by server)</small></button>
   </div>
 
-  <div class="actions" id="sb-actions">
+  <div class="actions" id="sb-actions" style="display:none">
     <button class="btn-undo" onclick="undo()">↩ Undo</button>
     <button class="btn-end" onclick="endGame()">🏁 End Game</button>
   </div>
 
-  <div class="share-box" id="share-box">
-    <p>📡 Share this Game Code for live viewing:</p>
+  <div class="share-box" id="share-box" style="display:none">
+    <p>📡 Game Code for spectators:</p>
     <input type="text" id="share-code" readonly/>
     <br>
     <button class="copy-btn" onclick="copyCode()">Copy Game Code</button>
   </div>
 
+  <div style="text-align:center;margin-top:.8rem">
+    <button class="back-btn" onclick="backFromScore()">← Back</button>
+  </div>
+
   <div class="winner hide" id="s-winner"></div>
 </div>
 
-<!-- PAGE: WATCH -->
-<div class="page" id="pg-watch">
-  <button class="back-btn" onclick="stopWatching();showPage('home')">← Back</button>
-  <h2>Watch Live Score</h2>
-  <p style="color:var(--dim);margin-bottom:1rem;font-size:.9rem">Enter the Game Code shared by the umpire:</p>
-  <div class="watch-input">
-    <input id="watch-code" placeholder="e.g. ABC123" maxlength="10" style="text-transform:uppercase"/>
-    <button onclick="watchGame()">Watch →</button>
+<!-- PAGE: LIVE GAMES LIST (Spectator) -->
+<div class="page" id="pg-live-list">
+  <button class="back-btn" onclick="stopListening();showPage('home')">← Back</button>
+  <h2>📡 Live Games</h2>
+  <p style="color:var(--dim);margin-bottom:1rem;font-size:.85rem">Tap any game to watch live, or enter a game code:</p>
+  <div style="display:flex;gap:.5rem;margin-bottom:1rem">
+    <input id="watch-code" placeholder="Game Code (e.g. KR4N7P)" maxlength="10" style="text-transform:uppercase;margin-bottom:0;flex:1"/>
+    <button class="start-btn watch" style="width:auto;padding:.7rem 1rem;margin:0" onclick="watchByCode()">Go</button>
   </div>
-  <div id="watch-area"></div>
+  <div id="live-games-area">
+    <div class="loading"><div class="spin"></div><br>Loading live games...</div>
+  </div>
 </div>
 
 <!-- PAGE: HISTORY -->
@@ -219,9 +254,9 @@ input:focus,select:focus{border-color:var(--green)}
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
 
 <script>
-/* ═══════════════════════════════════════════════════════════
-   🔧 FIREBASE CONFIG — REPLACE WITH YOUR OWN VALUES
-   ═══════════════════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════════
+   FIREBASE CONFIG
+   ═══════════════════════════════════════════════════ */
 const firebaseConfig = {
   apiKey:            "AIzaSyCbR8ietydlHPb_DT8HbryOSSLw2M5CRHg",
   authDomain:        "ifx-pickleball-ba328.firebaseapp.com",
@@ -231,31 +266,76 @@ const firebaseConfig = {
   messagingSenderId: "1029021712027",
   appId:             "1:1029021712027:web:efc21cdb36e4a74ff8103e"
 };
-/* ═══════════════════════════════════════════════════════════ */
+
+/* ═══════════════════════════════════════════════════
+   UMPIRE PASSWORD — Change this to your own password
+   ═══════════════════════════════════════════════════ */
+const UMPIRE_PASSWORD = "pickle123";
+/* ═══════════════════════════════════════════════════ */
 
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
+
+/* ── State ── */
+let G = null;
+let currentGameCode = null;
+let isUmpire = false;
+let isScoring = false;
+let undoLog = [];
+let watchRef = null;
+let liveListRef = null;
+let firstServer = 1;
 
 /* ── Navigation ── */
 function showPage(name){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.getElementById('pg-'+name).classList.add('active');
+  if(name==='umpire-dash') loadUmpireGames();
+  if(name==='live-list') loadLiveGamesList();
 }
 
+function updateRoleBadge(){
+  const badge = document.getElementById('role-badge');
+  if(isUmpire){
+    badge.textContent = 'UMPIRE';
+    badge.className = 'role-badge umpire-role';
+    badge.style.display = 'inline-block';
+  } else {
+    badge.style.display = 'none';
+  }
+}
+
+/* ── Umpire Login ── */
+function umpireLogin(){
+  const pw = document.getElementById('pw-input').value;
+  if(pw === UMPIRE_PASSWORD){
+    isUmpire = true;
+    document.getElementById('pw-error').style.display = 'none';
+    document.getElementById('pw-input').value = '';
+    updateRoleBadge();
+    showPage('umpire-dash');
+  } else {
+    document.getElementById('pw-error').style.display = 'block';
+  }
+}
+
+function umpireLogout(){
+  isUmpire = false;
+  isScoring = false;
+  updateRoleBadge();
+  showPage('home');
+}
+
+document.getElementById('pw-input').addEventListener('keydown', function(e){
+  if(e.key==='Enter') umpireLogin();
+});
+
 /* ── Setup ── */
-let firstServer = 1;
 function pickServer(team){
   firstServer = team;
   document.getElementById('pick-t1').classList.toggle('picked', team===1);
   document.getElementById('pick-t2').classList.toggle('picked', team===2);
 }
-
-/* ── Game State ── */
-let G = null;
-let gameRef = null;
-let undoLog = [];
-let isUmpire = false;
-let watchRef = null;
 
 function genCode(){
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
@@ -264,45 +344,154 @@ function genCode(){
   return code;
 }
 
+/* ── Start Game (Umpire only) ── */
 function startGame(){
+  if(!isUmpire) return;
   const t1 = document.getElementById('f-t1').value.trim() || 'Team 1';
   const t2 = document.getElementById('f-t2').value.trim() || 'Team 2';
   const win = parseInt(document.getElementById('f-win').value);
   const code = genCode();
 
   G = {
-    code: code,
-    t1: t1,
-    t2: t2,
-    win: win,
-    p1: 0,
-    p2: 0,
-    servingTeam: firstServer,
-    serverNum: 2,
+    code: code, t1: t1, t2: t2, win: win,
+    p1: 0, p2: 0,
+    servingTeam: firstServer, serverNum: 2,
     status: 'live',
     date: new Date().toISOString()
   };
 
   undoLog = [];
-  isUmpire = true;
+  isScoring = true;
+  currentGameCode = code;
 
-  // Write to Firebase
-  gameRef = db.ref('games/' + code);
-  gameRef.set(G);
-
-  // Show share code
+  db.ref('games/' + code).set(G);
   document.getElementById('share-code').value = code;
+  document.getElementById('f-t1').value = '';
+  document.getElementById('f-t2').value = '';
+
+  if(watchRef) watchRef.off();
+  watchRef = db.ref('games/' + code);
+  watchRef.on('value', snap => {
+    const data = snap.val();
+    if(data){ G = data; render(); }
+  });
 
   render();
   showPage('score');
 }
 
-function pushToFirebase(){
-  if(gameRef && G){
-    gameRef.set(G);
-  }
+/* ── Umpire game list ── */
+function loadUmpireGames(){
+  const el = document.getElementById('umpire-game-list');
+  el.innerHTML = '<div class="loading"><div class="spin"></div><br>Loading...</div>';
+
+  db.ref('games').orderByChild('status').equalTo('live').once('value', snap => {
+    const games = snap.val();
+    if(!games){
+      el.innerHTML = '<p class="empty">No live games. Start one!</p>';
+      return;
+    }
+    let html = '';
+    Object.values(games).forEach(g => {
+      html += '<div class="game-card" onclick="umpireOpenGame(\''+g.code+'\')">'
+        +'<div><div class="teams"><span class="live-dot"></span>'+esc(g.t1)+' vs '+esc(g.t2)+'</div>'
+        +'<div class="meta">Code: <b>'+g.code+'</b> · To '+g.win+'</div></div>'
+        +'<div class="fscore"><span class="s1">'+g.p1+'</span> – <span class="s2">'+g.p2+'</span></div></div>';
+    });
+    el.innerHTML = html;
+  });
 }
 
+function umpireOpenGame(code){
+  if(!isUmpire) return;
+  isScoring = true;
+  currentGameCode = code;
+  undoLog = [];
+
+  if(watchRef) watchRef.off();
+  watchRef = db.ref('games/' + code);
+  watchRef.on('value', snap => {
+    const data = snap.val();
+    if(data){ G = data; render(); }
+  });
+
+  document.getElementById('share-code').value = code;
+  showPage('score');
+}
+
+/* ── Live Games List (Spectator) ── */
+function loadLiveGamesList(){
+  const el = document.getElementById('live-games-area');
+  el.innerHTML = '<div class="loading"><div class="spin"></div><br>Loading live games...</div>';
+
+  if(liveListRef) liveListRef.off();
+  liveListRef = db.ref('games');
+
+  liveListRef.on('value', snap => {
+    const games = snap.val();
+    if(!games){
+      el.innerHTML = '<p class="empty">No live games right now.</p>';
+      return;
+    }
+    let html = '';
+    let count = 0;
+    Object.values(games).forEach(g => {
+      if(g.status !== 'live') return;
+      count++;
+      html += '<div class="game-card" onclick="spectatorWatch(\''+g.code+'\')">'
+        +'<div><div class="teams"><span class="live-dot"></span>'+esc(g.t1)+' vs '+esc(g.t2)+'</div>'
+        +'<div class="meta">Code: <b>'+g.code+'</b> · To '+g.win+'</div></div>'
+        +'<div class="fscore"><span class="s1">'+g.p1+'</span> – <span class="s2">'+g.p2+'</span></div></div>';
+    });
+    if(!count) html = '<p class="empty">No live games right now.</p>';
+    el.innerHTML = html;
+  });
+}
+
+function stopListening(){
+  if(liveListRef){ liveListRef.off(); liveListRef = null; }
+}
+
+/* ── Spectator Watch ── */
+function spectatorWatch(code){
+  isScoring = false;
+  currentGameCode = code;
+  undoLog = [];
+
+  if(watchRef) watchRef.off();
+  if(liveListRef){ liveListRef.off(); liveListRef = null; }
+
+  watchRef = db.ref('games/' + code);
+  watchRef.on('value', snap => {
+    const data = snap.val();
+    if(!data){
+      alert('Game not found.');
+      showPage('live-list');
+      return;
+    }
+    G = data;
+    render();
+  });
+
+  showPage('score');
+}
+
+function watchByCode(){
+  const code = document.getElementById('watch-code').value.trim().toUpperCase();
+  if(!code){ alert('Enter a game code'); return; }
+  spectatorWatch(code);
+}
+
+/* ── Back from scoreboard ── */
+function backFromScore(){
+  if(watchRef){ watchRef.off(); watchRef = null; }
+  G = null;
+  isScoring = false;
+  if(isUmpire) showPage('umpire-dash');
+  else showPage('home');
+}
+
+/* ── Render Scoreboard ── */
 function render(){
   if(!G) return;
 
@@ -312,56 +501,51 @@ function render(){
   document.getElementById('s-p2').textContent = G.p2;
   document.getElementById('s-target').textContent = 'To ' + G.win;
 
-  // Serving
   const servingName = G.servingTeam === 1 ? G.t1 : G.t2;
   document.getElementById('s-serve-team').textContent = servingName;
   document.getElementById('s-serve-num').textContent = '#' + G.serverNum;
   document.getElementById('box-t1').classList.toggle('serving', G.servingTeam === 1);
   document.getElementById('box-t2').classList.toggle('serving', G.servingTeam === 2);
 
-  // Score call
   const sScore = G.servingTeam === 1 ? G.p1 : G.p2;
   const rScore = G.servingTeam === 1 ? G.p2 : G.p1;
   document.getElementById('s-call').textContent = sScore + ' – ' + rScore + ' – ' + G.serverNum;
 
-  // Status
   const st = document.getElementById('s-status');
   const w = document.getElementById('s-winner');
-  const rallyBtns = document.getElementById('rally-btns');
-  const sbActions = document.getElementById('sb-actions');
+  const live = G.status === 'live';
 
-  if(G.status === 'live'){
+  if(live){
     st.textContent = 'LIVE'; st.className = 'tag live';
     w.classList.add('hide');
-    if(isUmpire){ rallyBtns.style.display = 'flex'; sbActions.style.display = 'flex'; }
-    else { rallyBtns.style.display = 'none'; sbActions.style.display = 'none'; }
   } else {
     st.textContent = 'FINISHED'; st.className = 'tag'; st.style.background='var(--red)'; st.style.color='#fff';
     const winner = G.p1 > G.p2 ? G.t1 : G.p2 > G.p1 ? G.t2 : 'Tied';
     w.textContent = winner === 'Tied' ? 'Game Tied!' : '🏆 ' + winner + ' Wins!';
     w.classList.remove('hide');
-    rallyBtns.style.display = 'none';
-    sbActions.style.display = 'none';
   }
 
-  // Show/hide share box only for umpire
-  document.getElementById('share-box').style.display = isUmpire ? 'block' : 'none';
+  // Show controls only for logged-in umpire scoring this game
+  const showControls = isUmpire && isScoring && live;
+  document.getElementById('rally-btns').style.display = showControls ? 'flex' : 'none';
+  document.getElementById('sb-actions').style.display = showControls ? 'flex' : 'none';
+  document.getElementById('share-box').style.display = (isUmpire && isScoring) ? 'block' : 'none';
 }
 
 /* ── POINT ── */
 function rallyPoint(){
-  if(!G || G.status !== 'live' || !isUmpire) return;
+  if(!G || G.status !== 'live' || !isScoring) return;
   undoLog.push({ p1:G.p1, p2:G.p2, servingTeam:G.servingTeam, serverNum:G.serverNum, status:G.status });
   if(G.servingTeam === 1) G.p1++; else G.p2++;
   checkWin();
-  pushToFirebase();
+  db.ref('games/' + G.code).set(G);
   render();
   if(navigator.vibrate) navigator.vibrate(30);
 }
 
 /* ── SIDE OUT ── */
 function rallySideOut(){
-  if(!G || G.status !== 'live' || !isUmpire) return;
+  if(!G || G.status !== 'live' || !isScoring) return;
   undoLog.push({ p1:G.p1, p2:G.p2, servingTeam:G.servingTeam, serverNum:G.serverNum, status:G.status });
   if(G.serverNum === 1){
     G.serverNum = 2;
@@ -369,7 +553,7 @@ function rallySideOut(){
     G.servingTeam = G.servingTeam === 1 ? 2 : 1;
     G.serverNum = 1;
   }
-  pushToFirebase();
+  db.ref('games/' + G.code).set(G);
   render();
   if(navigator.vibrate) navigator.vibrate([30,50,30]);
 }
@@ -382,22 +566,22 @@ function checkWin(){
 }
 
 function undo(){
-  if(!G || undoLog.length === 0 || !isUmpire) return;
+  if(!G || undoLog.length === 0 || !isScoring) return;
   const prev = undoLog.pop();
   G.p1 = prev.p1; G.p2 = prev.p2;
   G.servingTeam = prev.servingTeam;
   G.serverNum = prev.serverNum;
   G.status = prev.status;
-  pushToFirebase();
+  db.ref('games/' + G.code).set(G);
   render();
 }
 
 function endGame(){
-  if(!G || !isUmpire) return;
+  if(!G || !isScoring) return;
   if(!confirm('End this game?')) return;
   G.status = 'finished';
   saveToHistory();
-  pushToFirebase();
+  db.ref('games/' + G.code).set(G);
   render();
 }
 
@@ -407,50 +591,9 @@ function copyCode(){
   navigator.clipboard.writeText(input.value).then(()=>{
     const btn = document.querySelector('.copy-btn');
     btn.textContent = 'Copied!';
-    setTimeout(()=> btn.textContent = 'Copy Game Code', 1500);
+    setTimeout(()=>btn.textContent='Copy Game Code',1500);
   });
 }
-
-/* ── WATCH LIVE ── */
-function watchGame(){
-  const code = document.getElementById('watch-code').value.trim().toUpperCase();
-  if(!code){ alert('Enter a game code'); return; }
-
-  const area = document.getElementById('watch-area');
-  area.innerHTML = '<div class="loading"><div class="spin"></div><br>Connecting...</div>';
-
-  if(watchRef) watchRef.off();
-  watchRef = db.ref('games/' + code);
-
-  watchRef.on('value', snap => {
-    const data = snap.val();
-    if(!data){
-      area.innerHTML = '<p class="empty">Game not found. Check the code and try again.</p>';
-      return;
-    }
-    // Open scoreboard in watch mode
-    G = data;
-    isUmpire = false;
-    gameRef = null;
-    render();
-    showPage('score');
-  });
-}
-
-function stopWatching(){
-  if(watchRef){ watchRef.off(); watchRef = null; }
-}
-
-/* ── Deep link: ?code=ABC123 ── */
-(function(){
-  const params = new URLSearchParams(window.location.search);
-  const code = params.get('code');
-  if(code && /^[A-Z0-9]{4,8}$/i.test(code)){
-    document.getElementById('watch-code').value = code.toUpperCase();
-    showPage('watch');
-    setTimeout(watchGame, 500);
-  }
-})();
 
 /* ── History (localStorage) ── */
 function getHistory(){
@@ -468,12 +611,12 @@ function saveToHistory(){
 function loadHistory(){
   const h = getHistory();
   const el = document.getElementById('hist-list');
-  if(!h.length){ el.innerHTML = '<p class="empty">No games yet. Go play!</p>'; return; }
+  if(!h.length){ el.innerHTML = '<p class="empty">No games yet.</p>'; return; }
   el.innerHTML = h.map(g => {
     const d = new Date(g.date);
     const when = d.toLocaleDateString() + ' ' + d.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
     const winner = g.p1 > g.p2 ? g.t1 : g.p2 > g.p1 ? g.t2 : 'Tied';
-    return '<div class="game-card"><div><div class="teams">'+esc(g.t1)+' vs '+esc(g.t2)+'</div><div class="meta">Doubles · To '+g.win+' · '+when+' · Winner: '+esc(winner)+'</div></div><div class="fscore"><span class="s1">'+g.p1+'</span> – <span class="s2">'+g.p2+'</span></div></div>';
+    return '<div class="game-card" style="cursor:default"><div><div class="teams">'+esc(g.t1)+' vs '+esc(g.t2)+'</div><div class="meta">Doubles · To '+g.win+' · '+when+' · Winner: '+esc(winner)+'</div></div><div class="fscore"><span class="s1">'+g.p1+'</span> – <span class="s2">'+g.p2+'</span></div></div>';
   }).join('');
 }
 
@@ -484,6 +627,15 @@ function clearHistory(){
 }
 
 function esc(s){ const d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
+
+/* ── Deep link: ?code=ABC123 ── */
+(function(){
+  const params = new URLSearchParams(window.location.search);
+  const code = params.get('code');
+  if(code && /^[A-Z0-9]{4,8}$/i.test(code)){
+    spectatorWatch(code.toUpperCase());
+  }
+})();
 
 document.addEventListener('dblclick', function(e){ e.preventDefault(); }, {passive:false});
 </script>
