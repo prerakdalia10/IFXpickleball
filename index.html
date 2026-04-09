@@ -6,7 +6,7 @@
 <title>Pickleball Scorecard</title>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{--bg:#0f1923;--card:#1a2733;--card2:#243442;--green:#00e676;--blue:#42a5f5;--red:#ff5252;--yellow:#ffd600;--text:#e0e0e0;--dim:#78909c;--r:14px}
+:root{--bg:#0f1923;--card:#1a2733;--card2:#243442;--green:#00e676;--blue:#42a5f5;--red:#ff5252;--yellow:#ffd600;--text:#e0e0e0;--dim:#78909c;--r:14px;--purple:#ba68c8}
 body{font-family:"Segoe UI",system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:2rem}
 header{text-align:center;padding:1rem;background:var(--card);border-bottom:2px solid var(--green)}
 header h1{font-size:1.3rem}
@@ -20,6 +20,8 @@ h2{margin-bottom:1rem}
 .start-btn.umpire{background:var(--yellow);color:#111}
 .start-btn.watch{background:var(--blue);color:#111}
 .start-btn.hist{background:var(--card2);color:var(--text)}
+.start-btn.admin{background:var(--purple);color:#fff}
+.start-btn.standings{background:linear-gradient(135deg,var(--green),var(--blue));color:#111}
 
 /* ── Form ── */
 label{display:block;margin-bottom:.3rem;font-size:.85rem;color:var(--dim)}
@@ -52,9 +54,9 @@ input:focus,select:focus{border-color:var(--green)}
 .tname{font-size:.9rem;font-weight:700;margin-bottom:.2rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .serve-badge{display:none;font-size:.7rem;font-weight:700;background:var(--yellow);color:#111;padding:.15rem .5rem;border-radius:999px;margin-bottom:.3rem}
 .team-box.serving .serve-badge{display:inline-block}
-.points{font-size:4.5rem;font-weight:900;line-height:1;margin:.3rem 0;font-variant-numeric:tabular-nums}
-.t1 .points{color:var(--green)}
-.t2 .points{color:var(--blue)}
+.pts{font-size:4.5rem;font-weight:900;line-height:1;margin:.3rem 0;font-variant-numeric:tabular-nums}
+.t1 .pts{color:var(--green)}
+.t2 .pts{color:var(--blue)}
 
 .rally-btns{display:flex;gap:.6rem;margin-bottom:.8rem}
 .rally-btn{flex:1;padding:1.1rem .5rem;font-size:1.1rem;font-weight:800;border:none;border-radius:var(--r);cursor:pointer;text-align:center;line-height:1.3}
@@ -75,7 +77,7 @@ input:focus,select:focus{border-color:var(--green)}
 .winner.hide{display:none}
 
 /* ── Game cards ── */
-.game-card{background:var(--card);border-radius:var(--r);padding:.8rem 1rem;margin-bottom:.6rem;display:flex;justify-content:space-between;align-items:center;cursor:pointer;transition:transform .15s,box-shadow .15s}
+.game-card{background:var(--card);border-radius:var(--r);padding:.8rem 1rem;margin-bottom:.6rem;display:flex;justify-content:space-between;align-items:center;cursor:pointer;transition:transform .15s,box-shadow .15s;position:relative}
 .game-card:hover{transform:translateY(-2px);box-shadow:0 4px 20px rgba(0,0,0,.3)}
 .game-card .teams{font-weight:600;font-size:.95rem}
 .game-card .meta{font-size:.75rem;color:var(--dim);margin-top:.2rem}
@@ -88,8 +90,6 @@ input:focus,select:focus{border-color:var(--green)}
 .clear-btn{margin-top:1rem;padding:.6rem 1rem;background:var(--card2);color:var(--red);border:none;border-radius:var(--r);cursor:pointer;font-size:.85rem;width:100%}
 .export-btn{margin-top:.5rem;padding:.6rem 1rem;background:var(--green);color:#111;border:none;border-radius:var(--r);cursor:pointer;font-size:.85rem;font-weight:700;width:100%}
 
-/* History cards with delete */
-.game-card{position:relative}
 .game-card .del-btn{position:absolute;top:6px;right:8px;background:none;border:none;color:var(--dim);font-size:1.1rem;cursor:pointer;padding:4px 6px;border-radius:6px;line-height:1}
 .game-card .del-btn:hover{color:var(--red);background:var(--card2)}
 
@@ -104,10 +104,42 @@ input:focus,select:focus{border-color:var(--green)}
 
 .role-badge{display:inline-block;font-size:.7rem;padding:.2rem .6rem;border-radius:999px;margin-left:.5rem;font-weight:700;vertical-align:middle}
 .role-badge.umpire-role{background:var(--yellow);color:#111}
+.role-badge.admin-role{background:var(--purple);color:#fff}
+
+/* ── Points Table ── */
+.standings-group{margin-bottom:1.5rem}
+.standings-group h3{font-size:1rem;color:var(--green);margin-bottom:.5rem;padding-bottom:.3rem;border-bottom:1px solid var(--card2)}
+.standings-tbl{width:100%;border-collapse:collapse;font-size:.8rem;margin-bottom:.3rem}
+.standings-tbl th{background:var(--card2);color:var(--dim);padding:.5rem .4rem;text-align:center;font-weight:700;font-size:.7rem;text-transform:uppercase}
+.standings-tbl th:first-child,.standings-tbl td:first-child{text-align:left;padding-left:.6rem}
+.standings-tbl td{background:var(--card);padding:.5rem .4rem;text-align:center;border-bottom:1px solid var(--card2)}
+.standings-tbl tr:first-child td{background:rgba(0,230,118,.1)}
+.standings-tbl tr:nth-child(2) td{background:rgba(66,165,245,.05)}
+.pos-badge{display:inline-block;width:22px;height:22px;line-height:22px;border-radius:50%;font-weight:800;font-size:.75rem;text-align:center;margin-right:.3rem}
+.pos-1{background:var(--green);color:#111}
+.pos-2{background:var(--blue);color:#111}
+.pos-3{background:var(--yellow);color:#111}
+.pos-n{background:var(--card2);color:var(--dim)}
+
+/* ── Admin group cards ── */
+.grp-card{background:var(--card);border-radius:var(--r);padding:.8rem 1rem;margin-bottom:.6rem;border-left:4px solid var(--green)}
+.grp-card h3{font-size:.95rem;margin-bottom:.4rem}
+.grp-card .team-list{font-size:.85rem;color:var(--dim)}
+.grp-card .team-chip{display:inline-block;background:var(--card2);padding:.2rem .6rem;border-radius:999px;font-size:.8rem;margin:.2rem .2rem;color:var(--text)}
+.grp-card .del-team-btn{color:var(--red);cursor:pointer;margin-left:.3rem;font-weight:700}
+.grp-card .add-area{display:flex;gap:.4rem;margin-top:.5rem}
+.grp-card .add-area input{margin-bottom:0;flex:1;font-size:.85rem;padding:.5rem}
+.grp-card .add-area button{padding:.5rem .8rem;background:var(--green);color:#111;border:none;border-radius:var(--r);font-weight:700;cursor:pointer;font-size:.85rem;white-space:nowrap}
+.del-grp-btn{background:none;border:none;color:var(--red);cursor:pointer;font-size:.85rem;margin-top:.3rem;padding:.3rem .6rem}
+
+.add-grp-area{display:flex;gap:.4rem;margin-bottom:1rem}
+.add-grp-area input{margin-bottom:0;flex:1}
+.add-grp-area button{padding:.7rem 1rem;background:var(--green);color:#111;border:none;border-radius:var(--r);font-weight:700;cursor:pointer;white-space:nowrap}
 
 @media(max-width:400px){
-  .points{font-size:3.5rem}
+  .pts{font-size:3.5rem}
   .rally-btn{font-size:.95rem;padding:.9rem .3rem}
+  .standings-tbl{font-size:.7rem}
 }
 </style>
 </head>
@@ -117,13 +149,15 @@ input:focus,select:focus{border-color:var(--green)}
   <h1>🏓 Pickleball Scorecard <span class="role-badge" id="role-badge" style="display:none"></span></h1>
 </header>
 
-<!-- PAGE: HOME (Spectator default) -->
+<!-- PAGE: HOME -->
 <div class="page active" id="pg-home">
   <br>
+  <button class="start-btn standings" onclick="showPage('standings')">📊 Points Table</button>
   <button class="start-btn watch" onclick="showPage('live-list')">👀 Watch Live Scores</button>
   <button class="start-btn hist" onclick="showPage('history');loadHistory()">📋 Past Games</button>
   <hr style="border-color:var(--card2);margin:1.5rem 0">
   <button class="start-btn umpire" onclick="showPage('umpire-login')">🔒 Umpire Login</button>
+  <button class="start-btn admin" onclick="showPage('admin-login')">👑 Super Admin</button>
 </div>
 
 <!-- PAGE: UMPIRE LOGIN -->
@@ -137,6 +171,38 @@ input:focus,select:focus{border-color:var(--green)}
     <br>
     <button class="start-btn new" onclick="umpireLogin()">Login →</button>
     <div class="error" id="pw-error">❌ Wrong password. Try again.</div>
+  </div>
+</div>
+
+<!-- PAGE: ADMIN LOGIN -->
+<div class="page" id="pg-admin-login">
+  <button class="back-btn" onclick="showPage('home')">← Back</button>
+  <h2>👑 Super Admin Login</h2>
+  <div class="pw-box">
+    <p style="color:var(--dim);margin-bottom:1rem">Enter the admin password to manage groups and teams.</p>
+    <label>Password</label>
+    <input type="password" id="admin-pw-input" placeholder="Enter admin password" maxlength="30"/>
+    <br>
+    <button class="start-btn admin" onclick="adminLogin()">Login →</button>
+    <div class="error" id="admin-pw-error">❌ Wrong password. Try again.</div>
+  </div>
+</div>
+
+<!-- PAGE: ADMIN DASHBOARD -->
+<div class="page" id="pg-admin-dash">
+  <button class="back-btn" onclick="adminLogout()">← Logout</button>
+  <h2>👑 Admin Dashboard</h2>
+  <p style="color:var(--dim);margin-bottom:1rem;font-size:.85rem">Create groups and add teams. Umpires will pick teams from these groups when starting a match.</p>
+
+  <div class="section-label">Create New Group</div>
+  <div class="add-grp-area">
+    <input id="new-grp-name" placeholder="e.g. Group A" maxlength="40"/>
+    <button onclick="addGroup()">+ Add Group</button>
+  </div>
+
+  <div class="section-label">Existing Groups</div>
+  <div id="admin-groups-list">
+    <div class="loading"><div class="spin"></div><br>Loading...</div>
   </div>
 </div>
 
@@ -156,11 +222,21 @@ input:focus,select:focus{border-color:var(--green)}
   <button class="back-btn" onclick="showPage('umpire-dash')">← Back</button>
   <h2>Game Setup — Doubles</h2>
 
-  <div class="section-label">Team 1</div>
+  <div class="section-label">Select Group</div>
+  <label>Group</label>
+  <select id="f-group" onchange="onGroupSelect()">
+    <option value="">-- Select Group --</option>
+  </select>
+
+  <div class="section-label">Select Teams</div>
+  <label>Team 1</label>
+  <select id="f-t1-sel"><option value="">-- Pick group first --</option></select>
+  <label>Team 2</label>
+  <select id="f-t2-sel"><option value="">-- Pick group first --</option></select>
+
+  <div class="section-label">Or type custom names (no group)</div>
   <label>Team 1 Name</label>
   <input id="f-t1" placeholder="e.g. Team Alpha" maxlength="40"/>
-
-  <div class="section-label">Team 2</div>
   <label>Team 2 Name</label>
   <input id="f-t2" placeholder="e.g. Team Beta" maxlength="40"/>
 
@@ -183,6 +259,7 @@ input:focus,select:focus{border-color:var(--green)}
     <span class="tag">Doubles</span>
     <span class="tag" id="s-target">To 11</span>
     <span class="tag live" id="s-status">LIVE</span>
+    <span class="tag" id="s-group-tag" style="display:none;background:var(--purple);color:#fff"></span>
   </div>
 
   <div class="score-call">
@@ -199,16 +276,15 @@ input:focus,select:focus{border-color:var(--green)}
     <div class="team-box t1 serving" id="box-t1">
       <div class="serve-badge">SERVING</div>
       <div class="tname" id="s-t1">Team 1</div>
-      <div class="points" id="s-p1">0</div>
+      <div class="pts" id="s-p1">0</div>
     </div>
     <div class="team-box t2" id="box-t2">
       <div class="serve-badge">SERVING</div>
       <div class="tname" id="s-t2">Team 2</div>
-      <div class="points" id="s-p2">0</div>
+      <div class="pts" id="s-p2">0</div>
     </div>
   </div>
 
-  <!-- Umpire-only controls -->
   <div class="rally-btns" id="rally-btns" style="display:none">
     <button class="rally-btn btn-point" onclick="rallyPoint()">✅ POINT<br><small>(serving team scores)</small></button>
     <button class="rally-btn btn-sideout" onclick="rallySideOut()">🔄 SIDE OUT<br><small>(rally lost by server)</small></button>
@@ -233,7 +309,7 @@ input:focus,select:focus{border-color:var(--green)}
   <div class="winner hide" id="s-winner"></div>
 </div>
 
-<!-- PAGE: LIVE GAMES LIST (Spectator) -->
+<!-- PAGE: LIVE GAMES LIST -->
 <div class="page" id="pg-live-list">
   <button class="back-btn" onclick="stopListening();showPage('home')">← Back</button>
   <h2>📡 Live Games</h2>
@@ -247,13 +323,23 @@ input:focus,select:focus{border-color:var(--green)}
   </div>
 </div>
 
+<!-- PAGE: STANDINGS -->
+<div class="page" id="pg-standings">
+  <button class="back-btn" onclick="showPage('home')">← Back</button>
+  <h2>📊 Points Table</h2>
+  <p style="color:var(--dim);margin-bottom:1rem;font-size:.85rem">Live standings · Updated after every match</p>
+  <div id="standings-area">
+    <div class="loading"><div class="spin"></div><br>Loading standings...</div>
+  </div>
+</div>
+
 <!-- PAGE: HISTORY -->
 <div class="page" id="pg-history">
   <button class="back-btn" onclick="showPage('home')">← Back</button>
   <h2>Past Games</h2>
   <div id="hist-list"></div>
   <button class="export-btn" onclick="exportToExcel()">📥 Download as Excel (.xls)</button>
-  <button class="clear-btn" onclick="clearHistory()">🗑 Clear All History</button>
+  <button class="clear-btn" id="clear-hist-btn" onclick="clearHistory()" style="display:none">🗑 Clear All History</button>
 </div>
 
 <!-- Firebase SDK -->
@@ -275,9 +361,10 @@ const firebaseConfig = {
 };
 
 /* ═══════════════════════════════════════════════════
-   UMPIRE PASSWORD — Change this to your own password
+   PASSWORDS
    ═══════════════════════════════════════════════════ */
 const UMPIRE_PASSWORD = "pickle123";
+const ADMIN_PASSWORD  = "admin@321";
 /* ═══════════════════════════════════════════════════ */
 
 firebase.initializeApp(firebaseConfig);
@@ -287,11 +374,25 @@ const db = firebase.database();
 let G = null;
 let currentGameCode = null;
 let isUmpire = false;
+let isAdmin = false;
 let isScoring = false;
 let undoLog = [];
 let watchRef = null;
 let liveListRef = null;
+let standingsRef = null;
 let firstServer = 1;
+let cachedGroups = {};
+
+/* ── Device ID ── */
+function getDeviceId(){
+  let id = localStorage.getItem('pb_device_id');
+  if(!id){
+    id = 'dev_' + Date.now() + '_' + Math.random().toString(36).substr(2,9);
+    localStorage.setItem('pb_device_id', id);
+  }
+  return id;
+}
+const DEVICE_ID = getDeviceId();
 
 /* ── Navigation ── */
 function showPage(name){
@@ -299,11 +400,18 @@ function showPage(name){
   document.getElementById('pg-'+name).classList.add('active');
   if(name==='umpire-dash') loadUmpireGames();
   if(name==='live-list') loadLiveGamesList();
+  if(name==='admin-dash') loadAdminGroups();
+  if(name==='standings') loadStandings();
+  if(name==='setup') loadSetupGroups();
 }
 
 function updateRoleBadge(){
   const badge = document.getElementById('role-badge');
-  if(isUmpire){
+  if(isAdmin){
+    badge.textContent = 'ADMIN';
+    badge.className = 'role-badge admin-role';
+    badge.style.display = 'inline-block';
+  } else if(isUmpire){
     badge.textContent = 'UMPIRE';
     badge.className = 'role-badge umpire-role';
     badge.style.display = 'inline-block';
@@ -312,7 +420,109 @@ function updateRoleBadge(){
   }
 }
 
-/* ── Umpire Login ── */
+/* ═══════════════════════════════════════════════════
+   ADMIN LOGIN
+   ═══════════════════════════════════════════════════ */
+function adminLogin(){
+  const pw = document.getElementById('admin-pw-input').value;
+  if(pw === ADMIN_PASSWORD){
+    isAdmin = true;
+    isUmpire = true;
+    document.getElementById('admin-pw-error').style.display = 'none';
+    document.getElementById('admin-pw-input').value = '';
+    updateRoleBadge();
+    showPage('admin-dash');
+  } else {
+    document.getElementById('admin-pw-error').style.display = 'block';
+  }
+}
+
+function adminLogout(){
+  isAdmin = false;
+  isUmpire = false;
+  isScoring = false;
+  updateRoleBadge();
+  showPage('home');
+}
+
+document.getElementById('admin-pw-input').addEventListener('keydown', function(e){
+  if(e.key==='Enter') adminLogin();
+});
+
+/* ═══════════════════════════════════════════════════
+   ADMIN: GROUP MANAGEMENT
+   ═══════════════════════════════════════════════════ */
+function addGroup(){
+  if(!isAdmin) return;
+  const name = document.getElementById('new-grp-name').value.trim();
+  if(!name){ alert('Enter a group name'); return; }
+  const key = name.replace(/[^a-zA-Z0-9 ]/g,'').replace(/\s+/g,'_');
+  db.ref('groups/' + key).once('value', snap => {
+    if(snap.exists()){
+      alert('Group "'+name+'" already exists.');
+      return;
+    }
+    db.ref('groups/' + key).set({ name: name, teams: {} });
+    document.getElementById('new-grp-name').value = '';
+    loadAdminGroups();
+  });
+}
+
+function addTeamToGroup(groupKey){
+  if(!isAdmin) return;
+  const input = document.getElementById('add-team-'+groupKey);
+  const teamName = input.value.trim();
+  if(!teamName){ alert('Enter a team name'); return; }
+  const teamKey = teamName.replace(/[^a-zA-Z0-9 ]/g,'').replace(/\s+/g,'_');
+  db.ref('groups/' + groupKey + '/teams/' + teamKey).set(teamName);
+  input.value = '';
+  loadAdminGroups();
+}
+
+function removeTeamFromGroup(groupKey, teamKey){
+  if(!isAdmin) return;
+  if(!confirm('Remove this team?')) return;
+  db.ref('groups/' + groupKey + '/teams/' + teamKey).remove();
+  loadAdminGroups();
+}
+
+function deleteGroup(groupKey){
+  if(!isAdmin) return;
+  if(!confirm('Delete this entire group and all its teams?')) return;
+  db.ref('groups/' + groupKey).remove();
+  db.ref('standings/' + groupKey).remove();
+  loadAdminGroups();
+}
+
+function loadAdminGroups(){
+  const el = document.getElementById('admin-groups-list');
+  el.innerHTML = '<div class="loading"><div class="spin"></div><br>Loading...</div>';
+  db.ref('groups').once('value', snap => {
+    const groups = snap.val();
+    if(!groups){
+      el.innerHTML = '<p class="empty">No groups created yet.</p>';
+      return;
+    }
+    let html = '';
+    Object.entries(groups).forEach(([key, g]) => {
+      html += '<div class="grp-card"><h3>'+esc(g.name)+'</h3><div class="team-list">';
+      if(g.teams){
+        Object.entries(g.teams).forEach(([tk, tn]) => {
+          html += '<span class="team-chip">'+esc(tn)+'<span class="del-team-btn" onclick="removeTeamFromGroup(\''+key+'\',\''+tk+'\')"> ✕</span></span>';
+        });
+      } else {
+        html += '<span style="color:var(--dim);font-size:.8rem">No teams yet</span>';
+      }
+      html += '</div><div class="add-area"><input id="add-team-'+key+'" placeholder="New team name" maxlength="40"/><button onclick="addTeamToGroup(\''+key+'\')">+ Add</button></div>';
+      html += '<button class="del-grp-btn" onclick="deleteGroup(\''+key+'\')">🗑 Delete Group</button></div>';
+    });
+    el.innerHTML = html;
+  });
+}
+
+/* ═══════════════════════════════════════════════════
+   UMPIRE LOGIN
+   ═══════════════════════════════════════════════════ */
 function umpireLogin(){
   const pw = document.getElementById('pw-input').value;
   if(pw === UMPIRE_PASSWORD){
@@ -329,6 +539,7 @@ function umpireLogin(){
 function umpireLogout(){
   isUmpire = false;
   isScoring = false;
+  isAdmin = false;
   updateRoleBadge();
   showPage('home');
 }
@@ -337,7 +548,41 @@ document.getElementById('pw-input').addEventListener('keydown', function(e){
   if(e.key==='Enter') umpireLogin();
 });
 
-/* ── Setup ── */
+/* ═══════════════════════════════════════════════════
+   SETUP: Load groups into dropdowns
+   ═══════════════════════════════════════════════════ */
+function loadSetupGroups(){
+  db.ref('groups').once('value', snap => {
+    cachedGroups = snap.val() || {};
+    const sel = document.getElementById('f-group');
+    sel.innerHTML = '<option value="">-- Select Group (optional) --</option>';
+    Object.entries(cachedGroups).forEach(([key, g]) => {
+      sel.innerHTML += '<option value="'+key+'">'+esc(g.name)+'</option>';
+    });
+    document.getElementById('f-t1-sel').innerHTML = '<option value="">-- Pick group first --</option>';
+    document.getElementById('f-t2-sel').innerHTML = '<option value="">-- Pick group first --</option>';
+  });
+}
+
+function onGroupSelect(){
+  const groupKey = document.getElementById('f-group').value;
+  const sel1 = document.getElementById('f-t1-sel');
+  const sel2 = document.getElementById('f-t2-sel');
+  if(!groupKey || !cachedGroups[groupKey] || !cachedGroups[groupKey].teams){
+    sel1.innerHTML = '<option value="">-- No teams --</option>';
+    sel2.innerHTML = '<option value="">-- No teams --</option>';
+    return;
+  }
+  const teams = cachedGroups[groupKey].teams;
+  let opts = '<option value="">-- Select Team --</option>';
+  Object.entries(teams).forEach(([tk, tn]) => {
+    opts += '<option value="'+esc(tn)+'">'+esc(tn)+'</option>';
+  });
+  sel1.innerHTML = opts;
+  sel2.innerHTML = opts;
+}
+
+/* ── Setup helpers ── */
 function pickServer(team){
   firstServer = team;
   document.getElementById('pick-t1').classList.toggle('picked', team===1);
@@ -351,20 +596,39 @@ function genCode(){
   return code;
 }
 
-/* ── Start Game (Umpire only) ── */
+/* ═══════════════════════════════════════════════════
+   START GAME
+   ═══════════════════════════════════════════════════ */
 function startGame(){
   if(!isUmpire) return;
-  const t1 = document.getElementById('f-t1').value.trim() || 'Team 1';
-  const t2 = document.getElementById('f-t2').value.trim() || 'Team 2';
+
+  const groupKey = document.getElementById('f-group').value;
+  const selT1 = document.getElementById('f-t1-sel').value;
+  const selT2 = document.getElementById('f-t2-sel').value;
+  const customT1 = document.getElementById('f-t1').value.trim();
+  const customT2 = document.getElementById('f-t2').value.trim();
+
+  const t1 = selT1 || customT1 || 'Team 1';
+  const t2 = selT2 || customT2 || 'Team 2';
+
+  if(t1 === t2){
+    alert('Team 1 and Team 2 cannot be the same!');
+    return;
+  }
+
   const win = parseInt(document.getElementById('f-win').value);
   const code = genCode();
+  const groupName = (groupKey && cachedGroups[groupKey]) ? cachedGroups[groupKey].name : '';
 
   G = {
     code: code, t1: t1, t2: t2, win: win,
     p1: 0, p2: 0,
     servingTeam: firstServer, serverNum: 2,
     status: 'live',
-    date: new Date().toISOString()
+    date: new Date().toISOString(),
+    deviceId: DEVICE_ID,
+    groupKey: groupKey || '',
+    groupName: groupName
   };
 
   undoLog = [];
@@ -372,6 +636,7 @@ function startGame(){
   currentGameCode = code;
 
   db.ref('games/' + code).set(G);
+  localStorage.setItem('pb_active_game', code);
   document.getElementById('share-code').value = code;
   document.getElementById('f-t1').value = '';
   document.getElementById('f-t2').value = '';
@@ -387,7 +652,9 @@ function startGame(){
   showPage('score');
 }
 
-/* ── Umpire game list ── */
+/* ═══════════════════════════════════════════════════
+   UMPIRE GAME LIST
+   ═══════════════════════════════════════════════════ */
 function loadUmpireGames(){
   const el = document.getElementById('umpire-game-list');
   el.innerHTML = '<div class="loading"><div class="spin"></div><br>Loading...</div>';
@@ -400,9 +667,13 @@ function loadUmpireGames(){
     }
     let html = '';
     Object.values(games).forEach(g => {
-      html += '<div class="game-card" onclick="umpireOpenGame(\''+g.code+'\')">'
+      const isMine = g.deviceId === DEVICE_ID;
+      const label = isMine ? ' · <span style="color:var(--green)">YOUR GAME</span>' : ' · <span style="color:var(--dim)">Other device</span>';
+      const click = isMine ? 'onclick="umpireOpenGame(\''+g.code+'\')" style="cursor:pointer"' : 'style="cursor:default;opacity:.6"';
+      const grpLabel = g.groupName ? ' · '+esc(g.groupName) : '';
+      html += '<div class="game-card" '+click+'>'
         +'<div><div class="teams"><span class="live-dot"></span>'+esc(g.t1)+' vs '+esc(g.t2)+'</div>'
-        +'<div class="meta">Code: <b>'+g.code+'</b> · To '+g.win+'</div></div>'
+        +'<div class="meta">Code: <b>'+g.code+'</b> · To '+g.win+grpLabel+label+'</div></div>'
         +'<div class="fscore"><span class="s1">'+g.p1+'</span> – <span class="s2">'+g.p2+'</span></div></div>';
     });
     el.innerHTML = html;
@@ -411,9 +682,22 @@ function loadUmpireGames(){
 
 function umpireOpenGame(code){
   if(!isUmpire) return;
+  db.ref('games/' + code).once('value', snap => {
+    const data = snap.val();
+    if(!data) return;
+    if(data.deviceId && data.deviceId !== DEVICE_ID){
+      alert('This game is being scored on another device. You cannot edit it.');
+      return;
+    }
+    _openGameAsUmpire(code);
+  });
+}
+
+function _openGameAsUmpire(code){
   isScoring = true;
   currentGameCode = code;
   undoLog = [];
+  localStorage.setItem('pb_active_game', code);
 
   if(watchRef) watchRef.off();
   watchRef = db.ref('games/' + code);
@@ -426,7 +710,9 @@ function umpireOpenGame(code){
   showPage('score');
 }
 
-/* ── Live Games List (Spectator) ── */
+/* ═══════════════════════════════════════════════════
+   LIVE GAMES LIST (Spectator)
+   ═══════════════════════════════════════════════════ */
 function loadLiveGamesList(){
   const el = document.getElementById('live-games-area');
   el.innerHTML = '<div class="loading"><div class="spin"></div><br>Loading live games...</div>';
@@ -445,9 +731,10 @@ function loadLiveGamesList(){
     Object.values(games).forEach(g => {
       if(g.status !== 'live') return;
       count++;
+      const grpLabel = g.groupName ? ' · '+esc(g.groupName) : '';
       html += '<div class="game-card" onclick="spectatorWatch(\''+g.code+'\')">'
         +'<div><div class="teams"><span class="live-dot"></span>'+esc(g.t1)+' vs '+esc(g.t2)+'</div>'
-        +'<div class="meta">Code: <b>'+g.code+'</b> · To '+g.win+'</div></div>'
+        +'<div class="meta">Code: <b>'+g.code+'</b> · To '+g.win+grpLabel+'</div></div>'
         +'<div class="fscore"><span class="s1">'+g.p1+'</span> – <span class="s2">'+g.p2+'</span></div></div>';
     });
     if(!count) html = '<p class="empty">No live games right now.</p>';
@@ -464,8 +751,6 @@ function spectatorWatch(code){
   isScoring = false;
   currentGameCode = code;
   undoLog = [];
-
-  // Double-check: spectators must never have umpire scoring rights
   if(!isUmpire) isScoring = false;
 
   if(watchRef) watchRef.off();
@@ -495,13 +780,18 @@ function watchByCode(){
 /* ── Back from scoreboard ── */
 function backFromScore(){
   if(watchRef){ watchRef.off(); watchRef = null; }
+  if(!G || G.status === 'finished'){
+    localStorage.removeItem('pb_active_game');
+  }
   G = null;
   isScoring = false;
   if(isUmpire) showPage('umpire-dash');
   else showPage('home');
 }
 
-/* ── Render Scoreboard ── */
+/* ═══════════════════════════════════════════════════
+   RENDER SCOREBOARD
+   ═══════════════════════════════════════════════════ */
 function render(){
   if(!G) return;
 
@@ -510,6 +800,14 @@ function render(){
   document.getElementById('s-p1').textContent = G.p1;
   document.getElementById('s-p2').textContent = G.p2;
   document.getElementById('s-target').textContent = 'To ' + G.win;
+
+  const grpTag = document.getElementById('s-group-tag');
+  if(G.groupName){
+    grpTag.textContent = G.groupName;
+    grpTag.style.display = 'inline-block';
+  } else {
+    grpTag.style.display = 'none';
+  }
 
   const servingName = G.servingTeam === 1 ? G.t1 : G.t2;
   document.getElementById('s-serve-team').textContent = servingName;
@@ -535,27 +833,37 @@ function render(){
     w.classList.remove('hide');
   }
 
-  // Show controls ONLY for logged-in umpire scoring this game
-  const showControls = isUmpire === true && isScoring === true && live;
+  const isOwner = G.deviceId === DEVICE_ID;
+  const showControls = isUmpire === true && isScoring === true && live && isOwner;
   document.getElementById('rally-btns').style.display = showControls ? 'flex' : 'none';
   document.getElementById('sb-actions').style.display = showControls ? 'flex' : 'none';
-  document.getElementById('share-box').style.display = (isUmpire === true && isScoring === true) ? 'block' : 'none';
+  document.getElementById('share-box').style.display = (isUmpire === true && isScoring === true && isOwner) ? 'block' : 'none';
+
+  const winEligible = (G.p1 >= G.win || G.p2 >= G.win) && Math.abs(G.p1 - G.p2) >= 2;
+  const banner = document.getElementById('s-winner');
+  if(live && winEligible){
+    const leading = G.p1 > G.p2 ? G.t1 : G.t2;
+    banner.textContent = '🏆 ' + leading + ' has won! Umpire: press End Match to finalize.';
+    banner.classList.remove('hide');
+  } else if(live){
+    banner.classList.add('hide');
+  }
 }
 
-/* ── POINT ── */
+/* ═══════════════════════════════════════════════════
+   SCORING
+   ═══════════════════════════════════════════════════ */
 function rallyPoint(){
-  if(!G || G.status !== 'live' || !isScoring) return;
+  if(!G || G.status !== 'live' || !isScoring || G.deviceId !== DEVICE_ID) return;
   undoLog.push({ p1:G.p1, p2:G.p2, servingTeam:G.servingTeam, serverNum:G.serverNum, status:G.status });
   if(G.servingTeam === 1) G.p1++; else G.p2++;
-  checkWin();
   db.ref('games/' + G.code).set(G);
   render();
   if(navigator.vibrate) navigator.vibrate(30);
 }
 
-/* ── SIDE OUT ── */
 function rallySideOut(){
-  if(!G || G.status !== 'live' || !isScoring) return;
+  if(!G || G.status !== 'live' || !isScoring || G.deviceId !== DEVICE_ID) return;
   undoLog.push({ p1:G.p1, p2:G.p2, servingTeam:G.servingTeam, serverNum:G.serverNum, status:G.status });
   if(G.serverNum === 1){
     G.serverNum = 2;
@@ -568,15 +876,8 @@ function rallySideOut(){
   if(navigator.vibrate) navigator.vibrate([30,50,30]);
 }
 
-function checkWin(){
-  if((G.p1 >= G.win || G.p2 >= G.win) && Math.abs(G.p1 - G.p2) >= 2){
-    G.status = 'finished';
-    saveToHistory();
-  }
-}
-
 function undo(){
-  if(!G || undoLog.length === 0 || !isScoring) return;
+  if(!G || undoLog.length === 0 || !isScoring || G.deviceId !== DEVICE_ID) return;
   const prev = undoLog.pop();
   G.p1 = prev.p1; G.p2 = prev.p2;
   G.servingTeam = prev.servingTeam;
@@ -587,11 +888,13 @@ function undo(){
 }
 
 function endGame(){
-  if(!G || !isScoring) return;
+  if(!G || !isScoring || G.deviceId !== DEVICE_ID) return;
   if(!confirm('End this game?')) return;
   G.status = 'finished';
   saveToHistory();
+  updateStandings(G);
   db.ref('games/' + G.code).set(G);
+  localStorage.removeItem('pb_active_game');
   render();
 }
 
@@ -605,7 +908,135 @@ function copyCode(){
   });
 }
 
-/* ── History (localStorage) ── */
+/* ═══════════════════════════════════════════════════
+   STANDINGS / POINTS TABLE
+   ═══════════════════════════════════════════════════ */
+function updateStandings(game){
+  if(!game.groupKey) return;
+  const gk = game.groupKey;
+  const matchId = game.code;
+
+  // Save match result under standings
+  db.ref('standings/' + gk + '/matches/' + matchId).set({
+    t1: game.t1, t2: game.t2,
+    p1: game.p1, p2: game.p2,
+    date: game.date
+  });
+
+  // Recalculate all team stats for this group
+  db.ref('standings/' + gk + '/matches').once('value', snap => {
+    const matches = snap.val() || {};
+    const teamStats = {};
+
+    function ensureTeam(name){
+      if(!teamStats[name]){
+        teamStats[name] = { played:0, won:0, lost:0, pf:0, pa:0 };
+      }
+    }
+
+    Object.values(matches).forEach(m => {
+      ensureTeam(m.t1);
+      ensureTeam(m.t2);
+      teamStats[m.t1].played++;
+      teamStats[m.t2].played++;
+      teamStats[m.t1].pf += m.p1;
+      teamStats[m.t1].pa += m.p2;
+      teamStats[m.t2].pf += m.p2;
+      teamStats[m.t2].pa += m.p1;
+      if(m.p1 > m.p2){
+        teamStats[m.t1].won++;
+        teamStats[m.t2].lost++;
+      } else if(m.p2 > m.p1){
+        teamStats[m.t2].won++;
+        teamStats[m.t1].lost++;
+      }
+    });
+
+    db.ref('standings/' + gk + '/teams').set(teamStats);
+  });
+}
+
+function loadStandings(){
+  const el = document.getElementById('standings-area');
+  el.innerHTML = '<div class="loading"><div class="spin"></div><br>Loading standings...</div>';
+
+  if(standingsRef) standingsRef.off();
+
+  // Load groups first, then standings
+  db.ref('groups').once('value', grpSnap => {
+    const groups = grpSnap.val();
+    if(!groups){
+      el.innerHTML = '<p class="empty">No groups created yet. Ask admin to set up groups.</p>';
+      return;
+    }
+
+    standingsRef = db.ref('standings');
+    standingsRef.on('value', snap => {
+      const standings = snap.val() || {};
+      let html = '';
+
+      Object.entries(groups).forEach(([gk, g]) => {
+        html += '<div class="standings-group"><h3>'+esc(g.name)+'</h3>';
+
+        const teamStats = (standings[gk] && standings[gk].teams) ? standings[gk].teams : {};
+
+        // Also include teams from group definition that haven't played yet
+        if(g.teams){
+          Object.values(g.teams).forEach(tn => {
+            if(!teamStats[tn]){
+              teamStats[tn] = { played:0, won:0, lost:0, pf:0, pa:0 };
+            }
+          });
+        }
+
+        const sorted = Object.entries(teamStats).sort((a,b) => {
+          // Primary: most wins
+          if(b[1].won !== a[1].won) return b[1].won - a[1].won;
+          // Tiebreaker: lower total points conceded (pa = points against = conceded)
+          if(a[1].pa !== b[1].pa) return a[1].pa - b[1].pa;
+          // Further tie: higher points for
+          return b[1].pf - a[1].pf;
+        });
+
+        if(sorted.length === 0){
+          html += '<p class="empty">No teams in this group yet.</p>';
+        } else {
+          html += '<table class="standings-tbl"><tr><th>Pos</th><th>Team</th><th>P</th><th>W</th><th>L</th><th>PF</th><th>PA</th></tr>';
+          sorted.forEach(([name, s], idx) => {
+            const pos = idx + 1;
+            const posClass = pos===1?'pos-1':pos===2?'pos-2':pos===3?'pos-3':'pos-n';
+            html += '<tr><td><span class="pos-badge '+posClass+'">'+pos+'</span></td>'
+              +'<td style="text-align:left;font-weight:600">'+esc(name)+'</td>'
+              +'<td>'+s.played+'</td><td style="color:var(--green);font-weight:700">'+s.won+'</td>'
+              +'<td style="color:var(--red)">'+s.lost+'</td>'
+              +'<td>'+s.pf+'</td><td>'+s.pa+'</td></tr>';
+          });
+          html += '</table>';
+        }
+
+        // Show match results
+        const matches = (standings[gk] && standings[gk].matches) ? standings[gk].matches : {};
+        const mList = Object.values(matches);
+        if(mList.length > 0){
+          html += '<details style="margin-top:.4rem"><summary style="color:var(--dim);font-size:.8rem;cursor:pointer">Match Results ('+mList.length+')</summary>';
+          mList.forEach(m => {
+            const w = m.p1 > m.p2 ? m.t1 : m.p2 > m.p1 ? m.t2 : 'Tied';
+            html += '<div style="font-size:.8rem;color:var(--dim);padding:.2rem 0">'+esc(m.t1)+' <span style="color:var(--green)">'+m.p1+'</span> – <span style="color:var(--blue)">'+m.p2+'</span> '+esc(m.t2)+' ('+esc(w)+')</div>';
+          });
+          html += '</details>';
+        }
+
+        html += '</div>';
+      });
+
+      el.innerHTML = html;
+    });
+  });
+}
+
+/* ═══════════════════════════════════════════════════
+   HISTORY
+   ═══════════════════════════════════════════════════ */
 function getHistory(){
   try { return JSON.parse(localStorage.getItem('pb_history') || '[]'); }
   catch { return []; }
@@ -613,7 +1044,7 @@ function getHistory(){
 
 function saveToHistory(){
   const h = getHistory();
-  h.unshift({ t1:G.t1, t2:G.t2, p1:G.p1, p2:G.p2, win:G.win, date:G.date, code:G.code });
+  h.unshift({ t1:G.t1, t2:G.t2, p1:G.p1, p2:G.p2, win:G.win, date:G.date, code:G.code, groupName:G.groupName||'' });
   if(h.length > 100) h.length = 100;
   localStorage.setItem('pb_history', JSON.stringify(h));
 }
@@ -626,11 +1057,15 @@ function loadHistory(){
     const d = new Date(g.date);
     const when = d.toLocaleDateString() + ' ' + d.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
     const winner = g.p1 > g.p2 ? g.t1 : g.p2 > g.p1 ? g.t2 : 'Tied';
-    return '<div class="game-card" style="cursor:default"><button class="del-btn" title="Delete" onclick="deleteGame('+i+')">✕</button><div><div class="teams">'+esc(g.t1)+' vs '+esc(g.t2)+'</div><div class="meta">Doubles · To '+g.win+' · '+when+' · Winner: '+esc(winner)+'</div></div><div class="fscore"><span class="s1">'+g.p1+'</span> – <span class="s2">'+g.p2+'</span></div></div>';
+    const delBtn = isUmpire ? '<button class="del-btn" title="Delete" onclick="deleteGame('+i+')">✕</button>' : '';
+    const grpLabel = g.groupName ? ' · '+esc(g.groupName) : '';
+    return '<div class="game-card" style="cursor:default">'+delBtn+'<div><div class="teams">'+esc(g.t1)+' vs '+esc(g.t2)+'</div><div class="meta">Doubles · To '+g.win+' · '+when+' · Winner: '+esc(winner)+grpLabel+'</div></div><div class="fscore"><span class="s1">'+g.p1+'</span> – <span class="s2">'+g.p2+'</span></div></div>';
   }).join('');
+  document.getElementById('clear-hist-btn').style.display = isUmpire ? 'block' : 'none';
 }
 
 function deleteGame(index){
+  if(!isUmpire){ alert('Only umpires can delete games.'); return; }
   if(!confirm('Delete this game from history?')) return;
   const h = getHistory();
   h.splice(index, 1);
@@ -641,12 +1076,12 @@ function deleteGame(index){
 function exportToExcel(){
   const h = getHistory();
   if(!h.length){ alert('No games to export.'); return; }
-  let table = '<table><tr><th>Date</th><th>Team 1</th><th>Team 2</th><th>Score 1</th><th>Score 2</th><th>Play To</th><th>Winner</th><th>Game Code</th></tr>';
+  let table = '<table><tr><th>Date</th><th>Team 1</th><th>Team 2</th><th>Score 1</th><th>Score 2</th><th>Play To</th><th>Winner</th><th>Group</th><th>Game Code</th></tr>';
   h.forEach(g => {
     const d = new Date(g.date);
     const when = d.toLocaleDateString() + ' ' + d.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
     const winner = g.p1 > g.p2 ? g.t1 : g.p2 > g.p1 ? g.t2 : 'Tied';
-    table += '<tr><td>'+when+'</td><td>'+esc(g.t1)+'</td><td>'+esc(g.t2)+'</td><td>'+g.p1+'</td><td>'+g.p2+'</td><td>'+g.win+'</td><td>'+esc(winner)+'</td><td>'+(g.code||'')+'</td></tr>';
+    table += '<tr><td>'+when+'</td><td>'+esc(g.t1)+'</td><td>'+esc(g.t2)+'</td><td>'+g.p1+'</td><td>'+g.p2+'</td><td>'+g.win+'</td><td>'+esc(winner)+'</td><td>'+esc(g.groupName||'')+'</td><td>'+(g.code||'')+'</td></tr>';
   });
   table += '</table>';
   const blob = new Blob(['<html><head><meta charset="UTF-8"></head><body>'+table+'</body></html>'], {type:'application/vnd.ms-excel'});
@@ -659,6 +1094,7 @@ function exportToExcel(){
 }
 
 function clearHistory(){
+  if(!isUmpire){ alert('Only umpires can clear history.'); return; }
   if(!confirm('Delete all past games?')) return;
   localStorage.removeItem('pb_history');
   loadHistory();
@@ -666,14 +1102,65 @@ function clearHistory(){
 
 function esc(s){ const d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
 
-/* ── Deep link: ?code=ABC123 ── */
+/* ═══════════════════════════════════════════════════
+   DEEP LINK + AUTO-RESUME
+   ═══════════════════════════════════════════════════ */
 (function(){
   const params = new URLSearchParams(window.location.search);
   const code = params.get('code');
   if(code && /^[A-Z0-9]{4,8}$/i.test(code)){
     spectatorWatch(code.toUpperCase());
+    return;
+  }
+  const activeCode = localStorage.getItem('pb_active_game');
+  if(activeCode){
+    db.ref('games/' + activeCode).once('value', snap => {
+      const data = snap.val();
+      if(!data || data.status !== 'live') {
+        localStorage.removeItem('pb_active_game');
+        return;
+      }
+      if(data.deviceId !== DEVICE_ID){
+        localStorage.removeItem('pb_active_game');
+        return;
+      }
+      G = data;
+      currentGameCode = activeCode;
+      const home = document.getElementById('pg-home');
+      const banner = document.createElement('div');
+      banner.style.cssText = 'background:var(--card);border:2px solid var(--yellow);border-radius:var(--r);padding:1rem;text-align:center;margin-bottom:1rem';
+      banner.innerHTML = '<p style="color:var(--yellow);font-weight:700;margin-bottom:.5rem">⚠️ Active game: '+esc(data.t1)+' vs '+esc(data.t2)+' ('+data.p1+'-'+data.p2+')</p>'
+        +'<button class="start-btn umpire" onclick="resumeActiveGame()">🔄 Resume Game (Umpire Login Required)</button>';
+      home.insertBefore(banner, home.firstChild.nextSibling);
+    });
   }
 })();
+
+function resumeActiveGame(){
+  const activeCode = localStorage.getItem('pb_active_game');
+  if(!activeCode) return;
+  if(!isUmpire){
+    showPage('umpire-login');
+    const origLogin = umpireLogin;
+    umpireLogin = function(){
+      const pw = document.getElementById('pw-input').value;
+      if(pw === UMPIRE_PASSWORD){
+        isUmpire = true;
+        document.getElementById('pw-error').style.display = 'none';
+        document.getElementById('pw-input').value = '';
+        updateRoleBadge();
+        _openGameAsUmpire(activeCode);
+        showPage('score');
+        umpireLogin = origLogin;
+      } else {
+        document.getElementById('pw-error').style.display = 'block';
+      }
+    };
+    return;
+  }
+  _openGameAsUmpire(activeCode);
+  showPage('score');
+}
 
 document.addEventListener('dblclick', function(e){ e.preventDefault(); }, {passive:false});
 </script>
