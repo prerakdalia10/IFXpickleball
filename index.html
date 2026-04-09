@@ -127,6 +127,17 @@ input:focus,select:focus{border-color:var(--green)}
 .grp-card .team-list{font-size:.85rem;color:var(--dim)}
 .grp-card .team-chip{display:inline-block;background:var(--card2);padding:.2rem .6rem;border-radius:999px;font-size:.8rem;margin:.2rem .2rem;color:var(--text)}
 .grp-card .del-team-btn{color:var(--red);cursor:pointer;margin-left:.3rem;font-weight:700}
+.grp-card .edit-team-btn{color:var(--blue);cursor:pointer;margin-left:.2rem;font-weight:700;font-size:.75rem}
+.admin-game-card{background:var(--card);border-radius:var(--r);padding:.7rem .8rem;margin-bottom:.5rem;display:flex;justify-content:space-between;align-items:center;gap:.5rem}
+.admin-game-card .ag-info{flex:1;min-width:0}
+.admin-game-card .ag-teams{font-weight:600;font-size:.85rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.admin-game-card .ag-meta{font-size:.7rem;color:var(--dim);margin-top:.15rem}
+.admin-game-card .ag-score{font-size:1rem;font-weight:800;font-variant-numeric:tabular-nums;white-space:nowrap}
+.admin-game-card .ag-btns{display:flex;gap:.3rem}
+.admin-game-card .ag-btns button{padding:.35rem .5rem;border:none;border-radius:8px;cursor:pointer;font-size:.75rem;font-weight:700}
+.ag-edit-btn{background:var(--blue);color:#fff}
+.ag-del-btn{background:var(--red);color:#fff}
+.grp-card .category-tag{display:inline-block;font-size:.65rem;padding:.15rem .4rem;border-radius:999px;background:var(--purple);color:#fff;margin-left:.4rem;vertical-align:middle}
 .grp-card .add-area{display:flex;gap:.4rem;margin-top:.5rem}
 .grp-card .add-area input{margin-bottom:0;flex:1;font-size:.85rem;padding:.5rem}
 .grp-card .add-area button{padding:.5rem .8rem;background:var(--green);color:#111;border:none;border-radius:var(--r);font-weight:700;cursor:pointer;font-size:.85rem;white-space:nowrap}
@@ -135,6 +146,16 @@ input:focus,select:focus{border-color:var(--green)}
 .add-grp-area{display:flex;gap:.4rem;margin-bottom:1rem}
 .add-grp-area input{margin-bottom:0;flex:1}
 .add-grp-area button{padding:.7rem 1rem;background:var(--green);color:#111;border:none;border-radius:var(--r);font-weight:700;cursor:pointer;white-space:nowrap}
+
+/* Upload box */
+.upload-box{background:var(--card);border:2px dashed var(--card2);border-radius:var(--r);padding:1.2rem;text-align:center;margin-bottom:1rem;transition:border-color .2s}
+.upload-box.drag-over{border-color:var(--green)}
+.upload-box p{font-size:.85rem;color:var(--dim);margin-bottom:.5rem}
+.upload-box .file-input-label{display:inline-block;padding:.6rem 1.2rem;background:var(--blue);color:#fff;border-radius:var(--r);font-weight:700;cursor:pointer;font-size:.9rem}
+.upload-box .file-input-label:hover{opacity:.85}
+.upload-box input[type=file]{display:none}
+.upload-box .upload-status{margin-top:.5rem;font-size:.85rem}
+.upload-box .format-hint{font-size:.75rem;color:var(--dim);margin-top:.6rem;text-align:left;line-height:1.6}
 
 @media(max-width:400px){
   .pts{font-size:3.5rem}
@@ -194,6 +215,30 @@ input:focus,select:focus{border-color:var(--green)}
   <h2>👑 Admin Dashboard</h2>
   <p style="color:var(--dim);margin-bottom:1rem;font-size:.85rem">Create groups and add teams. Umpires will pick teams from these groups when starting a match.</p>
 
+  <div class="section-label">📥 Import from Excel</div>
+  <div class="upload-box" id="upload-box">
+    <p>Upload an Excel file (.xls / .xlsx) to import groups &amp; teams</p>
+    <label class="file-input-label">
+      📂 Choose File
+      <input type="file" id="xls-upload" accept=".xls,.xlsx" onchange="handleExcelUpload(event)"/>
+    </label>
+    <div class="upload-status" id="upload-status"></div>
+    <div class="format-hint">
+      <strong>Supported formats:</strong><br>
+      <b>Format 1 — Multiple sheets:</b> Each sheet name = group name. Team names in column A (one per row).<br>
+      <b>Format 2 — Single sheet:</b> Column A = Group name, Column B = Team name. First row can be a header.
+    </div>
+  </div>
+
+  <div class="section-label">🏆 Tournament Data</div>
+  <button class="start-btn new" onclick="seedTournamentData()" style="font-size:.9rem;padding:.8rem">🌱 Seed All Tournament Teams &amp; Groups</button>
+  <div id="seed-status" style="margin-bottom:1rem;font-size:.85rem"></div>
+
+  <div class="section-label">🎮 Manage Finished Games</div>
+  <div id="admin-games-list">
+    <div class="loading"><div class="spin"></div><br>Loading...</div>
+  </div>
+
   <div class="section-label">Create New Group</div>
   <div class="add-grp-area">
     <input id="new-grp-name" placeholder="e.g. Group A" maxlength="40"/>
@@ -203,6 +248,30 @@ input:focus,select:focus{border-color:var(--green)}
   <div class="section-label">Existing Groups</div>
   <div id="admin-groups-list">
     <div class="loading"><div class="spin"></div><br>Loading...</div>
+  </div>
+</div>
+
+<!-- MODAL: Edit Game Score -->
+<div id="edit-game-modal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.7);z-index:999;align-items:center;justify-content:center">
+  <div style="background:var(--card);border-radius:var(--r);padding:1.5rem;max-width:400px;width:90%;margin:auto;margin-top:20vh">
+    <h3 style="margin-bottom:1rem;font-size:1rem">✏️ Edit Game Score</h3>
+    <input type="hidden" id="edit-game-code"/>
+    <input type="hidden" id="edit-game-gk"/>
+    <div style="display:flex;gap:.5rem;align-items:center;margin-bottom:.8rem">
+      <div style="flex:1;text-align:center">
+        <div id="edit-t1-name" style="font-size:.85rem;font-weight:700;color:var(--green);margin-bottom:.3rem"></div>
+        <input type="number" id="edit-p1" min="0" max="99" style="text-align:center;font-size:1.3rem;font-weight:800;padding:.5rem"/>
+      </div>
+      <span style="font-size:1.2rem;font-weight:800">–</span>
+      <div style="flex:1;text-align:center">
+        <div id="edit-t2-name" style="font-size:.85rem;font-weight:700;color:var(--blue);margin-bottom:.3rem"></div>
+        <input type="number" id="edit-p2" min="0" max="99" style="text-align:center;font-size:1.3rem;font-weight:800;padding:.5rem"/>
+      </div>
+    </div>
+    <div style="display:flex;gap:.5rem">
+      <button class="start-btn new" onclick="saveEditedGame()" style="font-size:.9rem;padding:.7rem;margin:0">💾 Save</button>
+      <button class="start-btn hist" onclick="closeEditModal()" style="font-size:.9rem;padding:.7rem;margin:0">Cancel</button>
+    </div>
   </div>
 </div>
 
@@ -342,6 +411,9 @@ input:focus,select:focus{border-color:var(--green)}
   <button class="clear-btn" id="clear-hist-btn" onclick="clearHistory()" style="display:none">🗑 Clear All History</button>
 </div>
 
+<!-- SheetJS for Excel parsing -->
+<script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+
 <!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
@@ -400,7 +472,7 @@ function showPage(name){
   document.getElementById('pg-'+name).classList.add('active');
   if(name==='umpire-dash') loadUmpireGames();
   if(name==='live-list') loadLiveGamesList();
-  if(name==='admin-dash') loadAdminGroups();
+  if(name==='admin-dash'){ loadAdminGroups(); loadAdminGames(); }
   if(name==='standings') loadStandings();
   if(name==='setup') loadSetupGroups();
 }
@@ -505,18 +577,399 @@ function loadAdminGroups(){
     }
     let html = '';
     Object.entries(groups).forEach(([key, g]) => {
-      html += '<div class="grp-card"><h3>'+esc(g.name)+'</h3><div class="team-list">';
+      const catTag = g.category ? '<span class="category-tag">'+esc(g.category)+'</span>' : '';
+      html += '<div class="grp-card"><h3>'+esc(g.name)+catTag+'</h3><div class="team-list">';
       if(g.teams){
         Object.entries(g.teams).forEach(([tk, tn]) => {
-          html += '<span class="team-chip">'+esc(tn)+'<span class="del-team-btn" onclick="removeTeamFromGroup(\''+key+'\',\''+tk+'\')"> ✕</span></span>';
+          html += '<span class="team-chip">'+esc(tn)+'<span class="edit-team-btn" onclick="editTeamName(\''+key+'\',\''+tk+'\',\''+esc(tn).replace(/'/g,"\\'")+'\')">✎</span><span class="del-team-btn" onclick="removeTeamFromGroup(\''+key+'\',\''+tk+'\')"> ✕</span></span>';
         });
       } else {
         html += '<span style="color:var(--dim);font-size:.8rem">No teams yet</span>';
       }
-      html += '</div><div class="add-area"><input id="add-team-'+key+'" placeholder="New team name" maxlength="40"/><button onclick="addTeamToGroup(\''+key+'\')">+ Add</button></div>';
+      html += '</div><div class="add-area"><input id="add-team-'+key+'" placeholder="New team name" maxlength="60"/><button onclick="addTeamToGroup(\''+key+'\')">+ Add</button></div>';
       html += '<button class="del-grp-btn" onclick="deleteGroup(\''+key+'\')">🗑 Delete Group</button></div>';
     });
     el.innerHTML = html;
+  });
+}
+
+/* ═══════════════════════════════════════════════════
+   ADMIN: IMPORT FROM EXCEL
+   ═══════════════════════════════════════════════════ */
+function handleExcelUpload(e){
+  if(!isAdmin) return;
+  const file = e.target.files[0];
+  if(!file) return;
+  const status = document.getElementById('upload-status');
+  status.innerHTML = '<span style="color:var(--yellow)">⏳ Reading file...</span>';
+
+  const reader = new FileReader();
+  reader.onload = function(evt){
+    try {
+      const data = new Uint8Array(evt.target.result);
+      const workbook = XLSX.read(data, {type:'array'});
+      const sheetNames = workbook.SheetNames;
+
+      if(!sheetNames || sheetNames.length === 0){
+        status.innerHTML = '<span style="color:var(--red)">❌ No sheets found in the file.</span>';
+        return;
+      }
+
+      // Detect format: if only 1 sheet and has 2+ columns, use Format 2 (Group, Team columns)
+      // Otherwise use Format 1 (each sheet = group)
+      const firstSheet = workbook.Sheets[sheetNames[0]];
+      const firstData = XLSX.utils.sheet_to_json(firstSheet, {header:1});
+
+      let parsed = {}; // { groupName: [team1, team2, ...] }
+
+      const isFormat2 = sheetNames.length === 1 && firstData.length > 0 && firstData[0].length >= 2;
+
+      if(isFormat2){
+        // Format 2: single sheet, Col A = Group, Col B = Team
+        firstData.forEach((row, idx) => {
+          if(!row[0] || !row[1]) return;
+          const grp = String(row[0]).trim();
+          const team = String(row[1]).trim();
+          if(!grp || !team) return;
+          // Skip header row if it looks like a header
+          if(idx === 0 && (grp.toLowerCase() === 'group' || grp.toLowerCase() === 'group name')) return;
+          if(!parsed[grp]) parsed[grp] = [];
+          if(!parsed[grp].includes(team)) parsed[grp].push(team);
+        });
+      } else {
+        // Format 1: each sheet = group, Col A = team names
+        sheetNames.forEach(sheetName => {
+          const sheet = workbook.Sheets[sheetName];
+          const rows = XLSX.utils.sheet_to_json(sheet, {header:1});
+          const grp = sheetName.trim();
+          if(!parsed[grp]) parsed[grp] = [];
+          rows.forEach((row, idx) => {
+            const team = row[0] ? String(row[0]).trim() : '';
+            if(!team) return;
+            // Skip if header-like
+            if(idx === 0 && (team.toLowerCase() === 'team' || team.toLowerCase() === 'team name' || team.toLowerCase() === 'teams')) return;
+            if(!parsed[grp].includes(team)) parsed[grp].push(team);
+          });
+        });
+      }
+
+      const groupNames = Object.keys(parsed);
+      if(groupNames.length === 0){
+        status.innerHTML = '<span style="color:var(--red)">❌ No groups/teams found. Check file format.</span>';
+        return;
+      }
+
+      // Preview and confirm
+      let preview = 'Found ' + groupNames.length + ' group(s):\n';
+      let totalTeams = 0;
+      groupNames.forEach(g => {
+        preview += '\n' + g + ': ' + parsed[g].join(', ');
+        totalTeams += parsed[g].length;
+      });
+      preview += '\n\nTotal teams: ' + totalTeams;
+      preview += '\n\nImport these to Firebase? (Existing groups with same name will be merged.)';
+
+      if(!confirm(preview)){
+        status.innerHTML = '<span style="color:var(--dim)">Import cancelled.</span>';
+        e.target.value = '';
+        return;
+      }
+
+      // Write to Firebase
+      let done = 0;
+      groupNames.forEach(grpName => {
+        const key = grpName.replace(/[^a-zA-Z0-9 ]/g,'').replace(/\s+/g,'_');
+        // Set group name
+        db.ref('groups/' + key + '/name').set(grpName);
+        // Add each team
+        parsed[grpName].forEach(teamName => {
+          const tk = teamName.replace(/[^a-zA-Z0-9 ]/g,'').replace(/\s+/g,'_');
+          db.ref('groups/' + key + '/teams/' + tk).set(teamName);
+        });
+        done++;
+        if(done === groupNames.length){
+          status.innerHTML = '<span style="color:var(--green)">✅ Imported ' + groupNames.length + ' group(s) with ' + totalTeams + ' team(s)!</span>';
+          e.target.value = '';
+          loadAdminGroups();
+        }
+      });
+
+    } catch(err){
+      status.innerHTML = '<span style="color:var(--red)">❌ Error reading file: ' + esc(err.message) + '</span>';
+      e.target.value = '';
+    }
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+// Drag & drop support
+(function(){
+  const box = document.getElementById('upload-box');
+  if(!box) return;
+  box.addEventListener('dragover', function(e){ e.preventDefault(); box.classList.add('drag-over'); });
+  box.addEventListener('dragleave', function(){ box.classList.remove('drag-over'); });
+  box.addEventListener('drop', function(e){
+    e.preventDefault();
+    box.classList.remove('drag-over');
+    if(!isAdmin) return;
+    const file = e.dataTransfer.files[0];
+    if(!file) return;
+    if(!file.name.match(/\.xlsx?$/i)){ alert('Please drop an Excel file (.xls or .xlsx)'); return; }
+    // Trigger the same handler
+    const input = document.getElementById('xls-upload');
+    const dt = new DataTransfer();
+    dt.items.add(file);
+    input.files = dt.files;
+    handleExcelUpload({target: input});
+  });
+})();
+
+/* ═══════════════════════════════════════════════════
+   ADMIN: SEED TOURNAMENT DATA
+   ═══════════════════════════════════════════════════ */
+function seedTournamentData(){
+  if(!isAdmin) return;
+  const TOURNAMENT = {
+    'Group_A': {
+      name: 'Group A', category: 'Mens Double',
+      teams: {
+        'MD_A1': 'Badgujar Pranavkumar & Kahar Chirag',
+        'MD_A2': 'Gusain Yogesh & Bhoot Prem',
+        'MD_A3': 'Patel Divyeshkumar Girishbhai & Gobburi Hari Babu',
+        'MD_A4': 'Nair Anishkumar & Shah Darshil',
+        'MD_A5': 'Aryan Gauravkumar & Patni Shailesh',
+        'MD_A6': 'Kansara Aarav Naimesh & Harshadkumar Patel Priyankkumar'
+      }
+    },
+    'Group_B': {
+      name: 'Group B', category: 'Mens Double',
+      teams: {
+        'MD_B1': 'Varmora Jigar & Patel Harshkumar Nitinbhai',
+        'MD_B2': 'Kalani Karteekkumar Shantilal & Prajapati Srujal',
+        'MD_B3': 'Sahoo Gideon Binod & Chudasama Shashank Ranjitsinh',
+        'MD_B4': 'Chhajer Abhishek & Dalia Prerak',
+        'MD_B5': 'Dhora Kaushalkumar & Patel Parth',
+        'MD_B6': 'Singh Ramanpreet & Modi Chirag'
+      }
+    },
+    'Group_C': {
+      name: 'Group C', category: 'Mens Double',
+      teams: {
+        'MD_C1': 'Sutaria Nevil & Gupta Subham',
+        'MD_C2': 'Mansuri Nadim & Pochina Praveen',
+        'MD_C3': 'Bhatt Shubham & Kotikalapudi Jayasurya',
+        'MD_C4': 'Sasi Ravi & Shah Meet',
+        'MD_C5': 'Patel Hardikkumar & Ghodasara Kevalkumar',
+        'MD_C6': 'Limbachiya Dhairya & Rathore Sandip'
+      }
+    },
+    'Group_D': {
+      name: 'Group D', category: 'Mens Double',
+      teams: {
+        'MD_D1': 'Gandhi Jugal Tapan & Patel Shilp',
+        'MD_D2': 'Dave Anilkumar & Sharma Prabhash',
+        'MD_D3': 'Ghanchi Tanjil & Sheth Gunjan',
+        'MD_D4': 'Billore Sudhanshu & Bhansali Saiyam Ashokkumar',
+        'MD_D5': 'Gajjar Joy & Patel Raj',
+        'MD_D6': 'Parmar Aryan & Parmar Rohitkumar'
+      }
+    },
+    'Group_E': {
+      name: 'Group E', category: 'Womens Double',
+      teams: {
+        'WD_E1': 'Verma Ritu & Gangal Vartika Prafullbhai',
+        'WD_E2': 'Soni Amisha & Dey Dhriti',
+        'WD_E3': 'Rasdhari Simranben & Tigunait Anchal Avdhesh',
+        'WD_E4': 'Goyal Sakshi & Thakur Shivani',
+        'WD_E5': 'Shah Siddhi & Moolchandani Neelam',
+        'WD_E6': 'Mishra Neha & Maradia Janki'
+      }
+    },
+    'Group_F': {
+      name: 'Group F', category: 'Mix Double',
+      teams: {
+        'MX_F1': 'Chhajer Abhishek & Rasdhari Simranben',
+        'MX_F2': 'Ramanpreet Singh & Thakur Shivani',
+        'MX_F3': 'Kotikalapudi Jayasurya & Tigunait Anchal Avdhesh',
+        'MX_F4': 'Varmora Jigar & Shah Siddhi',
+        'MX_F5': 'Mansuri Nadim & Mishra Neha',
+        'MX_F6': 'Gupta Subham & Moolchandani Neelam'
+      }
+    },
+    'Group_G': {
+      name: 'Group G', category: 'Mix Double',
+      teams: {
+        'MX_G1': 'Gandhi Jugal Tapan & Gangal Vartika Prafullbhai',
+        'MX_G2': 'Kahar Chirag & Soni Amisha',
+        'MX_G3': 'Bhatt Shubham & Verma Ritu',
+        'MX_G4': 'Sutaria Nevil & Maradia Janki',
+        'MX_G5': 'Sharma Prabhash & Dey Dhriti',
+        'MX_G6': 'Dalia Prerak & Goyal Sakshi'
+      }
+    }
+  };
+
+  const totalTeams = Object.values(TOURNAMENT).reduce((sum, g) => sum + Object.keys(g.teams).length, 0);
+  if(!confirm('Seed ' + Object.keys(TOURNAMENT).length + ' groups with ' + totalTeams + ' teams into Firebase?\n\nThis will overwrite any existing groups with the same keys.')) return;
+
+  const status = document.getElementById('seed-status');
+  status.innerHTML = '<span style="color:var(--yellow)">⏳ Seeding data...</span>';
+
+  const updates = {};
+  Object.entries(TOURNAMENT).forEach(([key, g]) => {
+    updates['groups/' + key + '/name'] = g.name;
+    updates['groups/' + key + '/category'] = g.category;
+    Object.entries(g.teams).forEach(([tk, tn]) => {
+      updates['groups/' + key + '/teams/' + tk] = tn;
+    });
+  });
+
+  db.ref().update(updates).then(() => {
+    status.innerHTML = '<span style="color:var(--green)">✅ Seeded ' + Object.keys(TOURNAMENT).length + ' groups with ' + totalTeams + ' teams!</span>';
+    loadAdminGroups();
+  }).catch(err => {
+    status.innerHTML = '<span style="color:var(--red)">❌ Error: ' + esc(err.message) + '</span>';
+  });
+}
+
+/* ═══════════════════════════════════════════════════
+   ADMIN: MANAGE FINISHED GAMES
+   ═══════════════════════════════════════════════════ */
+function loadAdminGames(){
+  if(!isAdmin) return;
+  const el = document.getElementById('admin-games-list');
+  el.innerHTML = '<div class="loading"><div class="spin"></div><br>Loading games...</div>';
+
+  db.ref('games').orderByChild('status').equalTo('finished').once('value', snap => {
+    const games = snap.val();
+    if(!games){
+      el.innerHTML = '<p class="empty">No finished games yet.</p>';
+      return;
+    }
+    let html = '';
+    const sorted = Object.values(games).sort((a,b) => new Date(b.date) - new Date(a.date));
+    sorted.forEach(g => {
+      const d = new Date(g.date);
+      const when = d.toLocaleDateString() + ' ' + d.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+      const winner = g.p1 > g.p2 ? g.t1 : g.p2 > g.p1 ? g.t2 : 'Tied';
+      const grpLabel = g.groupName ? ' · ' + esc(g.groupName) : '';
+      html += '<div class="admin-game-card">'
+        + '<div class="ag-info"><div class="ag-teams">' + esc(g.t1) + ' vs ' + esc(g.t2) + '</div>'
+        + '<div class="ag-meta">' + when + grpLabel + ' · Winner: ' + esc(winner) + '</div></div>'
+        + '<div class="ag-score"><span style="color:var(--green)">' + g.p1 + '</span> – <span style="color:var(--blue)">' + g.p2 + '</span></div>'
+        + '<div class="ag-btns">'
+        + '<button class="ag-edit-btn" onclick="openEditGame(\'' + g.code + '\')">✏️</button>'
+        + '<button class="ag-del-btn" onclick="adminDeleteGame(\'' + g.code + '\')">🗑</button>'
+        + '</div></div>';
+    });
+    el.innerHTML = html;
+  });
+}
+
+function openEditGame(code){
+  if(!isAdmin) return;
+  db.ref('games/' + code).once('value', snap => {
+    const g = snap.val();
+    if(!g){ alert('Game not found.'); return; }
+    document.getElementById('edit-game-code').value = code;
+    document.getElementById('edit-game-gk').value = g.groupKey || '';
+    document.getElementById('edit-t1-name').textContent = g.t1;
+    document.getElementById('edit-t2-name').textContent = g.t2;
+    document.getElementById('edit-p1').value = g.p1;
+    document.getElementById('edit-p2').value = g.p2;
+    document.getElementById('edit-game-modal').style.display = 'flex';
+  });
+}
+
+function closeEditModal(){
+  document.getElementById('edit-game-modal').style.display = 'none';
+}
+
+function saveEditedGame(){
+  if(!isAdmin) return;
+  const code = document.getElementById('edit-game-code').value;
+  const newP1 = parseInt(document.getElementById('edit-p1').value) || 0;
+  const newP2 = parseInt(document.getElementById('edit-p2').value) || 0;
+  const gk = document.getElementById('edit-game-gk').value;
+
+  db.ref('games/' + code).once('value', snap => {
+    const g = snap.val();
+    if(!g){ alert('Game not found.'); return; }
+    g.p1 = newP1;
+    g.p2 = newP2;
+    db.ref('games/' + code).set(g).then(() => {
+      // Update standings match record too
+      if(gk){
+        db.ref('standings/' + gk + '/matches/' + code).update({ p1: newP1, p2: newP2 }).then(() => {
+          recalcGroupStandings(gk);
+        });
+      }
+      closeEditModal();
+      loadAdminGames();
+    });
+  });
+}
+
+function adminDeleteGame(code){
+  if(!isAdmin) return;
+  if(!confirm('Delete this game permanently? This will also remove it from standings.')) return;
+
+  db.ref('games/' + code).once('value', snap => {
+    const g = snap.val();
+    if(!g) return;
+    const gk = g.groupKey;
+    db.ref('games/' + code).remove().then(() => {
+      if(gk){
+        db.ref('standings/' + gk + '/matches/' + code).remove().then(() => {
+          recalcGroupStandings(gk);
+        });
+      }
+      loadAdminGames();
+    });
+  });
+}
+
+function recalcGroupStandings(gk){
+  db.ref('standings/' + gk + '/matches').once('value', snap => {
+    const matches = snap.val() || {};
+    const teamStats = {};
+
+    function ensureTeam(name){
+      if(!teamStats[name]) teamStats[name] = { played:0, won:0, lost:0, pf:0, pa:0 };
+    }
+
+    Object.values(matches).forEach(m => {
+      ensureTeam(m.t1);
+      ensureTeam(m.t2);
+      teamStats[m.t1].played++;
+      teamStats[m.t2].played++;
+      teamStats[m.t1].pf += m.p1;
+      teamStats[m.t1].pa += m.p2;
+      teamStats[m.t2].pf += m.p2;
+      teamStats[m.t2].pa += m.p1;
+      if(m.p1 > m.p2){
+        teamStats[m.t1].won++;
+        teamStats[m.t2].lost++;
+      } else if(m.p2 > m.p1){
+        teamStats[m.t2].won++;
+        teamStats[m.t1].lost++;
+      }
+    });
+
+    db.ref('standings/' + gk + '/teams').set(teamStats);
+  });
+}
+
+/* ═══════════════════════════════════════════════════
+   ADMIN: EDIT TEAM NAME
+   ═══════════════════════════════════════════════════ */
+function editTeamName(groupKey, teamKey, oldName){
+  if(!isAdmin) return;
+  const newName = prompt('Edit team name:', oldName);
+  if(!newName || newName.trim() === '' || newName.trim() === oldName) return;
+  const trimmed = newName.trim();
+  db.ref('groups/' + groupKey + '/teams/' + teamKey).set(trimmed).then(() => {
+    loadAdminGroups();
   });
 }
 
@@ -557,7 +1010,8 @@ function loadSetupGroups(){
     const sel = document.getElementById('f-group');
     sel.innerHTML = '<option value="">-- Select Group (optional) --</option>';
     Object.entries(cachedGroups).forEach(([key, g]) => {
-      sel.innerHTML += '<option value="'+key+'">'+esc(g.name)+'</option>';
+      const cat = g.category ? ' ('+g.category+')' : '';
+      sel.innerHTML += '<option value="'+key+'">'+esc(g.name + cat)+'</option>';
     });
     document.getElementById('f-t1-sel').innerHTML = '<option value="">-- Pick group first --</option>';
     document.getElementById('f-t2-sel').innerHTML = '<option value="">-- Pick group first --</option>';
@@ -976,7 +1430,8 @@ function loadStandings(){
       let html = '';
 
       Object.entries(groups).forEach(([gk, g]) => {
-        html += '<div class="standings-group"><h3>'+esc(g.name)+'</h3>';
+        const catLabel = g.category ? ' <span style="font-size:.75rem;color:var(--purple);font-weight:400">('+esc(g.category)+')</span>' : '';
+        html += '<div class="standings-group"><h3>'+esc(g.name)+catLabel+'</h3>';
 
         const teamStats = (standings[gk] && standings[gk].teams) ? standings[gk].teams : {};
 
