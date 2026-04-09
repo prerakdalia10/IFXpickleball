@@ -162,6 +162,15 @@ input:focus,select:focus{border-color:var(--green)}
 .qualify-row td{background:rgba(0,230,118,.15)!important}
 .qualify-badge{font-size:.6rem;color:var(--green);font-weight:700;margin-left:.3rem}
 .elim-row td{opacity:.6}
+.fixture-card{background:var(--card);border-radius:var(--r);padding:.7rem .8rem;margin-bottom:.5rem;display:flex;justify-content:space-between;align-items:center;cursor:pointer;transition:transform .1s,opacity .2s;border-left:3px solid var(--green)}
+.fixture-card:hover{transform:translateY(-1px)}
+.fixture-card.done{opacity:.4;cursor:default;border-left-color:var(--dim);pointer-events:none}
+.fixture-card .fx-teams{font-weight:600;font-size:.85rem}
+.fixture-card .fx-vs{color:var(--dim);font-size:.75rem}
+.fixture-card .fx-status{font-size:.7rem;font-weight:700;padding:.2rem .5rem;border-radius:999px}
+.fx-pending{background:var(--green);color:#111}
+.fx-done{background:var(--card2);color:var(--dim)}
+.fixtures-header{font-size:.85rem;color:var(--dim);margin-bottom:.5rem}
 @media(max-width:400px){
   .pts{font-size:3.5rem}
   .rally-btn{font-size:.95rem;padding:.9rem .3rem}
@@ -304,7 +313,13 @@ input:focus,select:focus{border-color:var(--green)}
     <option value="">-- Select Group --</option>
   </select>
 
-  <div class="section-label">Select Teams</div>
+  <div id="fixtures-area" style="display:none">
+    <div class="section-label">📅 Group Fixtures <span id="fixtures-count" style="font-weight:400;font-size:.8rem;color:var(--dim)"></span></div>
+    <p class="fixtures-header">Tap a match to start scoring. Completed matches are greyed out.</p>
+    <div id="fixtures-list"></div>
+  </div>
+
+  <div class="section-label">Or pick teams manually</div>
   <label>Team 1</label>
   <select id="f-t1-sel"><option value="">-- Pick group first --</option></select>
   <label>Team 2</label>
@@ -1029,9 +1044,12 @@ function onGroupSelect(){
   const groupKey = document.getElementById('f-group').value;
   const sel1 = document.getElementById('f-t1-sel');
   const sel2 = document.getElementById('f-t2-sel');
+  const fixturesArea = document.getElementById('fixtures-area');
+
   if(!groupKey || !cachedGroups[groupKey] || !cachedGroups[groupKey].teams){
     sel1.innerHTML = '<option value="">-- No teams --</option>';
     sel2.innerHTML = '<option value="">-- No teams --</option>';
+    fixturesArea.style.display = 'none';
     return;
   }
   const teams = cachedGroups[groupKey].teams;
@@ -1041,6 +1059,9 @@ function onGroupSelect(){
   });
   sel1.innerHTML = opts;
   sel2.innerHTML = opts;
+
+  // Generate and show round-robin fixtures
+  loadFixtures(groupKey);
 }
 
 /* ── Setup helpers ── */
@@ -1055,6 +1076,128 @@ function genCode(){
   let code = '';
   for(let i=0;i<6;i++) code += chars[Math.floor(Math.random()*chars.length)];
   return code;
+}
+
+/* ═══════════════════════════════════════════════════
+   FIXTURES: Auto-generated round-robin matches
+   ═══════════════════════════════════════════════════ */
+function loadFixtures(groupKey){
+  const fixturesArea = document.getElementById('fixtures-area');
+  const fixturesList = document.getElementById('fixtures-list');
+  const fixturesCount = document.getElementById('fixtures-count');
+
+  const g = cachedGroups[groupKey];
+  if(!g || !g.teams){
+    fixturesArea.style.display = 'none';
+    return;
+  }
+
+  const teamNames = Object.values(g.teams);
+  if(teamNames.length < 2){
+    fixturesArea.style.display = 'none';
+    return;
+  }
+
+  // Generate all round-robin pairs
+  const pairs = [];
+  for(let i = 0; i < teamNames.length; i++){
+    for(let j = i + 1; j < teamNames.length; j++){
+      pairs.push([teamNames[i], teamNames[j]]);
+    }
+  }
+
+  fixturesArea.style.display = 'block';
+  fixturesList.innerHTML = '<div class="loading"><div class="spin"></div><br>Loading fixtures...</div>';
+
+  // Check which matches are already completed
+  db.ref('standings/' + groupKey + '/matches').once('value', snap => {
+    const doneMatches = snap.val() || {};
+    const doneSet = new Set();
+    Object.values(doneMatches).forEach(m => {
+      // Create a normalized key so order doesn't matter
+      const key = [m.t1, m.t2].sort().join('|||');
+      doneSet.add(key);
+    });
+
+    // Also check live games for this group
+    db.ref('games').orderByChild('groupKey').equalTo(groupKey).once('value', liveSnap => {
+      const liveGames = liveSnap.val() || {};
+      const liveSet = new Set();
+      Object.values(liveGames).forEach(lg => {
+        if(lg.status === 'live'){
+          const key = [lg.t1, lg.t2].sort().join('|||');
+          liveSet.add(key);
+        }
+      });
+
+      let doneCount = 0;
+      let html = '';
+      pairs.forEach(([t1, t2], idx) => {
+        const key = [t1, t2].sort().join('|||');
+        const isDone = doneSet.has(key);
+        const isLive = liveSet.has(key);
+        if(isDone) doneCount++;
+
+        const cardClass = isDone ? 'fixture-card done' : 'fixture-card';
+        const statusHtml = isDone
+          ? '<span class="fx-status fx-done">✓ Done</span>'
+          : isLive
+            ? '<span class="fx-status" style="background:var(--yellow);color:#111">⏳ Live</span>'
+            : '<span class="fx-status fx-pending">▶ Start</span>';
+        const click = (!isDone && !isLive)
+          ? 'onclick="startFixtureMatch(\''+esc(t1).replace(/'/g,"\\'")+'\',' +
+            '\''+esc(t2).replace(/'/g,"\\'")+'\',' +
+            '\''+groupKey+'\')"'
+          : '';
+
+        html += '<div class="'+cardClass+'" '+click+'>'
+          + '<div><div class="fx-teams">'+esc(t1)+'</div>'
+          + '<div class="fx-vs">vs</div>'
+          + '<div class="fx-teams">'+esc(t2)+'</div></div>'
+          + statusHtml + '</div>';
+      });
+
+      fixturesCount.textContent = '(' + doneCount + '/' + pairs.length + ' done)';
+      fixturesList.innerHTML = html;
+    });
+  });
+}
+
+function startFixtureMatch(t1, t2, groupKey){
+  if(!isUmpire) return;
+  if(!confirm('Start match:\n' + t1 + '  vs  ' + t2 + '\n\nPlay to 11 points?')) return;
+
+  const code = genCode();
+  const groupName = cachedGroups[groupKey] ? cachedGroups[groupKey].name : '';
+
+  G = {
+    code: code, t1: t1, t2: t2, win: 11,
+    p1: 0, p2: 0,
+    servingTeam: 1, serverNum: 2,
+    status: 'live',
+    date: new Date().toISOString(),
+    deviceId: DEVICE_ID,
+    groupKey: groupKey,
+    groupName: groupName
+  };
+
+  undoLog = [];
+  isScoring = true;
+  currentGameCode = code;
+
+  db.ref('games/' + code).set(G);
+  localStorage.setItem('pb_active_game', code);
+  document.getElementById('share-code').value = code;
+
+  if(watchRef) watchRef.off();
+  watchRef = db.ref('games/' + code);
+  watchRef.on('value', snap => {
+    const data = snap.val();
+    if(data){ G = data; render(); }
+  });
+
+  render();
+  showPage('score');
 }
 
 /* ═══════════════════════════════════════════════════
