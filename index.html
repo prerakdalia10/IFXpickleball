@@ -157,6 +157,11 @@ input:focus,select:focus{border-color:var(--green)}
 .upload-box .upload-status{margin-top:.5rem;font-size:.85rem}
 .upload-box .format-hint{font-size:.75rem;color:var(--dim);margin-top:.6rem;text-align:left;line-height:1.6}
 
+.fab-admin{position:fixed;bottom:1.2rem;right:1.2rem;width:42px;height:42px;border-radius:50%;background:var(--purple);color:#fff;border:none;font-size:1.1rem;cursor:pointer;box-shadow:0 3px 12px rgba(0,0,0,.4);z-index:900;display:flex;align-items:center;justify-content:center;transition:transform .15s}
+.fab-admin:hover{transform:scale(1.1)}
+.qualify-row td{background:rgba(0,230,118,.15)!important}
+.qualify-badge{font-size:.6rem;color:var(--green);font-weight:700;margin-left:.3rem}
+.elim-row td{opacity:.6}
 @media(max-width:400px){
   .pts{font-size:3.5rem}
   .rally-btn{font-size:.95rem;padding:.9rem .3rem}
@@ -178,8 +183,10 @@ input:focus,select:focus{border-color:var(--green)}
   <button class="start-btn hist" onclick="showPage('history');loadHistory()">📋 Past Games</button>
   <hr style="border-color:var(--card2);margin:1.5rem 0">
   <button class="start-btn umpire" onclick="showPage('umpire-login')">🔒 Umpire Login</button>
-  <button class="start-btn admin" onclick="showPage('admin-login')">👑 Super Admin</button>
 </div>
+
+<!-- Fixed small Super Admin button -->
+<button class="fab-admin" onclick="showPage('admin-login')" title="Super Admin">👑</button>
 
 <!-- PAGE: UMPIRE LOGIN -->
 <div class="page" id="pg-umpire-login">
@@ -436,7 +443,7 @@ const firebaseConfig = {
    PASSWORDS
    ═══════════════════════════════════════════════════ */
 const UMPIRE_PASSWORD = "pickle123";
-const ADMIN_PASSWORD  = "jayshreeram";
+const ADMIN_PASSWORD  = "admin@321";
 /* ═══════════════════════════════════════════════════ */
 
 firebase.initializeApp(firebaseConfig);
@@ -1122,8 +1129,9 @@ function loadUmpireGames(){
     let html = '';
     Object.values(games).forEach(g => {
       const isMine = g.deviceId === DEVICE_ID;
-      const label = isMine ? ' · <span style="color:var(--green)">YOUR GAME</span>' : ' · <span style="color:var(--dim)">Other device</span>';
-      const click = isMine ? 'onclick="umpireOpenGame(\''+g.code+'\')" style="cursor:pointer"' : 'style="cursor:default;opacity:.6"';
+      const canOpen = isMine || isAdmin;
+      const label = isMine ? ' · <span style="color:var(--green)">YOUR GAME</span>' : isAdmin ? ' · <span style="color:var(--purple)">ADMIN ACCESS</span>' : ' · <span style="color:var(--dim)">Other device</span>';
+      const click = canOpen ? 'onclick="umpireOpenGame(\''+g.code+'\')" style="cursor:pointer"' : 'style="cursor:default;opacity:.6"';
       const grpLabel = g.groupName ? ' · '+esc(g.groupName) : '';
       html += '<div class="game-card" '+click+'>'
         +'<div><div class="teams"><span class="live-dot"></span>'+esc(g.t1)+' vs '+esc(g.t2)+'</div>'
@@ -1139,7 +1147,7 @@ function umpireOpenGame(code){
   db.ref('games/' + code).once('value', snap => {
     const data = snap.val();
     if(!data) return;
-    if(data.deviceId && data.deviceId !== DEVICE_ID){
+    if(!isAdmin && data.deviceId && data.deviceId !== DEVICE_ID){
       alert('This game is being scored on another device. You cannot edit it.');
       return;
     }
@@ -1287,7 +1295,7 @@ function render(){
     w.classList.remove('hide');
   }
 
-  const isOwner = G.deviceId === DEVICE_ID;
+  const isOwner = G.deviceId === DEVICE_ID || isAdmin;
   const showControls = isUmpire === true && isScoring === true && live && isOwner;
   document.getElementById('rally-btns').style.display = showControls ? 'flex' : 'none';
   document.getElementById('sb-actions').style.display = showControls ? 'flex' : 'none';
@@ -1308,7 +1316,7 @@ function render(){
    SCORING
    ═══════════════════════════════════════════════════ */
 function rallyPoint(){
-  if(!G || G.status !== 'live' || !isScoring || G.deviceId !== DEVICE_ID) return;
+  if(!G || G.status !== 'live' || !isScoring || (G.deviceId !== DEVICE_ID && !isAdmin)) return;
   undoLog.push({ p1:G.p1, p2:G.p2, servingTeam:G.servingTeam, serverNum:G.serverNum, status:G.status });
   if(G.servingTeam === 1) G.p1++; else G.p2++;
   db.ref('games/' + G.code).set(G);
@@ -1317,7 +1325,7 @@ function rallyPoint(){
 }
 
 function rallySideOut(){
-  if(!G || G.status !== 'live' || !isScoring || G.deviceId !== DEVICE_ID) return;
+  if(!G || G.status !== 'live' || !isScoring || (G.deviceId !== DEVICE_ID && !isAdmin)) return;
   undoLog.push({ p1:G.p1, p2:G.p2, servingTeam:G.servingTeam, serverNum:G.serverNum, status:G.status });
   if(G.serverNum === 1){
     G.serverNum = 2;
@@ -1331,7 +1339,7 @@ function rallySideOut(){
 }
 
 function undo(){
-  if(!G || undoLog.length === 0 || !isScoring || G.deviceId !== DEVICE_ID) return;
+  if(!G || undoLog.length === 0 || !isScoring || (G.deviceId !== DEVICE_ID && !isAdmin)) return;
   const prev = undoLog.pop();
   G.p1 = prev.p1; G.p2 = prev.p2;
   G.servingTeam = prev.servingTeam;
@@ -1342,7 +1350,7 @@ function undo(){
 }
 
 function endGame(){
-  if(!G || !isScoring || G.deviceId !== DEVICE_ID) return;
+  if(!G || !isScoring || (G.deviceId !== DEVICE_ID && !isAdmin)) return;
   if(!confirm('End this game?')) return;
   G.status = 'finished';
   saveToHistory();
@@ -1460,8 +1468,10 @@ function loadStandings(){
           sorted.forEach(([name, s], idx) => {
             const pos = idx + 1;
             const posClass = pos===1?'pos-1':pos===2?'pos-2':pos===3?'pos-3':'pos-n';
-            html += '<tr><td><span class="pos-badge '+posClass+'">'+pos+'</span></td>'
-              +'<td style="text-align:left;font-weight:600">'+esc(name)+'</td>'
+            const rowClass = pos <= 2 ? 'qualify-row' : 'elim-row';
+            const qBadge = pos <= 2 ? '<span class="qualify-badge">✓ Q</span>' : '';
+            html += '<tr class="'+rowClass+'"><td><span class="pos-badge '+posClass+'">'+pos+'</span></td>'
+              +'<td style="text-align:left;font-weight:600">'+esc(name)+qBadge+'</td>'
               +'<td>'+s.played+'</td><td style="color:var(--green);font-weight:700">'+s.won+'</td>'
               +'<td style="color:var(--red)">'+s.lost+'</td>'
               +'<td>'+s.pf+'</td><td>'+s.pa+'</td></tr>';
