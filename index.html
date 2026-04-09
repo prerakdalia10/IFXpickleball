@@ -86,6 +86,12 @@ input:focus,select:focus{border-color:var(--green)}
 
 .back-btn{display:inline-block;margin-bottom:1rem;padding:.5rem 1rem;background:var(--card2);color:var(--text);border:none;border-radius:var(--r);cursor:pointer;font-size:.9rem}
 .clear-btn{margin-top:1rem;padding:.6rem 1rem;background:var(--card2);color:var(--red);border:none;border-radius:var(--r);cursor:pointer;font-size:.85rem;width:100%}
+.export-btn{margin-top:.5rem;padding:.6rem 1rem;background:var(--green);color:#111;border:none;border-radius:var(--r);cursor:pointer;font-size:.85rem;font-weight:700;width:100%}
+
+/* History cards with delete */
+.game-card{position:relative}
+.game-card .del-btn{position:absolute;top:6px;right:8px;background:none;border:none;color:var(--dim);font-size:1.1rem;cursor:pointer;padding:4px 6px;border-radius:6px;line-height:1}
+.game-card .del-btn:hover{color:var(--red);background:var(--card2)}
 
 /* Password box */
 .pw-box{background:var(--card);border-radius:var(--r);padding:1.5rem;text-align:center;margin-top:1rem}
@@ -246,6 +252,7 @@ input:focus,select:focus{border-color:var(--green)}
   <button class="back-btn" onclick="showPage('home')">← Back</button>
   <h2>Past Games</h2>
   <div id="hist-list"></div>
+  <button class="export-btn" onclick="exportToExcel()">📥 Download as Excel (.xls)</button>
   <button class="clear-btn" onclick="clearHistory()">🗑 Clear All History</button>
 </div>
 
@@ -270,7 +277,7 @@ const firebaseConfig = {
 /* ═══════════════════════════════════════════════════
    UMPIRE PASSWORD — Change this to your own password
    ═══════════════════════════════════════════════════ */
-const UMPIRE_PASSWORD = "sweetpickle";
+const UMPIRE_PASSWORD = "pickle123";
 /* ═══════════════════════════════════════════════════ */
 
 firebase.initializeApp(firebaseConfig);
@@ -458,6 +465,9 @@ function spectatorWatch(code){
   currentGameCode = code;
   undoLog = [];
 
+  // Double-check: spectators must never have umpire scoring rights
+  if(!isUmpire) isScoring = false;
+
   if(watchRef) watchRef.off();
   if(liveListRef){ liveListRef.off(); liveListRef = null; }
 
@@ -525,11 +535,11 @@ function render(){
     w.classList.remove('hide');
   }
 
-  // Show controls only for logged-in umpire scoring this game
-  const showControls = isUmpire && isScoring && live;
+  // Show controls ONLY for logged-in umpire scoring this game
+  const showControls = isUmpire === true && isScoring === true && live;
   document.getElementById('rally-btns').style.display = showControls ? 'flex' : 'none';
   document.getElementById('sb-actions').style.display = showControls ? 'flex' : 'none';
-  document.getElementById('share-box').style.display = (isUmpire && isScoring) ? 'block' : 'none';
+  document.getElementById('share-box').style.display = (isUmpire === true && isScoring === true) ? 'block' : 'none';
 }
 
 /* ── POINT ── */
@@ -612,12 +622,40 @@ function loadHistory(){
   const h = getHistory();
   const el = document.getElementById('hist-list');
   if(!h.length){ el.innerHTML = '<p class="empty">No games yet.</p>'; return; }
-  el.innerHTML = h.map(g => {
+  el.innerHTML = h.map((g,i) => {
     const d = new Date(g.date);
     const when = d.toLocaleDateString() + ' ' + d.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
     const winner = g.p1 > g.p2 ? g.t1 : g.p2 > g.p1 ? g.t2 : 'Tied';
-    return '<div class="game-card" style="cursor:default"><div><div class="teams">'+esc(g.t1)+' vs '+esc(g.t2)+'</div><div class="meta">Doubles · To '+g.win+' · '+when+' · Winner: '+esc(winner)+'</div></div><div class="fscore"><span class="s1">'+g.p1+'</span> – <span class="s2">'+g.p2+'</span></div></div>';
+    return '<div class="game-card" style="cursor:default"><button class="del-btn" title="Delete" onclick="deleteGame('+i+')">✕</button><div><div class="teams">'+esc(g.t1)+' vs '+esc(g.t2)+'</div><div class="meta">Doubles · To '+g.win+' · '+when+' · Winner: '+esc(winner)+'</div></div><div class="fscore"><span class="s1">'+g.p1+'</span> – <span class="s2">'+g.p2+'</span></div></div>';
   }).join('');
+}
+
+function deleteGame(index){
+  if(!confirm('Delete this game from history?')) return;
+  const h = getHistory();
+  h.splice(index, 1);
+  localStorage.setItem('pb_history', JSON.stringify(h));
+  loadHistory();
+}
+
+function exportToExcel(){
+  const h = getHistory();
+  if(!h.length){ alert('No games to export.'); return; }
+  let table = '<table><tr><th>Date</th><th>Team 1</th><th>Team 2</th><th>Score 1</th><th>Score 2</th><th>Play To</th><th>Winner</th><th>Game Code</th></tr>';
+  h.forEach(g => {
+    const d = new Date(g.date);
+    const when = d.toLocaleDateString() + ' ' + d.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+    const winner = g.p1 > g.p2 ? g.t1 : g.p2 > g.p1 ? g.t2 : 'Tied';
+    table += '<tr><td>'+when+'</td><td>'+esc(g.t1)+'</td><td>'+esc(g.t2)+'</td><td>'+g.p1+'</td><td>'+g.p2+'</td><td>'+g.win+'</td><td>'+esc(winner)+'</td><td>'+(g.code||'')+'</td></tr>';
+  });
+  table += '</table>';
+  const blob = new Blob(['<html><head><meta charset="UTF-8"></head><body>'+table+'</body></html>'], {type:'application/vnd.ms-excel'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'pickleball_history.xls';
+  a.click();
+  URL.revokeObjectURL(url);
 }
 
 function clearHistory(){
