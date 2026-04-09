@@ -171,6 +171,10 @@ input:focus,select:focus{border-color:var(--green)}
 .fx-pending{background:var(--green);color:#111}
 .fx-done{background:var(--card2);color:var(--dim)}
 .fixtures-header{font-size:.85rem;color:var(--dim);margin-bottom:.5rem}
+.toss-flip-btn{padding:.6rem 1.5rem;background:var(--yellow);color:#111;border:none;border-radius:var(--r);font-weight:800;font-size:1rem;cursor:pointer}
+.toss-team-btn{flex:1;padding:.7rem;border:none;border-radius:var(--r);font-weight:700;font-size:.85rem;cursor:pointer}
+.t1-toss{background:var(--green);color:#111}
+.t2-toss{background:var(--blue);color:#111}
 @media(max-width:400px){
   .pts{font-size:3.5rem}
   .rally-btn{font-size:.95rem;padding:.9rem .3rem}
@@ -335,12 +339,6 @@ input:focus,select:focus{border-color:var(--green)}
   <label>Play to</label>
   <select id="f-win"><option value="11" selected>11</option><option value="15">15</option><option value="21">21</option></select>
 
-  <div class="section-label">Who serves first?</div>
-  <div class="server-pick">
-    <button id="pick-t1" onclick="pickServer(1)" class="picked">Team 1</button>
-    <button id="pick-t2" onclick="pickServer(2)">Team 2</button>
-  </div>
-
   <button class="start-btn new" onclick="startGame()">Start Scoring →</button>
 </div>
 
@@ -351,6 +349,18 @@ input:focus,select:focus{border-color:var(--green)}
     <span class="tag" id="s-target">To 11</span>
     <span class="tag live" id="s-status">LIVE</span>
     <span class="tag" id="s-group-tag" style="display:none;background:var(--purple);color:#fff"></span>
+  </div>
+
+  <div id="toss-area" style="display:none">
+    <div style="background:var(--card);border-radius:var(--r);padding:1rem;text-align:center;margin-bottom:1rem;border:2px solid var(--yellow)">
+      <div style="font-size:1rem;font-weight:700;color:var(--yellow);margin-bottom:.8rem">🪙 Toss — Who serves first?</div>
+      <button class="toss-flip-btn" onclick="randomToss()">🪙 Flip Coin (Random)</button>
+      <div id="toss-result" style="margin:.6rem 0;font-size:.9rem;font-weight:700;min-height:1.5rem"></div>
+      <div style="display:flex;gap:.5rem">
+        <button class="toss-team-btn t1-toss" onclick="decideToss(1)"><span id="toss-t1-name">Team 1</span></button>
+        <button class="toss-team-btn t2-toss" onclick="decideToss(2)"><span id="toss-t2-name">Team 2</span></button>
+      </div>
+    </div>
   </div>
 
   <div class="score-call">
@@ -458,7 +468,7 @@ const firebaseConfig = {
    PASSWORDS
    ═══════════════════════════════════════════════════ */
 const UMPIRE_PASSWORD = "pickle123";
-const ADMIN_PASSWORD  = "admin@321";
+const ADMIN_PASSWORD  = "jayshreeram";
 /* ═══════════════════════════════════════════════════ */
 
 firebase.initializeApp(firebaseConfig);
@@ -1078,6 +1088,33 @@ function genCode(){
   return code;
 }
 
+/* ── Toss ── */
+function decideToss(team){
+  if(!G || !isScoring) return;
+  G.servingTeam = team;
+  G.serverNum = 2;
+  G.tossDecided = true;
+  db.ref('games/' + G.code).set(G);
+  render();
+}
+
+function randomToss(){
+  if(!G || !isScoring) return;
+  const winner = Math.random() < 0.5 ? 1 : 2;
+  const teamName = winner === 1 ? G.t1 : G.t2;
+  const resultEl = document.getElementById('toss-result');
+  const coinBtn = document.querySelector('.toss-flip-btn');
+  if(coinBtn) coinBtn.disabled = true;
+  if(resultEl) resultEl.innerHTML = '<span style="color:var(--yellow)">🪙 Flipping...</span>';
+  setTimeout(function(){
+    if(resultEl) resultEl.innerHTML = '🎉 <span style="color:var(--green)">' + esc(teamName) + '</span> serves first!';
+    setTimeout(function(){
+      if(coinBtn) coinBtn.disabled = false;
+      decideToss(winner);
+    }, 1200);
+  }, 800);
+}
+
 /* ═══════════════════════════════════════════════════
    FIXTURES: Auto-generated round-robin matches
    ═══════════════════════════════════════════════════ */
@@ -1174,6 +1211,7 @@ function startFixtureMatch(t1, t2, groupKey){
     code: code, t1: t1, t2: t2, win: 11,
     p1: 0, p2: 0,
     servingTeam: 1, serverNum: 2,
+    tossDecided: false,
     status: 'live',
     date: new Date().toISOString(),
     deviceId: DEVICE_ID,
@@ -1227,7 +1265,8 @@ function startGame(){
   G = {
     code: code, t1: t1, t2: t2, win: win,
     p1: 0, p2: 0,
-    servingTeam: firstServer, serverNum: 2,
+    servingTeam: 1, serverNum: 2,
+    tossDecided: false,
     status: 'live',
     date: new Date().toISOString(),
     deviceId: DEVICE_ID,
@@ -1440,11 +1479,25 @@ function render(){
 
   const isOwner = G.deviceId === DEVICE_ID || isAdmin;
   const showControls = isUmpire === true && isScoring === true && live && isOwner;
-  document.getElementById('rally-btns').style.display = showControls ? 'flex' : 'none';
-  document.getElementById('sb-actions').style.display = showControls ? 'flex' : 'none';
+  const winEligible = (G.p1 >= G.win || G.p2 >= G.win) && Math.abs(G.p1 - G.p2) >= 2;
+  const tossNeeded = G.tossDecided === false && live;
+
+  // Toss area
+  const tossArea = document.getElementById('toss-area');
+  if(tossArea){
+    tossArea.style.display = (showControls && tossNeeded) ? 'block' : 'none';
+    if(tossNeeded){
+      document.getElementById('toss-t1-name').textContent = G.t1;
+      document.getElementById('toss-t2-name').textContent = G.t2;
+    }
+  }
+
+  // Hide rally buttons during toss or when win reached; keep undo+end visible
+  const showRally = showControls && !tossNeeded && !winEligible;
+  document.getElementById('rally-btns').style.display = showRally ? 'flex' : 'none';
+  document.getElementById('sb-actions').style.display = (showControls && !tossNeeded) ? 'flex' : 'none';
   document.getElementById('share-box').style.display = (isUmpire === true && isScoring === true && isOwner) ? 'block' : 'none';
 
-  const winEligible = (G.p1 >= G.win || G.p2 >= G.win) && Math.abs(G.p1 - G.p2) >= 2;
   const banner = document.getElementById('s-winner');
   if(live && winEligible){
     const leading = G.p1 > G.p2 ? G.t1 : G.t2;
