@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no"/>
+<title>Pickleball Scorecard</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0f1923;--card:#1a2733;--card2:#243442;--green:#00e676;--blue:#42a5f5;--red:#ff5252;--yellow:#ffd600;--text:#e0e0e0;--dim:#78909c;--r:14px}
+body{font-family:"Segoe UI",system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:2rem}
+header{text-align:center;padding:1rem;background:var(--card);border-bottom:2px solid var(--green)}
+header h1{font-size:1.3rem}
+h2{margin-bottom:1rem}
+.page{display:none;max-width:500px;margin:0 auto;padding:1rem}
+.page.active{display:block}
+
+/* ── Buttons ── */
+.start-btn{width:100%;padding:1.2rem;font-size:1.1rem;font-weight:700;border:none;border-radius:var(--r);cursor:pointer;margin-bottom:.8rem}
+.start-btn.new{background:var(--green);color:#111}
+.start-btn.watch{background:var(--blue);color:#111}
+.start-btn.hist{background:var(--card2);color:var(--text)}
+
+/* ── Form ── */
+label{display:block;margin-bottom:.3rem;font-size:.85rem;color:var(--dim)}
+input,select{width:100%;padding:.7rem;font-size:1rem;background:var(--card2);color:var(--text);border:2px solid transparent;border-radius:var(--r);outline:none;margin-bottom:1rem}
+input:focus,select:focus{border-color:var(--green)}
+.section-label{font-size:.95rem;font-weight:700;color:var(--green);margin:1rem 0 .5rem;border-bottom:1px solid var(--card2);padding-bottom:.3rem}
+
+/* Server picker */
+.server-pick{display:flex;gap:.5rem;margin-bottom:1rem}
+.server-pick button{flex:1;padding:.7rem;font-size:.9rem;font-weight:600;border:2px solid var(--card2);border-radius:var(--r);cursor:pointer;background:var(--card2);color:var(--text);transition:all .2s}
+.server-pick button.picked{border-color:var(--yellow);background:var(--yellow);color:#111}
+
+/* ── Scoreboard ── */
+.sb-header{display:flex;justify-content:center;gap:.5rem;margin-bottom:.6rem;flex-wrap:wrap}
+.tag{background:var(--card2);padding:.3rem .7rem;border-radius:999px;font-size:.75rem;font-weight:700;text-transform:uppercase}
+.tag.live{background:var(--green);color:#111;animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+
+/* Score call */
+.score-call{text-align:center;background:var(--card);border-radius:var(--r);padding:.8rem;margin-bottom:1rem}
+.score-call .call{font-size:2rem;font-weight:900;letter-spacing:2px;font-variant-numeric:tabular-nums}
+.score-call .call-label{font-size:.75rem;color:var(--dim);margin-top:.3rem}
+
+/* Serving info */
+.serving-info{text-align:center;background:var(--card2);border-radius:var(--r);padding:.6rem;margin-bottom:1rem;font-size:.9rem}
+.serving-info .serve-team{color:var(--yellow);font-weight:700}
+.serving-info .serve-num{color:var(--green);font-weight:700}
+
+.score-zone{display:flex;gap:.6rem;margin-bottom:1rem}
+.team-box{flex:1;background:var(--card);border-radius:var(--r);padding:1rem .5rem;text-align:center;border:3px solid transparent;transition:border-color .2s}
+.team-box.serving{border-color:var(--yellow)}
+.tname{font-size:.9rem;font-weight:700;margin-bottom:.2rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.serve-badge{display:none;font-size:.7rem;font-weight:700;background:var(--yellow);color:#111;padding:.15rem .5rem;border-radius:999px;margin-bottom:.3rem}
+.team-box.serving .serve-badge{display:inline-block}
+.points{font-size:4.5rem;font-weight:900;line-height:1;margin:.3rem 0;font-variant-numeric:tabular-nums}
+.t1 .points{color:var(--green)}
+.t2 .points{color:var(--blue)}
+
+/* Action buttons */
+.rally-btns{display:flex;gap:.6rem;margin-bottom:.8rem}
+.rally-btn{flex:1;padding:1.1rem .5rem;font-size:1.1rem;font-weight:800;border:none;border-radius:var(--r);cursor:pointer;text-align:center;line-height:1.3}
+.btn-point{background:var(--green);color:#111}
+.btn-sideout{background:var(--yellow);color:#111}
+
+.actions{display:flex;gap:.6rem;flex-wrap:wrap;margin-bottom:.8rem}
+.actions button{flex:1;min-width:100px;padding:.65rem;font-size:.9rem;border:none;border-radius:var(--r);cursor:pointer;font-weight:600}
+.btn-undo{background:var(--card2);color:var(--text)}
+.btn-end{background:var(--red);color:#fff}
+
+/* Share box */
+.share-box{background:var(--card2);border-radius:var(--r);padding:1rem;text-align:center;margin-bottom:.8rem}
+.share-box p{font-size:.85rem;color:var(--dim);margin-bottom:.5rem}
+.share-box input{margin-bottom:.5rem;text-align:center;border:1px solid var(--green);background:var(--card)}
+.share-box .copy-btn{padding:.5rem 1.5rem;background:var(--green);color:#111;border:none;border-radius:var(--r);font-weight:700;cursor:pointer}
+
+.winner{margin-top:1rem;text-align:center;padding:1rem;border-radius:var(--r);font-size:1.3rem;font-weight:800;background:linear-gradient(135deg,#ffd600,#ff6d00);color:#111}
+.winner.hide{display:none}
+
+/* ── Watch page ── */
+.watch-input{display:flex;gap:.5rem;margin-bottom:1rem}
+.watch-input input{flex:1;margin-bottom:0}
+.watch-input button{padding:.7rem 1.2rem;background:var(--blue);color:#111;border:none;border-radius:var(--r);font-weight:700;cursor:pointer;white-space:nowrap}
+
+/* ── History ── */
+.game-card{background:var(--card);border-radius:var(--r);padding:.8rem 1rem;margin-bottom:.6rem;display:flex;justify-content:space-between;align-items:center}
+.game-card .teams{font-weight:600;font-size:.95rem}
+.game-card .meta{font-size:.75rem;color:var(--dim);margin-top:.2rem}
+.game-card .fscore{font-size:1.2rem;font-weight:800;font-variant-numeric:tabular-nums}
+.game-card .s1{color:var(--green)}.game-card .s2{color:var(--blue)}
+.empty{color:var(--dim);font-style:italic;text-align:center;padding:2rem 0}
+.back-btn{display:inline-block;margin-bottom:1rem;padding:.5rem 1rem;background:var(--card2);color:var(--text);border:none;border-radius:var(--r);cursor:pointer;font-size:.9rem}
+.clear-btn{margin-top:1rem;padding:.6rem 1rem;background:var(--card2);color:var(--red);border:none;border-radius:var(--r);cursor:pointer;font-size:.85rem;width:100%}
+
+/* Loading */
+.loading{text-align:center;padding:3rem 1rem;color:var(--dim)}
+.loading .spin{display:inline-block;width:30px;height:30px;border:3px solid var(--card2);border-top:3px solid var(--green);border-radius:50%;animation:spin .8s linear infinite;margin-bottom:.5rem}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+@media(max-width:400px){
+  .points{font-size:3.5rem}
+  .rally-btn{font-size:.95rem;padding:.9rem .3rem}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🏓 Pickleball Scorecard</h1>
+</header>
+
+<!-- PAGE: HOME -->
+<div class="page active" id="pg-home">
+  <br>
+  <button class="start-btn new" onclick="showPage('setup')">▶ New Game (Umpire)</button>
+  <button class="start-btn watch" onclick="showPage('watch')">👀 Watch Live Score</button>
+  <button class="start-btn hist" onclick="showPage('history');loadHistory()">📋 Past Games</button>
+</div>
+
+<!-- PAGE: SETUP -->
+<div class="page" id="pg-setup">
+  <button class="back-btn" onclick="showPage('home')">← Back</button>
+  <h2>Game Setup — Doubles</h2>
+
+  <div class="section-label">Team 1</div>
+  <label>Team 1 Name</label>
+  <input id="f-t1" placeholder="e.g. Team Alpha" maxlength="40"/>
+
+  <div class="section-label">Team 2</div>
+  <label>Team 2 Name</label>
+  <input id="f-t2" placeholder="e.g. Team Beta" maxlength="40"/>
+
+  <div class="section-label">Settings</div>
+  <label>Play to</label>
+  <select id="f-win"><option value="11" selected>11</option><option value="15">15</option><option value="21">21</option></select>
+
+  <div class="section-label">Who serves first?</div>
+  <div class="server-pick">
+    <button id="pick-t1" onclick="pickServer(1)" class="picked">Team 1</button>
+    <button id="pick-t2" onclick="pickServer(2)">Team 2</button>
+  </div>
+
+  <button class="start-btn new" onclick="startGame()">Start Scoring →</button>
+</div>
+
+<!-- PAGE: SCOREBOARD -->
+<div class="page" id="pg-score">
+  <div class="sb-header">
+    <span class="tag">Doubles</span>
+    <span class="tag" id="s-target">To 11</span>
+    <span class="tag live" id="s-status">LIVE</span>
+  </div>
+
+  <div class="score-call">
+    <div class="call" id="s-call">0 – 0 – 2</div>
+    <div class="call-label">Serving team score – Receiving team score – Server #</div>
+  </div>
+
+  <div class="serving-info">
+    🏓 Serving: <span class="serve-team" id="s-serve-team">Team 1</span>
+    &nbsp;·&nbsp; Server <span class="serve-num" id="s-serve-num">#2</span>
+  </div>
+
+  <div class="score-zone">
+    <div class="team-box t1 serving" id="box-t1">
+      <div class="serve-badge">SERVING</div>
+      <div class="tname" id="s-t1">Team 1</div>
+      <div class="points" id="s-p1">0</div>
+    </div>
+    <div class="team-box t2" id="box-t2">
+      <div class="serve-badge">SERVING</div>
+      <div class="tname" id="s-t2">Team 2</div>
+      <div class="points" id="s-p2">0</div>
+    </div>
+  </div>
+
+  <div class="rally-btns" id="rally-btns">
+    <button class="rally-btn btn-point" onclick="rallyPoint()">✅ POINT<br><small>(serving team scores)</small></button>
+    <button class="rally-btn btn-sideout" onclick="rallySideOut()">🔄 SIDE OUT<br><small>(rally lost by server)</small></button>
+  </div>
+
+  <div class="actions" id="sb-actions">
+    <button class="btn-undo" onclick="undo()">↩ Undo</button>
+    <button class="btn-end" onclick="endGame()">🏁 End Game</button>
+  </div>
+
+  <div class="share-box" id="share-box">
+    <p>📡 Share this Game Code for live viewing:</p>
+    <input type="text" id="share-code" readonly/>
+    <br>
+    <button class="copy-btn" onclick="copyCode()">Copy Game Code</button>
+  </div>
+
+  <div class="winner hide" id="s-winner"></div>
+</div>
+
+<!-- PAGE: WATCH -->
+<div class="page" id="pg-watch">
+  <button class="back-btn" onclick="stopWatching();showPage('home')">← Back</button>
+  <h2>Watch Live Score</h2>
+  <p style="color:var(--dim);margin-bottom:1rem;font-size:.9rem">Enter the Game Code shared by the umpire:</p>
+  <div class="watch-input">
+    <input id="watch-code" placeholder="e.g. ABC123" maxlength="10" style="text-transform:uppercase"/>
+    <button onclick="watchGame()">Watch →</button>
+  </div>
+  <div id="watch-area"></div>
+</div>
+
+<!-- PAGE: HISTORY -->
+<div class="page" id="pg-history">
+  <button class="back-btn" onclick="showPage('home')">← Back</button>
+  <h2>Past Games</h2>
+  <div id="hist-list"></div>
+  <button class="clear-btn" onclick="clearHistory()">🗑 Clear All History</button>
+</div>
+
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+
+<script>
+/* ═══════════════════════════════════════════════════════════
+   🔧 FIREBASE CONFIG — REPLACE WITH YOUR OWN VALUES
+   ═══════════════════════════════════════════════════════════ */
+const firebaseConfig = {
+  apiKey:            "AIzaSyCbR8ietydlHPb_DT8HbryOSSLw2M5CRHg",
+  authDomain:        "ifx-pickleball-ba328.firebaseapp.com",
+  databaseURL:       "https://ifx-pickleball-ba328-default-rtdb.firebaseio.com",
+  projectId:         "ifx-pickleball-ba328",
+  storageBucket:     "ifx-pickleball-ba328.firebasestorage.app",
+  messagingSenderId: "1029021712027",
+  appId:             "1:1029021712027:web:efc21cdb36e4a74ff8103e"
+};
+/* ═══════════════════════════════════════════════════════════ */
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+/* ── Navigation ── */
+function showPage(name){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById('pg-'+name).classList.add('active');
+}
+
+/* ── Setup ── */
+let firstServer = 1;
+function pickServer(team){
+  firstServer = team;
+  document.getElementById('pick-t1').classList.toggle('picked', team===1);
+  document.getElementById('pick-t2').classList.toggle('picked', team===2);
+}
+
+/* ── Game State ── */
+let G = null;
+let gameRef = null;
+let undoLog = [];
+let isUmpire = false;
+let watchRef = null;
+
+function genCode(){
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let code = '';
+  for(let i=0;i<6;i++) code += chars[Math.floor(Math.random()*chars.length)];
+  return code;
+}
+
+function startGame(){
+  const t1 = document.getElementById('f-t1').value.trim() || 'Team 1';
+  const t2 = document.getElementById('f-t2').value.trim() || 'Team 2';
+  const win = parseInt(document.getElementById('f-win').value);
+  const code = genCode();
+
+  G = {
+    code: code,
+    t1: t1,
+    t2: t2,
+    win: win,
+    p1: 0,
+    p2: 0,
+    servingTeam: firstServer,
+    serverNum: 2,
+    status: 'live',
+    date: new Date().toISOString()
+  };
+
+  undoLog = [];
+  isUmpire = true;
+
+  // Write to Firebase
+  gameRef = db.ref('games/' + code);
+  gameRef.set(G);
+
+  // Show share code
+  document.getElementById('share-code').value = code;
+
+  render();
+  showPage('score');
+}
+
+function pushToFirebase(){
+  if(gameRef && G){
+    gameRef.set(G);
+  }
+}
+
+function render(){
+  if(!G) return;
+
+  document.getElementById('s-t1').textContent = G.t1;
+  document.getElementById('s-t2').textContent = G.t2;
+  document.getElementById('s-p1').textContent = G.p1;
+  document.getElementById('s-p2').textContent = G.p2;
+  document.getElementById('s-target').textContent = 'To ' + G.win;
+
+  // Serving
+  const servingName = G.servingTeam === 1 ? G.t1 : G.t2;
+  document.getElementById('s-serve-team').textContent = servingName;
+  document.getElementById('s-serve-num').textContent = '#' + G.serverNum;
+  document.getElementById('box-t1').classList.toggle('serving', G.servingTeam === 1);
+  document.getElementById('box-t2').classList.toggle('serving', G.servingTeam === 2);
+
+  // Score call
+  const sScore = G.servingTeam === 1 ? G.p1 : G.p2;
+  const rScore = G.servingTeam === 1 ? G.p2 : G.p1;
+  document.getElementById('s-call').textContent = sScore + ' – ' + rScore + ' – ' + G.serverNum;
+
+  // Status
+  const st = document.getElementById('s-status');
+  const w = document.getElementById('s-winner');
+  const rallyBtns = document.getElementById('rally-btns');
+  const sbActions = document.getElementById('sb-actions');
+
+  if(G.status === 'live'){
+    st.textContent = 'LIVE'; st.className = 'tag live';
+    w.classList.add('hide');
+    if(isUmpire){ rallyBtns.style.display = 'flex'; sbActions.style.display = 'flex'; }
+    else { rallyBtns.style.display = 'none'; sbActions.style.display = 'none'; }
+  } else {
+    st.textContent = 'FINISHED'; st.className = 'tag'; st.style.background='var(--red)'; st.style.color='#fff';
+    const winner = G.p1 > G.p2 ? G.t1 : G.p2 > G.p1 ? G.t2 : 'Tied';
+    w.textContent = winner === 'Tied' ? 'Game Tied!' : '🏆 ' + winner + ' Wins!';
+    w.classList.remove('hide');
+    rallyBtns.style.display = 'none';
+    sbActions.style.display = 'none';
+  }
+
+  // Show/hide share box only for umpire
+  document.getElementById('share-box').style.display = isUmpire ? 'block' : 'none';
+}
+
+/* ── POINT ── */
+function rallyPoint(){
+  if(!G || G.status !== 'live' || !isUmpire) return;
+  undoLog.push({ p1:G.p1, p2:G.p2, servingTeam:G.servingTeam, serverNum:G.serverNum, status:G.status });
+  if(G.servingTeam === 1) G.p1++; else G.p2++;
+  checkWin();
+  pushToFirebase();
+  render();
+  if(navigator.vibrate) navigator.vibrate(30);
+}
+
+/* ── SIDE OUT ── */
+function rallySideOut(){
+  if(!G || G.status !== 'live' || !isUmpire) return;
+  undoLog.push({ p1:G.p1, p2:G.p2, servingTeam:G.servingTeam, serverNum:G.serverNum, status:G.status });
+  if(G.serverNum === 1){
+    G.serverNum = 2;
+  } else {
+    G.servingTeam = G.servingTeam === 1 ? 2 : 1;
+    G.serverNum = 1;
+  }
+  pushToFirebase();
+  render();
+  if(navigator.vibrate) navigator.vibrate([30,50,30]);
+}
+
+function checkWin(){
+  if((G.p1 >= G.win || G.p2 >= G.win) && Math.abs(G.p1 - G.p2) >= 2){
+    G.status = 'finished';
+    saveToHistory();
+  }
+}
+
+function undo(){
+  if(!G || undoLog.length === 0 || !isUmpire) return;
+  const prev = undoLog.pop();
+  G.p1 = prev.p1; G.p2 = prev.p2;
+  G.servingTeam = prev.servingTeam;
+  G.serverNum = prev.serverNum;
+  G.status = prev.status;
+  pushToFirebase();
+  render();
+}
+
+function endGame(){
+  if(!G || !isUmpire) return;
+  if(!confirm('End this game?')) return;
+  G.status = 'finished';
+  saveToHistory();
+  pushToFirebase();
+  render();
+}
+
+function copyCode(){
+  const input = document.getElementById('share-code');
+  input.select();
+  navigator.clipboard.writeText(input.value).then(()=>{
+    const btn = document.querySelector('.copy-btn');
+    btn.textContent = 'Copied!';
+    setTimeout(()=> btn.textContent = 'Copy Game Code', 1500);
+  });
+}
+
+/* ── WATCH LIVE ── */
+function watchGame(){
+  const code = document.getElementById('watch-code').value.trim().toUpperCase();
+  if(!code){ alert('Enter a game code'); return; }
+
+  const area = document.getElementById('watch-area');
+  area.innerHTML = '<div class="loading"><div class="spin"></div><br>Connecting...</div>';
+
+  if(watchRef) watchRef.off();
+  watchRef = db.ref('games/' + code);
+
+  watchRef.on('value', snap => {
+    const data = snap.val();
+    if(!data){
+      area.innerHTML = '<p class="empty">Game not found. Check the code and try again.</p>';
+      return;
+    }
+    // Open scoreboard in watch mode
+    G = data;
+    isUmpire = false;
+    gameRef = null;
+    render();
+    showPage('score');
+  });
+}
+
+function stopWatching(){
+  if(watchRef){ watchRef.off(); watchRef = null; }
+}
+
+/* ── Deep link: ?code=ABC123 ── */
+(function(){
+  const params = new URLSearchParams(window.location.search);
+  const code = params.get('code');
+  if(code && /^[A-Z0-9]{4,8}$/i.test(code)){
+    document.getElementById('watch-code').value = code.toUpperCase();
+    showPage('watch');
+    setTimeout(watchGame, 500);
+  }
+})();
+
+/* ── History (localStorage) ── */
+function getHistory(){
+  try { return JSON.parse(localStorage.getItem('pb_history') || '[]'); }
+  catch { return []; }
+}
+
+function saveToHistory(){
+  const h = getHistory();
+  h.unshift({ t1:G.t1, t2:G.t2, p1:G.p1, p2:G.p2, win:G.win, date:G.date, code:G.code });
+  if(h.length > 100) h.length = 100;
+  localStorage.setItem('pb_history', JSON.stringify(h));
+}
+
+function loadHistory(){
+  const h = getHistory();
+  const el = document.getElementById('hist-list');
+  if(!h.length){ el.innerHTML = '<p class="empty">No games yet. Go play!</p>'; return; }
+  el.innerHTML = h.map(g => {
+    const d = new Date(g.date);
+    const when = d.toLocaleDateString() + ' ' + d.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+    const winner = g.p1 > g.p2 ? g.t1 : g.p2 > g.p1 ? g.t2 : 'Tied';
+    return '<div class="game-card"><div><div class="teams">'+esc(g.t1)+' vs '+esc(g.t2)+'</div><div class="meta">Doubles · To '+g.win+' · '+when+' · Winner: '+esc(winner)+'</div></div><div class="fscore"><span class="s1">'+g.p1+'</span> – <span class="s2">'+g.p2+'</span></div></div>';
+  }).join('');
+}
+
+function clearHistory(){
+  if(!confirm('Delete all past games?')) return;
+  localStorage.removeItem('pb_history');
+  loadHistory();
+}
+
+function esc(s){ const d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
+
+document.addEventListener('dblclick', function(e){ e.preventDefault(); }, {passive:false});
+</script>
+</body>
+</html>
