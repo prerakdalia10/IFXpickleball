@@ -118,7 +118,7 @@ input:focus,select:focus{border-color:var(--green)}
 .pos-badge{display:inline-block;width:22px;height:22px;line-height:22px;border-radius:50%;font-weight:800;font-size:.75rem;text-align:center;margin-right:.3rem}
 .pos-1{background:var(--green);color:#111}
 .pos-2{background:var(--blue);color:#111}
-.pos-3{background:var(--yellow);color:#111}
+.pos-3{background:var(--card2);color:var(--dim)}
 .pos-n{background:var(--card2);color:var(--dim)}
 
 /* ── Admin group cards ── */
@@ -1469,9 +1469,8 @@ function loadStandings(){
             const pos = idx + 1;
             const posClass = pos===1?'pos-1':pos===2?'pos-2':pos===3?'pos-3':'pos-n';
             const rowClass = pos <= 2 ? 'qualify-row' : 'elim-row';
-            const qBadge = pos <= 2 ? '<span class="qualify-badge">✓ Q</span>' : '';
             html += '<tr class="'+rowClass+'"><td><span class="pos-badge '+posClass+'">'+pos+'</span></td>'
-              +'<td style="text-align:left;font-weight:600">'+esc(name)+qBadge+'</td>'
+              +'<td style="text-align:left;font-weight:600">'+esc(name)+'</td>'
               +'<td>'+s.played+'</td><td style="color:var(--green);font-weight:700">'+s.won+'</td>'
               +'<td style="color:var(--red)">'+s.lost+'</td>'
               +'<td>'+s.pf+'</td><td>'+s.pa+'</td></tr>';
