@@ -6,22 +6,29 @@
 <title>Pickleball Scorecard</title>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{--bg:#0f1923;--card:#1a2733;--card2:#243442;--green:#00e676;--blue:#42a5f5;--red:#ff5252;--yellow:#ffd600;--text:#e0e0e0;--dim:#78909c;--r:14px;--purple:#ba68c8}
+:root{--bg:#0a1628;--card:#162032;--card2:#1e2d42;--green:#00e676;--blue:#42a5f5;--red:#ff5252;--yellow:#ffd600;--text:#e8eaf6;--dim:#78909c;--r:16px;--purple:#ba68c8;--court:#2e7d32;--court-line:#fff}
 body{font-family:"Segoe UI",system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:2rem}
-header{text-align:center;padding:1rem;background:var(--card);border-bottom:2px solid var(--green)}
-header h1{font-size:1.3rem}
+header{text-align:center;padding:.8rem 1rem;background:linear-gradient(135deg,#1a2744,#0d1b2a);border-bottom:3px solid var(--green);box-shadow:0 2px 20px rgba(0,230,118,.15)}
+header h1{font-size:1.3rem;letter-spacing:.5px}
 h2{margin-bottom:1rem}
 .page{display:none;max-width:500px;margin:0 auto;padding:1rem}
 .page.active{display:block}
 
+/* Court background for home */
+#pg-home{position:relative;overflow:hidden}
+#pg-home::before{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:320px;height:200px;background:var(--court);border:3px solid var(--court-line);border-radius:4px;opacity:.06;z-index:0}
+#pg-home::after{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:0;height:200px;border-left:3px dashed var(--court-line);opacity:.06;z-index:0}
+#pg-home>*{position:relative;z-index:1}
+
 /* ── Buttons ── */
-.start-btn{width:100%;padding:1.2rem;font-size:1.1rem;font-weight:700;border:none;border-radius:var(--r);cursor:pointer;margin-bottom:.8rem}
-.start-btn.new{background:var(--green);color:#111}
-.start-btn.umpire{background:var(--yellow);color:#111}
-.start-btn.watch{background:var(--blue);color:#111}
+.start-btn{width:100%;padding:1.2rem;font-size:1.05rem;font-weight:700;border:none;border-radius:var(--r);cursor:pointer;margin-bottom:.8rem;transition:transform .1s,box-shadow .15s;letter-spacing:.3px}
+.start-btn:active{transform:scale(.97)}
+.start-btn.new{background:linear-gradient(135deg,#00e676,#00c853);color:#111;box-shadow:0 3px 15px rgba(0,230,118,.25)}
+.start-btn.umpire{background:linear-gradient(135deg,#ffd600,#ffab00);color:#111;box-shadow:0 3px 15px rgba(255,214,0,.2)}
+.start-btn.watch{background:linear-gradient(135deg,#42a5f5,#1e88e5);color:#fff;box-shadow:0 3px 15px rgba(66,165,245,.2)}
 .start-btn.hist{background:var(--card2);color:var(--text)}
-.start-btn.admin{background:var(--purple);color:#fff}
-.start-btn.standings{background:linear-gradient(135deg,var(--green),var(--blue));color:#111}
+.start-btn.admin{background:linear-gradient(135deg,#ba68c8,#9c27b0);color:#fff}
+.start-btn.standings{background:linear-gradient(135deg,#00e676,#42a5f5);color:#111;box-shadow:0 3px 15px rgba(0,230,118,.2)}
 
 /* ── Form ── */
 label{display:block;margin-bottom:.3rem;font-size:.85rem;color:var(--dim)}
@@ -40,41 +47,46 @@ input:focus,select:focus{border-color:var(--green)}
 .tag.live{background:var(--green);color:#111;animation:pulse 1.5s infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
 
-.score-call{text-align:center;background:var(--card);border-radius:var(--r);padding:.8rem;margin-bottom:1rem}
-.score-call .call{font-size:2rem;font-weight:900;letter-spacing:2px;font-variant-numeric:tabular-nums}
-.score-call .call-label{font-size:.75rem;color:var(--dim);margin-top:.3rem}
+.score-call{text-align:center;background:linear-gradient(180deg,var(--card),var(--card2));border-radius:var(--r);padding:.8rem;margin-bottom:.8rem;border:1px solid rgba(255,255,255,.05)}
+.score-call .call{font-size:2.2rem;font-weight:900;letter-spacing:3px;font-variant-numeric:tabular-nums;text-shadow:0 2px 8px rgba(0,0,0,.3)}
+.score-call .call-label{font-size:.7rem;color:var(--dim);margin-top:.3rem;letter-spacing:.5px}
 
-.serving-info{text-align:center;background:var(--card2);border-radius:var(--r);padding:.6rem;margin-bottom:1rem;font-size:.9rem}
+.serving-info{text-align:center;background:var(--card2);border-radius:var(--r);padding:.5rem;margin-bottom:.6rem;font-size:.85rem;border:1px solid rgba(255,214,0,.1)}
 .serving-info .serve-team{color:var(--yellow);font-weight:700}
 .serving-info .serve-num{color:var(--green);font-weight:700}
 
-.score-zone{display:flex;gap:.6rem;margin-bottom:1rem}
-.team-box{flex:1;background:var(--card);border-radius:var(--r);padding:1rem .5rem;text-align:center;border:3px solid transparent;transition:border-color .2s}
-.team-box.serving{border-color:var(--yellow)}
-.tname{font-size:.9rem;font-weight:700;margin-bottom:.2rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.serve-badge{display:none;font-size:.7rem;font-weight:700;background:var(--yellow);color:#111;padding:.15rem .5rem;border-radius:999px;margin-bottom:.3rem}
+.score-zone{display:flex;gap:.5rem;margin-bottom:.6rem}
+.team-box{flex:1;background:linear-gradient(180deg,var(--card),rgba(15,25,35,.9));border-radius:var(--r);padding:.8rem .4rem;text-align:center;border:3px solid transparent;transition:all .25s;position:relative;overflow:hidden}
+.team-box::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:transparent;transition:background .25s}
+.team-box.serving{border-color:var(--yellow);box-shadow:0 0 20px rgba(255,214,0,.1)}
+.team-box.serving::before{background:var(--yellow)}
+.tname{font-size:.8rem;font-weight:700;margin-bottom:.2rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.serve-badge{display:none;font-size:.65rem;font-weight:700;background:var(--yellow);color:#111;padding:.15rem .5rem;border-radius:999px;margin-bottom:.2rem}
 .team-box.serving .serve-badge{display:inline-block}
-.pts{font-size:4.5rem;font-weight:900;line-height:1;margin:.3rem 0;font-variant-numeric:tabular-nums}
+.pts{font-size:4.2rem;font-weight:900;line-height:1;margin:.2rem 0;font-variant-numeric:tabular-nums;text-shadow:0 2px 10px rgba(0,0,0,.3)}
 .t1 .pts{color:var(--green)}
 .t2 .pts{color:var(--blue)}
 
-.rally-btns{display:flex;gap:.6rem;margin-bottom:.8rem}
-.rally-btn{flex:1;padding:1.1rem .5rem;font-size:1.1rem;font-weight:800;border:none;border-radius:var(--r);cursor:pointer;text-align:center;line-height:1.3}
-.btn-point{background:var(--green);color:#111}
-.btn-sideout{background:var(--yellow);color:#111}
+.rally-btns{display:flex;gap:.5rem;margin-bottom:.6rem}
+.rally-btn{flex:1;padding:1rem .5rem;font-size:1rem;font-weight:800;border:none;border-radius:var(--r);cursor:pointer;text-align:center;line-height:1.3;transition:transform .1s;box-shadow:0 3px 12px rgba(0,0,0,.2)}
+.rally-btn:active{transform:scale(.95)}
+.btn-point{background:linear-gradient(135deg,#00e676,#00c853);color:#111}
+.btn-sideout{background:linear-gradient(135deg,#ffd600,#ffab00);color:#111}
 
-.actions{display:flex;gap:.6rem;flex-wrap:wrap;margin-bottom:.8rem}
-.actions button{flex:1;min-width:100px;padding:.65rem;font-size:.9rem;border:none;border-radius:var(--r);cursor:pointer;font-weight:600}
+.actions{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:.6rem}
+.actions button{flex:1;min-width:100px;padding:.6rem;font-size:.85rem;border:none;border-radius:var(--r);cursor:pointer;font-weight:600;transition:transform .1s}
+.actions button:active{transform:scale(.95)}
 .btn-undo{background:var(--card2);color:var(--text)}
-.btn-end{background:var(--red);color:#fff}
+.btn-end{background:linear-gradient(135deg,#ff5252,#d32f2f);color:#fff}
 
 .share-box{background:var(--card2);border-radius:var(--r);padding:1rem;text-align:center;margin-bottom:.8rem}
 .share-box p{font-size:.85rem;color:var(--dim);margin-bottom:.5rem}
 .share-box input{margin-bottom:.5rem;text-align:center;border:1px solid var(--green);background:var(--card)}
 .share-box .copy-btn{padding:.5rem 1.5rem;background:var(--green);color:#111;border:none;border-radius:var(--r);font-weight:700;cursor:pointer}
 
-.winner{margin-top:1rem;text-align:center;padding:1rem;border-radius:var(--r);font-size:1.3rem;font-weight:800;background:linear-gradient(135deg,#ffd600,#ff6d00);color:#111}
+.winner{margin-top:.8rem;text-align:center;padding:1rem;border-radius:var(--r);font-size:1.2rem;font-weight:800;background:linear-gradient(135deg,#ffd600,#ff6d00);color:#111;box-shadow:0 4px 20px rgba(255,214,0,.2);animation:winPulse 1s ease-in-out infinite}
 .winner.hide{display:none}
+@keyframes winPulse{0%,100%{box-shadow:0 4px 20px rgba(255,214,0,.2)}50%{box-shadow:0 4px 30px rgba(255,214,0,.4)}}
 
 /* ── Game cards ── */
 .game-card{background:var(--card);border-radius:var(--r);padding:.8rem 1rem;margin-bottom:.6rem;display:flex;justify-content:space-between;align-items:center;cursor:pointer;transition:transform .15s,box-shadow .15s;position:relative}
@@ -175,22 +187,27 @@ input:focus,select:focus{border-color:var(--green)}
 .toss-team-btn{flex:1;padding:.7rem;border:none;border-radius:var(--r);font-weight:700;font-size:.85rem;cursor:pointer}
 .t1-toss{background:var(--green);color:#111}
 .t2-toss{background:var(--blue);color:#111}
-.reservice-bar{background:var(--card);border-radius:var(--r);padding:.5rem .7rem;margin-bottom:.8rem;font-size:.8rem}
-.rs-header{text-align:center;color:var(--dim);font-weight:600;font-size:.75rem;margin-bottom:.4rem}
-.rs-teams{display:flex;gap:.6rem}
-.rs-team{flex:1;display:flex;align-items:center;justify-content:center;gap:.3rem;background:var(--card2);border-radius:10px;padding:.35rem .4rem}
-.rs-team .rs-name{font-weight:600;font-size:.7rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:90px}
-.rs-team .rs-count{color:var(--yellow);font-weight:800;font-size:.95rem;min-width:1rem;text-align:center}
-.rs-team button{width:24px;height:24px;border-radius:50%;border:none;font-size:.85rem;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center}
+/* Re-service: 4 players, 3 each */
+.rs-panel{background:var(--card);border-radius:var(--r);padding:.6rem;margin-bottom:.6rem;border:1px solid rgba(255,214,0,.1)}
+.rs-panel-title{text-align:center;font-size:.7rem;font-weight:700;color:var(--dim);margin-bottom:.5rem;text-transform:uppercase;letter-spacing:1px}
+.rs-grid{display:grid;grid-template-columns:1fr 1fr;gap:.4rem}
+.rs-player{display:flex;align-items:center;gap:.3rem;background:var(--card2);border-radius:10px;padding:.3rem .4rem;transition:opacity .2s}
+.rs-player.rs-inactive{opacity:.35}
+.rs-player .rs-pname{flex:1;font-size:.65rem;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.rs-player .rs-dots{display:flex;gap:3px;align-items:center}
+.rs-dot{width:14px;height:14px;border-radius:50%;border:2px solid var(--yellow);background:transparent;transition:background .15s}
+.rs-dot.used{background:var(--yellow)}
+.rs-player button{width:22px;height:22px;border-radius:50%;border:none;font-size:.75rem;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .rs-plus{background:var(--yellow);color:#111}
 .rs-minus{background:var(--bg);color:var(--text)}
-.rs-total{text-align:center;margin-top:.3rem;font-size:.7rem;color:var(--dim)}
 .umpire-info{text-align:center;font-size:.75rem;color:var(--dim);margin-bottom:.5rem}
 .umpire-info span{color:var(--yellow);font-weight:600}
 @media(max-width:400px){
-  .pts{font-size:3.5rem}
-  .rally-btn{font-size:.95rem;padding:.9rem .3rem}
+  .pts{font-size:3.2rem}
+  .rally-btn{font-size:.9rem;padding:.8rem .3rem}
   .standings-tbl{font-size:.7rem}
+  .rs-player .rs-pname{font-size:.6rem;max-width:60px}
+  .score-call .call{font-size:1.8rem}
 }
 </style>
 </head>
@@ -399,23 +416,9 @@ input:focus,select:focus{border-color:var(--green)}
   </div>
 
   <div id="reservice-area" style="display:none">
-    <div class="reservice-bar">
-      <div class="rs-header">🔄 Re-serve Counter (3 total per game)</div>
-      <div class="rs-teams">
-        <div class="rs-team">
-          <span class="rs-name" id="rs-t1-name" style="color:var(--green)">T1</span>
-          <button class="rs-minus" onclick="reserviceChange(1,-1)">−</button>
-          <span class="rs-count" id="rs-t1-count">0</span>
-          <button class="rs-plus" onclick="reserviceChange(1,1)">+</button>
-        </div>
-        <div class="rs-team">
-          <span class="rs-name" id="rs-t2-name" style="color:var(--blue)">T2</span>
-          <button class="rs-minus" onclick="reserviceChange(2,-1)">−</button>
-          <span class="rs-count" id="rs-t2-count">0</span>
-          <button class="rs-plus" onclick="reserviceChange(2,1)">+</button>
-        </div>
-      </div>
-      <div class="rs-total">Used: <span id="rs-total-used">0</span>/3</div>
+    <div class="rs-panel">
+      <div class="rs-panel-title">🔄 Re-serve Tracker (3 per player)</div>
+      <div class="rs-grid" id="rs-grid"></div>
     </div>
   </div>
 
@@ -1184,16 +1187,54 @@ function randomToss(){
   }, 800);
 }
 
-/* ── Re-service counter (per team, 3 total per game) ── */
-function reserviceChange(team, delta){
+/* ── Re-service: 4 players, 3 each per game ── */
+function getPlayerNames(){
+  if(!G) return ['P1','P2','P3','P4'];
+  var t1Parts = G.t1.split(' & '), t2Parts = G.t2.split(' & ');
+  var p1 = (t1Parts[0]||'Player 1').trim();
+  var p2 = (t1Parts[1]||'Player 2').trim();
+  var p3 = (t2Parts[0]||'Player 3').trim();
+  var p4 = (t2Parts[1]||'Player 4').trim();
+  return [p1,p2,p3,p4];
+}
+
+function renderReserviceGrid(showControls){
+  var grid = document.getElementById('rs-grid');
+  var names = getPlayerNames();
+  var keys = ['rsP1','rsP2','rsP3','rsP4'];
+  var teams = [1,1,2,2]; // P1,P2 = team1; P3,P4 = team2
+  var colors = ['var(--green)','var(--green)','var(--blue)','var(--blue)'];
+  var servingTeam = G.servingTeam;
+  var html = '';
+  for(var i=0;i<4;i++){
+    var count = G[keys[i]] || 0;
+    var isServing = teams[i] === servingTeam;
+    var inactiveClass = isServing ? '' : ' rs-inactive';
+    var dots = '';
+    for(var d=0;d<3;d++){
+      dots += '<div class="rs-dot'+(d<count?' used':'')+'" style="border-color:'+colors[i]+';'+(d<count?'background:'+colors[i]:'')+'"></div>';
+    }
+    var btns = '';
+    if(showControls && isServing){
+      btns = '<button class="rs-minus" onclick="reserviceChange('+i+',-1)">−</button>'
+        + '<button class="rs-plus" onclick="reserviceChange('+i+',1)" style="background:'+colors[i]+'">+</button>';
+    }
+    html += '<div class="rs-player'+inactiveClass+'">'
+      + '<span class="rs-pname" style="color:'+colors[i]+'">'+esc(names[i])+'</span>'
+      + '<div class="rs-dots">'+dots+'</div>'
+      + btns
+      + '</div>';
+  }
+  grid.innerHTML = html;
+}
+
+function reserviceChange(playerIndex, delta){
   if(!G || G.status !== 'live' || !isScoring || (G.deviceId !== DEVICE_ID && !isAdmin)) return;
-  const key = team === 1 ? 'rsT1' : 'rsT2';
-  const cur = G[key] || 0;
-  const next = cur + delta;
-  if(next < 0) return;
-  const otherKey = team === 1 ? 'rsT2' : 'rsT1';
-  const total = next + (G[otherKey] || 0);
-  if(total > 3) return;
+  var keys = ['rsP1','rsP2','rsP3','rsP4'];
+  var key = keys[playerIndex];
+  var cur = G[key] || 0;
+  var next = cur + delta;
+  if(next < 0 || next > 3) return;
   G[key] = next;
   db.ref('games/' + G.code).set(G);
   render();
@@ -1302,7 +1343,7 @@ function startFixtureMatch(t1, t2, groupKey){
     p1: 0, p2: 0,
     servingTeam: 1, serverNum: 2,
     tossDecided: false,
-    rsT1: 0, rsT2: 0,
+    rsP1: 0, rsP2: 0, rsP3: 0, rsP4: 0,
     status: 'live',
     date: new Date().toISOString(),
     deviceId: DEVICE_ID,
@@ -1360,7 +1401,7 @@ function startGame(){
     p1: 0, p2: 0,
     servingTeam: 1, serverNum: 2,
     tossDecided: false,
-    rsT1: 0, rsT2: 0,
+    rsP1: 0, rsP2: 0, rsP3: 0, rsP4: 0,
     status: 'live',
     date: new Date().toISOString(),
     deviceId: DEVICE_ID,
@@ -1603,20 +1644,13 @@ function render(){
   document.getElementById('sb-actions').style.display = (showControls && !tossNeeded) ? 'flex' : 'none';
   document.getElementById('share-box').style.display = (isUmpire === true && isScoring === true && isOwner) ? 'block' : 'none';
 
-  // Re-service counter (Womens Double & Mix Double)
+  // Re-service counter (Womens Double & Mix Double) — 4 players, 3 each
   const rsArea = document.getElementById('reservice-area');
   const cat = (G.category || '').toLowerCase();
   const showReservice = (cat.indexOf('womens') !== -1 || cat.indexOf('mix') !== -1) && live;
   rsArea.style.display = showReservice ? 'block' : 'none';
   if(showReservice){
-    const r1 = G.rsT1 || 0, r2 = G.rsT2 || 0;
-    document.getElementById('rs-t1-name').textContent = G.t1;
-    document.getElementById('rs-t2-name').textContent = G.t2;
-    document.getElementById('rs-t1-count').textContent = r1;
-    document.getElementById('rs-t2-count').textContent = r2;
-    document.getElementById('rs-total-used').textContent = r1 + r2;
-    const rsBtns = rsArea.querySelectorAll('button');
-    rsBtns.forEach(function(b){ b.style.display = showControls ? 'flex' : 'none'; });
+    renderReserviceGrid(showControls);
   }
 
   const banner = document.getElementById('s-winner');
@@ -1634,7 +1668,7 @@ function render(){
    ═══════════════════════════════════════════════════ */
 function rallyPoint(){
   if(!G || G.status !== 'live' || !isScoring || (G.deviceId !== DEVICE_ID && !isAdmin)) return;
-  undoLog.push({ p1:G.p1, p2:G.p2, servingTeam:G.servingTeam, serverNum:G.serverNum, status:G.status, rsT1:G.rsT1||0, rsT2:G.rsT2||0 });
+  undoLog.push({ p1:G.p1, p2:G.p2, servingTeam:G.servingTeam, serverNum:G.serverNum, status:G.status, rsP1:G.rsP1||0, rsP2:G.rsP2||0, rsP3:G.rsP3||0, rsP4:G.rsP4||0 });
   if(G.servingTeam === 1) G.p1++; else G.p2++;
   db.ref('games/' + G.code).set(G);
   render();
@@ -1643,7 +1677,7 @@ function rallyPoint(){
 
 function rallySideOut(){
   if(!G || G.status !== 'live' || !isScoring || (G.deviceId !== DEVICE_ID && !isAdmin)) return;
-  undoLog.push({ p1:G.p1, p2:G.p2, servingTeam:G.servingTeam, serverNum:G.serverNum, status:G.status, rsT1:G.rsT1||0, rsT2:G.rsT2||0 });
+  undoLog.push({ p1:G.p1, p2:G.p2, servingTeam:G.servingTeam, serverNum:G.serverNum, status:G.status, rsP1:G.rsP1||0, rsP2:G.rsP2||0, rsP3:G.rsP3||0, rsP4:G.rsP4||0 });
   if(G.serverNum === 1){
     G.serverNum = 2;
   } else {
@@ -1662,8 +1696,10 @@ function undo(){
   G.servingTeam = prev.servingTeam;
   G.serverNum = prev.serverNum;
   G.status = prev.status;
-  G.rsT1 = prev.rsT1 || 0;
-  G.rsT2 = prev.rsT2 || 0;
+  G.rsP1 = prev.rsP1 || 0;
+  G.rsP2 = prev.rsP2 || 0;
+  G.rsP3 = prev.rsP3 || 0;
+  G.rsP4 = prev.rsP4 || 0;
   db.ref('games/' + G.code).set(G);
   render();
 }
