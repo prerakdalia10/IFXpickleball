@@ -175,12 +175,16 @@ input:focus,select:focus{border-color:var(--green)}
 .toss-team-btn{flex:1;padding:.7rem;border:none;border-radius:var(--r);font-weight:700;font-size:.85rem;cursor:pointer}
 .t1-toss{background:var(--green);color:#111}
 .t2-toss{background:var(--blue);color:#111}
-.reservice-bar{display:flex;align-items:center;justify-content:center;gap:.5rem;background:var(--card);border-radius:var(--r);padding:.5rem;margin-bottom:.8rem;font-size:.85rem}
-.reservice-bar .rs-label{color:var(--dim);font-weight:600}
-.reservice-bar .rs-count{color:var(--yellow);font-weight:800;font-size:1.1rem;min-width:1.5rem;text-align:center}
-.reservice-bar button{width:28px;height:28px;border-radius:50%;border:none;font-size:1rem;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.reservice-bar{background:var(--card);border-radius:var(--r);padding:.5rem .7rem;margin-bottom:.8rem;font-size:.8rem}
+.rs-header{text-align:center;color:var(--dim);font-weight:600;font-size:.75rem;margin-bottom:.4rem}
+.rs-teams{display:flex;gap:.6rem}
+.rs-team{flex:1;display:flex;align-items:center;justify-content:center;gap:.3rem;background:var(--card2);border-radius:10px;padding:.35rem .4rem}
+.rs-team .rs-name{font-weight:600;font-size:.7rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:90px}
+.rs-team .rs-count{color:var(--yellow);font-weight:800;font-size:.95rem;min-width:1rem;text-align:center}
+.rs-team button{width:24px;height:24px;border-radius:50%;border:none;font-size:.85rem;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center}
 .rs-plus{background:var(--yellow);color:#111}
-.rs-minus{background:var(--card2);color:var(--text)}
+.rs-minus{background:var(--bg);color:var(--text)}
+.rs-total{text-align:center;margin-top:.3rem;font-size:.7rem;color:var(--dim)}
 .umpire-info{text-align:center;font-size:.75rem;color:var(--dim);margin-bottom:.5rem}
 .umpire-info span{color:var(--yellow);font-weight:600}
 @media(max-width:400px){
@@ -396,11 +400,22 @@ input:focus,select:focus{border-color:var(--green)}
 
   <div id="reservice-area" style="display:none">
     <div class="reservice-bar">
-      <span class="rs-label">🔄 Re-serve:</span>
-      <button class="rs-minus" onclick="reserviceChange(-1)">−</button>
-      <span class="rs-count" id="rs-count">0</span>
-      <span style="color:var(--dim)">/3</span>
-      <button class="rs-plus" onclick="reserviceChange(1)">+</button>
+      <div class="rs-header">🔄 Re-serve Counter (3 total per game)</div>
+      <div class="rs-teams">
+        <div class="rs-team">
+          <span class="rs-name" id="rs-t1-name" style="color:var(--green)">T1</span>
+          <button class="rs-minus" onclick="reserviceChange(1,-1)">−</button>
+          <span class="rs-count" id="rs-t1-count">0</span>
+          <button class="rs-plus" onclick="reserviceChange(1,1)">+</button>
+        </div>
+        <div class="rs-team">
+          <span class="rs-name" id="rs-t2-name" style="color:var(--blue)">T2</span>
+          <button class="rs-minus" onclick="reserviceChange(2,-1)">−</button>
+          <span class="rs-count" id="rs-t2-count">0</span>
+          <button class="rs-plus" onclick="reserviceChange(2,1)">+</button>
+        </div>
+      </div>
+      <div class="rs-total">Used: <span id="rs-total-used">0</span>/3</div>
     </div>
   </div>
 
@@ -1169,13 +1184,17 @@ function randomToss(){
   }, 800);
 }
 
-/* ── Re-service counter ── */
-function reserviceChange(delta){
+/* ── Re-service counter (per team, 3 total per game) ── */
+function reserviceChange(team, delta){
   if(!G || G.status !== 'live' || !isScoring || (G.deviceId !== DEVICE_ID && !isAdmin)) return;
-  const cur = G.reserviceCount || 0;
+  const key = team === 1 ? 'rsT1' : 'rsT2';
+  const cur = G[key] || 0;
   const next = cur + delta;
-  if(next < 0 || next > 3) return;
-  G.reserviceCount = next;
+  if(next < 0) return;
+  const otherKey = team === 1 ? 'rsT2' : 'rsT1';
+  const total = next + (G[otherKey] || 0);
+  if(total > 3) return;
+  G[key] = next;
   db.ref('games/' + G.code).set(G);
   render();
 }
@@ -1283,7 +1302,7 @@ function startFixtureMatch(t1, t2, groupKey){
     p1: 0, p2: 0,
     servingTeam: 1, serverNum: 2,
     tossDecided: false,
-    reserviceCount: 0,
+    rsT1: 0, rsT2: 0,
     status: 'live',
     date: new Date().toISOString(),
     deviceId: DEVICE_ID,
@@ -1341,7 +1360,7 @@ function startGame(){
     p1: 0, p2: 0,
     servingTeam: 1, serverNum: 2,
     tossDecided: false,
-    reserviceCount: 0,
+    rsT1: 0, rsT2: 0,
     status: 'live',
     date: new Date().toISOString(),
     deviceId: DEVICE_ID,
@@ -1590,7 +1609,12 @@ function render(){
   const showReservice = (cat.indexOf('womens') !== -1 || cat.indexOf('mix') !== -1) && live;
   rsArea.style.display = showReservice ? 'block' : 'none';
   if(showReservice){
-    document.getElementById('rs-count').textContent = G.reserviceCount || 0;
+    const r1 = G.rsT1 || 0, r2 = G.rsT2 || 0;
+    document.getElementById('rs-t1-name').textContent = G.t1;
+    document.getElementById('rs-t2-name').textContent = G.t2;
+    document.getElementById('rs-t1-count').textContent = r1;
+    document.getElementById('rs-t2-count').textContent = r2;
+    document.getElementById('rs-total-used').textContent = r1 + r2;
     const rsBtns = rsArea.querySelectorAll('button');
     rsBtns.forEach(function(b){ b.style.display = showControls ? 'flex' : 'none'; });
   }
@@ -1610,7 +1634,7 @@ function render(){
    ═══════════════════════════════════════════════════ */
 function rallyPoint(){
   if(!G || G.status !== 'live' || !isScoring || (G.deviceId !== DEVICE_ID && !isAdmin)) return;
-  undoLog.push({ p1:G.p1, p2:G.p2, servingTeam:G.servingTeam, serverNum:G.serverNum, status:G.status, reserviceCount:G.reserviceCount||0 });
+  undoLog.push({ p1:G.p1, p2:G.p2, servingTeam:G.servingTeam, serverNum:G.serverNum, status:G.status, rsT1:G.rsT1||0, rsT2:G.rsT2||0 });
   if(G.servingTeam === 1) G.p1++; else G.p2++;
   db.ref('games/' + G.code).set(G);
   render();
@@ -1619,14 +1643,13 @@ function rallyPoint(){
 
 function rallySideOut(){
   if(!G || G.status !== 'live' || !isScoring || (G.deviceId !== DEVICE_ID && !isAdmin)) return;
-  undoLog.push({ p1:G.p1, p2:G.p2, servingTeam:G.servingTeam, serverNum:G.serverNum, status:G.status, reserviceCount:G.reserviceCount||0 });
+  undoLog.push({ p1:G.p1, p2:G.p2, servingTeam:G.servingTeam, serverNum:G.serverNum, status:G.status, rsT1:G.rsT1||0, rsT2:G.rsT2||0 });
   if(G.serverNum === 1){
     G.serverNum = 2;
   } else {
     G.servingTeam = G.servingTeam === 1 ? 2 : 1;
     G.serverNum = 1;
   }
-  G.reserviceCount = 0;
   db.ref('games/' + G.code).set(G);
   render();
   if(navigator.vibrate) navigator.vibrate([30,50,30]);
@@ -1639,7 +1662,8 @@ function undo(){
   G.servingTeam = prev.servingTeam;
   G.serverNum = prev.serverNum;
   G.status = prev.status;
-  G.reserviceCount = prev.reserviceCount || 0;
+  G.rsT1 = prev.rsT1 || 0;
+  G.rsT2 = prev.rsT2 || 0;
   db.ref('games/' + G.code).set(G);
   render();
 }
