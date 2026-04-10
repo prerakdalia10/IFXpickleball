@@ -6,10 +6,10 @@
 <title>Pickleball Scorecard</title>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{--bg:#0a1628;--card:#162032;--card2:#1e2d42;--green:#00e676;--blue:#42a5f5;--red:#ff5252;--yellow:#ffd600;--text:#e8eaf6;--dim:#78909c;--r:16px;--purple:#ba68c8;--court:#2e7d32;--court-line:#fff}
+:root{--bg:#0b1929;--card:#12283e;--card2:#1a3555;--green:#43a047;--blue:#1565c0;--red:#c62828;--yellow:#d4a843;--text:#f0f0f0;--dim:#8899aa;--r:12px;--purple:#7b1fa2;--court:#2e7d32;--court-line:#fff}
 body{font-family:"Segoe UI",system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:2rem}
-header{text-align:center;padding:.8rem 1rem;background:linear-gradient(135deg,#1a2744,#0d1b2a);border-bottom:3px solid var(--green);box-shadow:0 2px 20px rgba(0,230,118,.15)}
-header h1{font-size:1.3rem;letter-spacing:.5px}
+header{text-align:center;padding:1rem 1rem;background:linear-gradient(180deg,#0d2137,#162d48);border-bottom:2px solid var(--yellow);box-shadow:0 2px 20px rgba(212,168,67,.12)}
+header h1{font-size:1.3rem;letter-spacing:.8px;text-shadow:0 1px 3px rgba(0,0,0,.3)}
 h2{margin-bottom:1rem}
 .page{display:none;max-width:500px;margin:0 auto;padding:1rem}
 .page.active{display:block}
@@ -21,20 +21,20 @@ h2{margin-bottom:1rem}
 #pg-home>*{position:relative;z-index:1}
 
 /* ── Buttons ── */
-.start-btn{width:100%;padding:1.2rem;font-size:1.05rem;font-weight:700;border:none;border-radius:var(--r);cursor:pointer;margin-bottom:.8rem;transition:transform .1s,box-shadow .15s;letter-spacing:.3px}
-.start-btn:active{transform:scale(.97)}
-.start-btn.new{background:linear-gradient(135deg,#00e676,#00c853);color:#111;box-shadow:0 3px 15px rgba(0,230,118,.25)}
-.start-btn.umpire{background:linear-gradient(135deg,#ffd600,#ffab00);color:#111;box-shadow:0 3px 15px rgba(255,214,0,.2)}
-.start-btn.watch{background:linear-gradient(135deg,#42a5f5,#1e88e5);color:#fff;box-shadow:0 3px 15px rgba(66,165,245,.2)}
-.start-btn.hist{background:var(--card2);color:var(--text)}
-.start-btn.admin{background:linear-gradient(135deg,#ba68c8,#9c27b0);color:#fff}
-.start-btn.standings{background:linear-gradient(135deg,#00e676,#42a5f5);color:#111;box-shadow:0 3px 15px rgba(0,230,118,.2)}
+.start-btn{width:100%;padding:1.2rem;font-size:1.05rem;font-weight:700;border:1px solid rgba(0,0,0,.18);border-radius:var(--r);cursor:pointer;margin-bottom:.8rem;transition:transform .1s,box-shadow .15s,filter .15s;letter-spacing:.5px}
+.start-btn:active{transform:scale(.97);filter:brightness(.95)}
+.start-btn.new{background:linear-gradient(180deg,#66bb6a 0%,#43a047 45%,#388e3c 55%,#43a047 100%);color:#fff;border-color:#2e7d32;box-shadow:0 3px 10px rgba(46,125,50,.3),inset 0 1px 0 rgba(255,255,255,.2);text-shadow:0 1px 2px rgba(0,0,0,.3)}
+.start-btn.umpire{background:linear-gradient(180deg,#e8c547 0%,#d4a843 45%,#b8922e 55%,#d4a843 100%);color:#1a1a1a;border-color:#a07828;box-shadow:0 3px 10px rgba(180,140,40,.25),inset 0 1px 0 rgba(255,255,255,.35);text-shadow:0 1px 0 rgba(255,255,255,.2)}
+.start-btn.watch{background:linear-gradient(180deg,#e0e0e0 0%,#bdbdbd 45%,#a8a8a8 55%,#bdbdbd 100%);color:#1a1a1a;border-color:#888;box-shadow:0 3px 10px rgba(0,0,0,.2),inset 0 1px 0 rgba(255,255,255,.5);text-shadow:0 1px 0 rgba(255,255,255,.3)}
+.start-btn.hist{background:linear-gradient(180deg,#2a3f55 0%,#1e3348 45%,#162a3e 55%,#1e3348 100%);color:var(--text);border-color:rgba(255,255,255,.1);box-shadow:inset 0 1px 0 rgba(255,255,255,.06)}
+.start-btn.admin{background:linear-gradient(180deg,#ef5350 0%,#c62828 45%,#b71c1c 55%,#c62828 100%);color:#fff;border-color:#8e1a1a;box-shadow:0 3px 10px rgba(198,40,40,.3),inset 0 1px 0 rgba(255,255,255,.15);text-shadow:0 1px 2px rgba(0,0,0,.3)}
+.start-btn.standings{background:linear-gradient(180deg,#f5f5f5 0%,#e0e0e0 45%,#cccccc 55%,#e0e0e0 100%);color:#1a1a1a;border-color:#999;box-shadow:0 3px 10px rgba(0,0,0,.15),inset 0 1px 0 rgba(255,255,255,.6);text-shadow:0 1px 0 rgba(255,255,255,.3)}
 
 /* ── Form ── */
 label{display:block;margin-bottom:.3rem;font-size:.85rem;color:var(--dim)}
-input,select{width:100%;padding:.7rem;font-size:1rem;background:var(--card2);color:var(--text);border:2px solid transparent;border-radius:var(--r);outline:none;margin-bottom:1rem}
-input:focus,select:focus{border-color:var(--green)}
-.section-label{font-size:.95rem;font-weight:700;color:var(--green);margin:1rem 0 .5rem;border-bottom:1px solid var(--card2);padding-bottom:.3rem}
+input,select{width:100%;padding:.7rem;font-size:1rem;background:var(--card2);color:var(--text);border:1px solid rgba(255,255,255,.08);border-radius:var(--r);outline:none;margin-bottom:1rem}
+input:focus,select:focus{border-color:var(--yellow)}
+.section-label{font-size:.95rem;font-weight:700;color:var(--yellow);margin:1rem 0 .5rem;border-bottom:1px solid rgba(212,168,67,.15);padding-bottom:.3rem}
 
 /* Server picker */
 .server-pick{display:flex;gap:.5rem;margin-bottom:1rem}
@@ -47,60 +47,68 @@ input:focus,select:focus{border-color:var(--green)}
 .tag.live{background:var(--green);color:#111;animation:pulse 1.5s infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
 
-.score-call{text-align:center;background:linear-gradient(180deg,var(--card),var(--card2));border-radius:var(--r);padding:.8rem;margin-bottom:.8rem;border:1px solid rgba(255,255,255,.05)}
-.score-call .call{font-size:2.2rem;font-weight:900;letter-spacing:3px;font-variant-numeric:tabular-nums;text-shadow:0 2px 8px rgba(0,0,0,.3)}
+.score-call{text-align:center;background:linear-gradient(180deg,var(--card),var(--card2));border-radius:var(--r);padding:.8rem;margin-bottom:.8rem;border:1px solid rgba(255,255,255,.06)}
+.score-call .call{font-size:2.2rem;font-weight:900;letter-spacing:3px;font-variant-numeric:tabular-nums;text-shadow:0 2px 8px rgba(0,0,0,.4)}
 .score-call .call-label{font-size:.7rem;color:var(--dim);margin-top:.3rem;letter-spacing:.5px}
 
-.serving-info{text-align:center;background:var(--card2);border-radius:var(--r);padding:.5rem;margin-bottom:.6rem;font-size:.85rem;border:1px solid rgba(255,214,0,.1)}
+.serving-info{text-align:center;background:var(--card2);border-radius:var(--r);padding:.5rem;margin-bottom:.6rem;font-size:.85rem;border:1px solid rgba(212,168,67,.15)}
 .serving-info .serve-team{color:var(--yellow);font-weight:700}
 .serving-info .serve-num{color:var(--green);font-weight:700}
 
 .score-zone{display:flex;gap:.5rem;margin-bottom:.6rem}
-.team-box{flex:1;background:linear-gradient(180deg,var(--card),rgba(15,25,35,.9));border-radius:var(--r);padding:.8rem .4rem;text-align:center;border:3px solid transparent;transition:all .25s;position:relative;overflow:hidden}
+.team-box{flex:1;background:linear-gradient(180deg,var(--card),rgba(11,25,41,.95));border-radius:var(--r);padding:.8rem .4rem;text-align:center;border:2px solid rgba(255,255,255,.06);transition:all .25s;position:relative;overflow:hidden}
 .team-box::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:transparent;transition:background .25s}
-.team-box.serving{border-color:var(--yellow);box-shadow:0 0 20px rgba(255,214,0,.1)}
+.team-box.serving{border-color:var(--yellow);box-shadow:0 0 20px rgba(212,168,67,.15)}
 .team-box.serving::before{background:var(--yellow)}
 .tname{font-size:.8rem;font-weight:700;margin-bottom:.2rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .serve-badge{display:none;font-size:.65rem;font-weight:700;background:var(--yellow);color:#111;padding:.15rem .5rem;border-radius:999px;margin-bottom:.2rem}
 .team-box.serving .serve-badge{display:inline-block}
 .pts{font-size:4.2rem;font-weight:900;line-height:1;margin:.2rem 0;font-variant-numeric:tabular-nums;text-shadow:0 2px 10px rgba(0,0,0,.3)}
-.t1 .pts{color:var(--green)}
-.t2 .pts{color:var(--blue)}
+.t1 .pts{color:#4caf50}
+.t2 .pts{color:#e53935}
 
 .rally-btns{display:flex;gap:.5rem;margin-bottom:.6rem}
 .rally-btn{flex:1;padding:1rem .5rem;font-size:1rem;font-weight:800;border:none;border-radius:var(--r);cursor:pointer;text-align:center;line-height:1.3;transition:transform .1s;box-shadow:0 3px 12px rgba(0,0,0,.2)}
 .rally-btn:active{transform:scale(.95)}
-.btn-point{background:linear-gradient(135deg,#00e676,#00c853);color:#111}
-.btn-sideout{background:linear-gradient(135deg,#ffd600,#ffab00);color:#111}
+.btn-point{background:linear-gradient(180deg,#66bb6a 0%,#43a047 45%,#2e7d32 60%,#388e3c 100%);color:#fff;border:1px solid #1b5e20;box-shadow:0 3px 8px rgba(46,125,50,.3),inset 0 1px 0 rgba(255,255,255,.2);text-shadow:0 1px 2px rgba(0,0,0,.3)}
+.btn-sideout{background:linear-gradient(180deg,#e8c547 0%,#d4a843 45%,#a07828 60%,#b8922e 100%);color:#1a1a1a;border:1px solid #8a6d1e;box-shadow:0 3px 8px rgba(180,140,40,.25),inset 0 1px 0 rgba(255,255,255,.3);text-shadow:0 1px 0 rgba(255,255,255,.15)}
 
 .actions{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:.6rem}
 .actions button{flex:1;min-width:100px;padding:.6rem;font-size:.85rem;border:none;border-radius:var(--r);cursor:pointer;font-weight:600;transition:transform .1s}
 .actions button:active{transform:scale(.95)}
-.btn-undo{background:var(--card2);color:var(--text)}
-.btn-end{background:linear-gradient(135deg,#ff5252,#d32f2f);color:#fff}
+.btn-undo{background:linear-gradient(180deg,#2a3f55,#1e3348,#1a2e42);color:var(--text);border:1px solid rgba(255,255,255,.1);box-shadow:inset 0 1px 0 rgba(255,255,255,.06)}
+.btn-end{background:linear-gradient(180deg,#ef5350 0%,#c62828 50%,#b71c1c 100%);color:#fff;border:1px solid #8e1a1a;box-shadow:inset 0 1px 0 rgba(255,255,255,.12)}
+
+/* More drawer */
+.more-toggle{width:100%;padding:.6rem;font-size:.8rem;font-weight:700;background:linear-gradient(180deg,#1e3348,#162a3e);color:var(--dim);border:1px solid rgba(255,255,255,.08);border-radius:var(--r);cursor:pointer;text-align:center;margin-bottom:.5rem;transition:background .15s}
+.more-toggle:active{background:var(--card)}
+.more-drawer{display:none;background:linear-gradient(180deg,var(--card),#0e2030);border-radius:var(--r);padding:.8rem;margin-bottom:.6rem;border:1px solid rgba(255,255,255,.06)}
+.more-drawer.open{display:block}
+.more-drawer .more-row{display:flex;gap:.5rem;margin-bottom:.5rem}
+.more-drawer .more-row:last-child{margin-bottom:0}
 
 .share-box{background:var(--card2);border-radius:var(--r);padding:1rem;text-align:center;margin-bottom:.8rem}
 .share-box p{font-size:.85rem;color:var(--dim);margin-bottom:.5rem}
 .share-box input{margin-bottom:.5rem;text-align:center;border:1px solid var(--green);background:var(--card)}
-.share-box .copy-btn{padding:.5rem 1.5rem;background:var(--green);color:#111;border:none;border-radius:var(--r);font-weight:700;cursor:pointer}
+.share-box .copy-btn{padding:.5rem 1.5rem;background:linear-gradient(180deg,#e0e0e0,#bdbdbd,#a8a8a8);color:#1a1a1a;border:1px solid #888;border-radius:var(--r);font-weight:700;cursor:pointer;box-shadow:inset 0 1px 0 rgba(255,255,255,.4);text-shadow:0 1px 0 rgba(255,255,255,.3)}
 
-.winner{margin-top:.8rem;text-align:center;padding:1rem;border-radius:var(--r);font-size:1.2rem;font-weight:800;background:linear-gradient(135deg,#ffd600,#ff6d00);color:#111;box-shadow:0 4px 20px rgba(255,214,0,.2);animation:winPulse 1s ease-in-out infinite}
+.winner{margin-top:.8rem;text-align:center;padding:1rem;border-radius:var(--r);font-size:1.2rem;font-weight:800;background:linear-gradient(180deg,#e8c547,#d4a843,#b8922e);color:#111;border:1px solid #a07828;box-shadow:0 4px 20px rgba(212,168,67,.3);animation:winPulse 1s ease-in-out infinite;text-shadow:0 1px 0 rgba(255,255,255,.2)}
 .winner.hide{display:none}
-@keyframes winPulse{0%,100%{box-shadow:0 4px 20px rgba(255,214,0,.2)}50%{box-shadow:0 4px 30px rgba(255,214,0,.4)}}
+@keyframes winPulse{0%,100%{box-shadow:0 4px 20px rgba(212,168,67,.25)}50%{box-shadow:0 4px 30px rgba(212,168,67,.45)}}
 
 /* ── Game cards ── */
-.game-card{background:var(--card);border-radius:var(--r);padding:.8rem 1rem;margin-bottom:.6rem;display:flex;justify-content:space-between;align-items:center;cursor:pointer;transition:transform .15s,box-shadow .15s;position:relative}
+.game-card{background:var(--card);border-radius:var(--r);padding:.8rem 1rem;margin-bottom:.6rem;display:flex;justify-content:space-between;align-items:center;cursor:pointer;transition:transform .15s,box-shadow .15s;position:relative;border:1px solid rgba(255,255,255,.05)}
 .game-card:hover{transform:translateY(-2px);box-shadow:0 4px 20px rgba(0,0,0,.3)}
 .game-card .teams{font-weight:600;font-size:.95rem}
 .game-card .meta{font-size:.75rem;color:var(--dim);margin-top:.2rem}
 .game-card .fscore{font-size:1.2rem;font-weight:800;font-variant-numeric:tabular-nums}
-.game-card .s1{color:var(--green)}.game-card .s2{color:var(--blue)}
+.game-card .s1{color:var(--green)}.game-card .s2{color:var(--red)}
 .game-card .live-dot{display:inline-block;width:8px;height:8px;background:var(--green);border-radius:50%;margin-right:4px;animation:pulse 1.5s infinite}
 .empty{color:var(--dim);font-style:italic;text-align:center;padding:2rem 0}
 
-.back-btn{display:inline-block;margin-bottom:1rem;padding:.5rem 1rem;background:var(--card2);color:var(--text);border:none;border-radius:var(--r);cursor:pointer;font-size:.9rem}
+.back-btn{display:inline-block;margin-bottom:1rem;padding:.5rem 1rem;background:linear-gradient(180deg,#2a3f55,#1e3348);color:var(--text);border:1px solid rgba(255,255,255,.1);border-radius:var(--r);cursor:pointer;font-size:.9rem;box-shadow:inset 0 1px 0 rgba(255,255,255,.06)}
 .clear-btn{margin-top:1rem;padding:.6rem 1rem;background:var(--card2);color:var(--red);border:none;border-radius:var(--r);cursor:pointer;font-size:.85rem;width:100%}
-.export-btn{margin-top:.5rem;padding:.6rem 1rem;background:var(--green);color:#111;border:none;border-radius:var(--r);cursor:pointer;font-size:.85rem;font-weight:700;width:100%}
+.export-btn{margin-top:.5rem;padding:.7rem 1rem;background:linear-gradient(180deg,#66bb6a,#43a047,#388e3c);color:#fff;border:1px solid #2e7d32;border-radius:var(--r);cursor:pointer;font-size:.85rem;font-weight:700;width:100%;box-shadow:inset 0 1px 0 rgba(255,255,255,.15);text-shadow:0 1px 1px rgba(0,0,0,.2)}
 
 .game-card .del-btn{position:absolute;top:6px;right:8px;background:none;border:none;color:var(--dim);font-size:1.1rem;cursor:pointer;padding:4px 6px;border-radius:6px;line-height:1}
 .game-card .del-btn:hover{color:var(--red);background:var(--card2)}
@@ -125,8 +133,8 @@ input:focus,select:focus{border-color:var(--green)}
 .standings-tbl th{background:var(--card2);color:var(--dim);padding:.5rem .4rem;text-align:center;font-weight:700;font-size:.7rem;text-transform:uppercase}
 .standings-tbl th:first-child,.standings-tbl td:first-child{text-align:left;padding-left:.6rem}
 .standings-tbl td{background:var(--card);padding:.5rem .4rem;text-align:center;border-bottom:1px solid var(--card2)}
-.standings-tbl tr:first-child td{background:rgba(0,230,118,.1)}
-.standings-tbl tr:nth-child(2) td{background:rgba(66,165,245,.05)}
+.standings-tbl tr:first-child td{background:rgba(67,160,71,.1)}
+.standings-tbl tr:nth-child(2) td{background:rgba(255,255,255,.03)}
 .pos-badge{display:inline-block;width:22px;height:22px;line-height:22px;border-radius:50%;font-weight:800;font-size:.75rem;text-align:center;margin-right:.3rem}
 .pos-1{background:var(--green);color:#111}
 .pos-2{background:var(--blue);color:#111}
@@ -169,9 +177,9 @@ input:focus,select:focus{border-color:var(--green)}
 .upload-box .upload-status{margin-top:.5rem;font-size:.85rem}
 .upload-box .format-hint{font-size:.75rem;color:var(--dim);margin-top:.6rem;text-align:left;line-height:1.6}
 
-.fab-admin{position:fixed;bottom:1.2rem;right:1.2rem;width:42px;height:42px;border-radius:50%;background:var(--purple);color:#fff;border:none;font-size:1.1rem;cursor:pointer;box-shadow:0 3px 12px rgba(0,0,0,.4);z-index:900;display:flex;align-items:center;justify-content:center;transition:transform .15s}
+.fab-admin{position:fixed;top:.6rem;right:.6rem;width:42px;height:42px;border-radius:50%;background:linear-gradient(180deg,#ef5350,#c62828);color:#fff;border:1px solid #8e1a1a;font-size:1.1rem;cursor:pointer;box-shadow:0 3px 12px rgba(198,40,40,.35);z-index:900;display:flex;align-items:center;justify-content:center;transition:transform .15s}
 .fab-admin:hover{transform:scale(1.1)}
-.qualify-row td{background:rgba(0,230,118,.15)!important}
+.qualify-row td{background:rgba(67,160,71,.15)!important}
 .qualify-badge{font-size:.6rem;color:var(--green);font-weight:700;margin-left:.3rem}
 .elim-row td{opacity:.6}
 .fixture-card{background:var(--card);border-radius:var(--r);padding:.7rem .8rem;margin-bottom:.5rem;display:flex;justify-content:space-between;align-items:center;cursor:pointer;transition:transform .1s,opacity .2s;border-left:3px solid var(--green)}
@@ -183,12 +191,12 @@ input:focus,select:focus{border-color:var(--green)}
 .fx-pending{background:var(--green);color:#111}
 .fx-done{background:var(--card2);color:var(--dim)}
 .fixtures-header{font-size:.85rem;color:var(--dim);margin-bottom:.5rem}
-.toss-flip-btn{padding:.6rem 1.5rem;background:var(--yellow);color:#111;border:none;border-radius:var(--r);font-weight:800;font-size:1rem;cursor:pointer}
+.toss-flip-btn{padding:.7rem 1.8rem;background:linear-gradient(180deg,#e8c547,#d4a843,#b8922e);color:#1a1a1a;border:1px solid #a07828;border-radius:var(--r);font-weight:800;font-size:1rem;cursor:pointer;box-shadow:0 3px 8px rgba(180,140,40,.25),inset 0 1px 0 rgba(255,255,255,.3);text-shadow:0 1px 0 rgba(255,255,255,.15)}
 .toss-team-btn{flex:1;padding:.7rem;border:none;border-radius:var(--r);font-weight:700;font-size:.85rem;cursor:pointer}
-.t1-toss{background:var(--green);color:#111}
-.t2-toss{background:var(--blue);color:#111}
+.t1-toss{background:linear-gradient(180deg,#66bb6a,#388e3c);color:#fff;border:1px solid #2e7d32;box-shadow:inset 0 1px 0 rgba(255,255,255,.2)}
+.t2-toss{background:linear-gradient(180deg,#ef5350,#c62828);color:#fff;border:1px solid #8e1a1a;box-shadow:inset 0 1px 0 rgba(255,255,255,.15)}
 /* Re-service: 4 players, 3 each */
-.rs-panel{background:var(--card);border-radius:var(--r);padding:.6rem;margin-bottom:.6rem;border:1px solid rgba(255,214,0,.1)}
+.rs-panel{background:var(--card);border-radius:var(--r);padding:.6rem;margin-bottom:.6rem;border:1px solid rgba(212,168,67,.12)}
 .rs-panel-title{text-align:center;font-size:.7rem;font-weight:700;color:var(--dim);margin-bottom:.5rem;text-transform:uppercase;letter-spacing:1px}
 .rs-grid{display:grid;grid-template-columns:1fr 1fr;gap:.4rem}
 .rs-player{display:flex;align-items:center;gap:.3rem;background:var(--card2);border-radius:10px;padding:.3rem .4rem;transition:opacity .2s}
@@ -209,6 +217,27 @@ input:focus,select:focus{border-color:var(--green)}
   .rs-player .rs-pname{font-size:.6rem;max-width:60px}
   .score-call .call{font-size:1.8rem}
 }
+
+/* ── Bouncing Pickleball ── */
+.pb-ball{position:fixed;width:48px;height:48px;border-radius:50%;background:radial-gradient(circle at 38% 35%,#f5f280,#e0d440 40%,#c8b400 65%,#8a7a00);border:2px solid #bba800;box-shadow:0 4px 14px rgba(0,0,0,.45),inset 0 -3px 6px rgba(0,0,0,.2),inset 0 3px 6px rgba(255,255,200,.35);cursor:pointer;z-index:999;pointer-events:auto;touch-action:none;-webkit-tap-highlight-color:transparent;overflow:hidden}
+.pb-ball .pb-holes{position:absolute;inset:0}
+.pb-ball .pb-holes span{position:absolute;width:6px;height:6px;border-radius:50%;background:rgba(100,80,0,.35);box-shadow:inset 0 1px 1px rgba(0,0,0,.25)}
+.pb-ball .pb-holes span:nth-child(1){top:8px;left:12px}
+.pb-ball .pb-holes span:nth-child(2){top:7px;left:24px}
+.pb-ball .pb-holes span:nth-child(3){top:7px;left:36px}
+.pb-ball .pb-holes span:nth-child(4){top:17px;left:6px}
+.pb-ball .pb-holes span:nth-child(5){top:16px;left:18px}
+.pb-ball .pb-holes span:nth-child(6){top:16px;left:30px}
+.pb-ball .pb-holes span:nth-child(7){top:17px;left:40px}
+.pb-ball .pb-holes span:nth-child(8){top:26px;left:10px}
+.pb-ball .pb-holes span:nth-child(9){top:25px;left:22px}
+.pb-ball .pb-holes span:nth-child(10){top:25px;left:34px}
+.pb-ball .pb-holes span:nth-child(11){top:34px;left:16px}
+.pb-ball .pb-holes span:nth-child(12){top:34px;left:28px}
+.pb-ball::after{content:'';position:absolute;top:4px;left:8px;width:14px;height:7px;background:rgba(255,255,255,.3);border-radius:50%;transform:rotate(-25deg);z-index:1}
+.start-btn.btn-hit{animation:btnHit .25s ease-out}
+.fab-admin.btn-hit{animation:btnHit .25s ease-out}
+@keyframes btnHit{0%{transform:scale(1)}50%{transform:scale(.88)}100%{transform:scale(1)}}
 </style>
 </head>
 <body>
@@ -219,16 +248,18 @@ input:focus,select:focus{border-color:var(--green)}
 
 <!-- PAGE: HOME -->
 <div class="page active" id="pg-home">
-  <br>
-  <button class="start-btn standings" onclick="showPage('standings')">📊 Points Table</button>
-  <button class="start-btn watch" onclick="showPage('live-list')">👀 Watch Live Scores</button>
-  <button class="start-btn hist" onclick="showPage('history');loadHistory()">📋 Past Games</button>
-  <hr style="border-color:var(--card2);margin:1.5rem 0">
-  <button class="start-btn umpire" onclick="showPage('umpire-login')">🔒 Umpire Login</button>
+  <div style="height:30vh"></div>
+  <button class="start-btn standings" onclick="showPage('standings')" style="padding:.7rem 1rem">📊 Points Table</button>
+  <button class="start-btn watch" onclick="showPage('live-list')" style="padding:.7rem 1rem">👀 Watch Live Scores</button>
+  <button class="start-btn hist" onclick="showPage('history');loadHistory()" style="padding:.7rem 1rem">📋 Past Games</button>
+  <div style="flex:1"></div>
+  <button class="start-btn umpire" id="umpire-paddle" onclick="showPage('umpire-login')" style="position:fixed;bottom:100px;left:50%;transform:translateX(-50%);width:200px;z-index:998;touch-action:none">🔒 Umpire Login</button>
 </div>
 
+<div id="pb-score-display" style="display:none;position:fixed;top:58px;left:50%;transform:translateX(-50%);z-index:998;background:rgba(11,25,41,.85);border:1px solid var(--yellow);border-radius:20px;padding:.25rem .8rem;font-size:.75rem;font-weight:700;color:var(--yellow);pointer-events:none">🏐 Balls: <span id="pb-ball-count">1</span></div>
+
 <!-- Fixed small Super Admin button -->
-<button class="fab-admin" onclick="showPage('admin-login')" title="Super Admin">👑</button>
+<button class="fab-admin" id="fab-admin-btn" onclick="showPage('admin-login')" title="Super Admin">👑</button>
 
 <!-- PAGE: UMPIRE LOGIN -->
 <div class="page" id="pg-umpire-login">
@@ -384,79 +415,109 @@ input:focus,select:focus{border-color:var(--green)}
 
 <!-- PAGE: SCOREBOARD -->
 <div class="page" id="pg-score">
-  <div class="sb-header">
-    <span class="tag">Doubles</span>
-    <span class="tag" id="s-target">To 11</span>
-    <span class="tag live" id="s-status">LIVE</span>
-    <span class="tag" id="s-group-tag" style="display:none;background:var(--purple);color:#fff"></span>
+
+  <!-- TOSS SCREEN — shown only before toss -->
+  <div id="toss-screen" style="display:none">
+    <div class="sb-header">
+      <span class="tag live">NEW MATCH</span>
+      <span class="tag" id="ts-target">To 11</span>
+      <span class="tag" id="ts-group-tag" style="display:none;background:var(--purple);color:#fff"></span>
+    </div>
+    <div class="umpire-info" id="ts-umpire-info" style="display:none">🧑‍⚖️ Umpire: <span id="ts-umpire-name"></span></div>
+    <div class="score-zone" style="margin-top:.8rem">
+      <div class="team-box t1" style="border-color:var(--green);opacity:.85">
+        <div class="tname" id="ts-t1">Team 1</div>
+        <div class="pts" style="font-size:1.5rem;color:var(--green)">VS</div>
+      </div>
+      <div class="team-box t2" style="border-color:var(--blue);opacity:.85">
+        <div class="tname" id="ts-t2">Team 2</div>
+        <div class="pts" style="font-size:1.5rem;color:var(--blue)">VS</div>
+      </div>
+    </div>
+    <div style="background:var(--card);border-radius:var(--r);padding:1.2rem;text-align:center;border:2px solid var(--yellow);margin-top:.5rem">
+      <div style="font-size:1.1rem;font-weight:800;color:var(--yellow);margin-bottom:1rem">🪙 Toss — Who serves first?</div>
+      <button class="toss-flip-btn" onclick="randomToss()">🪙 Flip Coin</button>
+      <div id="toss-result" style="margin:.8rem 0;font-size:.95rem;font-weight:700;min-height:1.5rem"></div>
+      <div style="font-size:.75rem;color:var(--dim);margin-bottom:.6rem">Or pick directly:</div>
+      <div style="display:flex;gap:.5rem">
+        <button class="toss-team-btn t1-toss" onclick="decideToss(1)" style="padding:.8rem"><span id="toss-t1-name">Team 1</span></button>
+        <button class="toss-team-btn t2-toss" onclick="decideToss(2)" style="padding:.8rem"><span id="toss-t2-name">Team 2</span></button>
+      </div>
+    </div>
+    <div style="text-align:center;margin-top:.8rem">
+      <button class="back-btn" onclick="backFromScore()">← Cancel</button>
+    </div>
   </div>
 
-  <div class="umpire-info" id="s-umpire-info" style="display:none">🧑‍⚖️ Umpire: <span id="s-umpire-name"></span></div>
+  <!-- MAIN SCOREBOARD — shown after toss / for spectators -->
+  <div id="main-scoreboard" style="display:none">
+    <div class="sb-header">
+      <span class="tag">Doubles</span>
+      <span class="tag" id="s-target">To 11</span>
+      <span class="tag live" id="s-status">LIVE</span>
+      <span class="tag" id="s-group-tag" style="display:none;background:var(--purple);color:#fff"></span>
+    </div>
 
-  <div id="toss-area" style="display:none">
-    <div style="background:var(--card);border-radius:var(--r);padding:1rem;text-align:center;margin-bottom:1rem;border:2px solid var(--yellow)">
-      <div style="font-size:1rem;font-weight:700;color:var(--yellow);margin-bottom:.8rem">🪙 Toss — Who serves first?</div>
-      <button class="toss-flip-btn" onclick="randomToss()">🪙 Flip Coin (Random)</button>
-      <div id="toss-result" style="margin:.6rem 0;font-size:.9rem;font-weight:700;min-height:1.5rem"></div>
-      <div style="display:flex;gap:.5rem">
-        <button class="toss-team-btn t1-toss" onclick="decideToss(1)"><span id="toss-t1-name">Team 1</span></button>
-        <button class="toss-team-btn t2-toss" onclick="decideToss(2)"><span id="toss-t2-name">Team 2</span></button>
+    <div class="umpire-info" id="s-umpire-info" style="display:none">🧑‍⚖️ Umpire: <span id="s-umpire-name"></span></div>
+
+    <div class="score-call">
+      <div class="call" id="s-call">0 – 0 – 2</div>
+      <div class="call-label">Serving team – Receiving team – Server #</div>
+    </div>
+
+    <div class="serving-info">
+      🏓 Serving: <span class="serve-team" id="s-serve-team">Team 1</span>
+      &nbsp;·&nbsp; Server <span class="serve-num" id="s-serve-num">#2</span>
+    </div>
+
+    <div class="score-zone">
+      <div class="team-box t1 serving" id="box-t1">
+        <div class="serve-badge">SERVING</div>
+        <div class="tname" id="s-t1">Team 1</div>
+        <div class="pts" id="s-p1">0</div>
+      </div>
+      <div class="team-box t2" id="box-t2">
+        <div class="serve-badge">SERVING</div>
+        <div class="tname" id="s-t2">Team 2</div>
+        <div class="pts" id="s-p2">0</div>
+      </div>
+    </div>
+
+    <div class="rally-btns" id="rally-btns" style="display:none">
+      <button class="rally-btn btn-point" onclick="rallyPoint()">✅ POINT<br><small>(serving team scores)</small></button>
+      <button class="rally-btn btn-sideout" onclick="rallySideOut()">🔄 SIDE OUT<br><small>(rally lost by server)</small></button>
+    </div>
+
+    <div class="winner hide" id="s-winner"></div>
+
+    <!-- More toggle -->
+    <button class="more-toggle" id="more-toggle-btn" onclick="toggleMoreDrawer()">▼ More Options</button>
+    <div class="more-drawer" id="more-drawer">
+      <div class="actions" id="sb-actions" style="display:none;margin-bottom:.5rem">
+        <button class="btn-undo" onclick="undo()">↩ Undo</button>
+        <button class="btn-end" onclick="endGame()">🏁 End Match</button>
+      </div>
+
+      <div id="reservice-area" style="display:none">
+        <div class="rs-panel">
+          <div class="rs-panel-title">🔄 Re-serve Tracker (3 per player)</div>
+          <div class="rs-grid" id="rs-grid"></div>
+        </div>
+      </div>
+
+      <div class="share-box" id="share-box" style="display:none">
+        <p>📡 Game Code for spectators:</p>
+        <input type="text" id="share-code" readonly/>
+        <br>
+        <button class="copy-btn" onclick="copyCode()">Copy Game Code</button>
+      </div>
+
+      <div style="text-align:center">
+        <button class="back-btn" onclick="backFromScore()">← Back</button>
       </div>
     </div>
   </div>
 
-  <div class="score-call">
-    <div class="call" id="s-call">0 – 0 – 2</div>
-    <div class="call-label">Serving team score – Receiving team score – Server #</div>
-  </div>
-
-  <div class="serving-info">
-    🏓 Serving: <span class="serve-team" id="s-serve-team">Team 1</span>
-    &nbsp;·&nbsp; Server <span class="serve-num" id="s-serve-num">#2</span>
-  </div>
-
-  <div id="reservice-area" style="display:none">
-    <div class="rs-panel">
-      <div class="rs-panel-title">🔄 Re-serve Tracker (3 per player)</div>
-      <div class="rs-grid" id="rs-grid"></div>
-    </div>
-  </div>
-
-  <div class="score-zone">
-    <div class="team-box t1 serving" id="box-t1">
-      <div class="serve-badge">SERVING</div>
-      <div class="tname" id="s-t1">Team 1</div>
-      <div class="pts" id="s-p1">0</div>
-    </div>
-    <div class="team-box t2" id="box-t2">
-      <div class="serve-badge">SERVING</div>
-      <div class="tname" id="s-t2">Team 2</div>
-      <div class="pts" id="s-p2">0</div>
-    </div>
-  </div>
-
-  <div class="rally-btns" id="rally-btns" style="display:none">
-    <button class="rally-btn btn-point" onclick="rallyPoint()">✅ POINT<br><small>(serving team scores)</small></button>
-    <button class="rally-btn btn-sideout" onclick="rallySideOut()">🔄 SIDE OUT<br><small>(rally lost by server)</small></button>
-  </div>
-
-  <div class="actions" id="sb-actions" style="display:none">
-    <button class="btn-undo" onclick="undo()">↩ Undo</button>
-    <button class="btn-end" onclick="endGame()">🏁 End Game</button>
-  </div>
-
-  <div class="share-box" id="share-box" style="display:none">
-    <p>📡 Game Code for spectators:</p>
-    <input type="text" id="share-code" readonly/>
-    <br>
-    <button class="copy-btn" onclick="copyCode()">Copy Game Code</button>
-  </div>
-
-  <div style="text-align:center;margin-top:.8rem">
-    <button class="back-btn" onclick="backFromScore()">← Back</button>
-  </div>
-
-  <div class="winner hide" id="s-winner"></div>
 </div>
 
 <!-- PAGE: LIVE GAMES LIST -->
@@ -520,6 +581,84 @@ const UMPIRE_PASSWORD = "pickle123";
 const ADMIN_PASSWORD  = "jayshreeram";
 /* ═══════════════════════════════════════════════════ */
 
+/* ═══════════════════════════════════════════════════
+   SOUND EFFECTS (Web Audio API — no files needed)
+   ═══════════════════════════════════════════════════ */
+var sfxCtx = null;
+function sfxInit(){
+  if(!sfxCtx){
+    try{ sfxCtx = new (window.AudioContext || window.webkitAudioContext)(); }catch(e){}
+  }
+  if(sfxCtx && sfxCtx.state === 'suspended') sfxCtx.resume();
+}
+// ensure AudioContext is initialized on first user interaction
+document.addEventListener('pointerdown', sfxInit, { once: true });
+
+function sfxBounce(){
+  if(!sfxCtx) return;
+  var o = sfxCtx.createOscillator();
+  var g = sfxCtx.createGain();
+  o.connect(g); g.connect(sfxCtx.destination);
+  o.type = 'sine';
+  o.frequency.setValueAtTime(800, sfxCtx.currentTime);
+  o.frequency.exponentialRampToValueAtTime(400, sfxCtx.currentTime + 0.08);
+  g.gain.setValueAtTime(0.18, sfxCtx.currentTime);
+  g.gain.exponentialRampToValueAtTime(0.001, sfxCtx.currentTime + 0.1);
+  o.start(sfxCtx.currentTime);
+  o.stop(sfxCtx.currentTime + 0.1);
+}
+
+function sfxPoint(){
+  if(!sfxCtx) return;
+  var t = sfxCtx.currentTime;
+  [523, 659, 784].forEach(function(f, i){
+    var o = sfxCtx.createOscillator();
+    var g = sfxCtx.createGain();
+    o.connect(g); g.connect(sfxCtx.destination);
+    o.type = 'triangle';
+    o.frequency.setValueAtTime(f, t + i * 0.08);
+    g.gain.setValueAtTime(0, t);
+    g.gain.linearRampToValueAtTime(0.22, t + i * 0.08);
+    g.gain.exponentialRampToValueAtTime(0.001, t + i * 0.08 + 0.15);
+    o.start(t + i * 0.08);
+    o.stop(t + i * 0.08 + 0.15);
+  });
+}
+
+function sfxSideOut(){
+  if(!sfxCtx) return;
+  var o = sfxCtx.createOscillator();
+  var g = sfxCtx.createGain();
+  o.connect(g); g.connect(sfxCtx.destination);
+  o.type = 'square';
+  o.frequency.setValueAtTime(440, sfxCtx.currentTime);
+  o.frequency.linearRampToValueAtTime(330, sfxCtx.currentTime + 0.15);
+  g.gain.setValueAtTime(0.12, sfxCtx.currentTime);
+  g.gain.exponentialRampToValueAtTime(0.001, sfxCtx.currentTime + 0.2);
+  o.start(sfxCtx.currentTime);
+  o.stop(sfxCtx.currentTime + 0.2);
+}
+
+function sfxWin(){
+  if(!sfxCtx) return;
+  var t = sfxCtx.currentTime;
+  var melody = [523, 587, 659, 784, 1047, 784, 1047];
+  melody.forEach(function(f, i){
+    var o = sfxCtx.createOscillator();
+    var g = sfxCtx.createGain();
+    o.connect(g); g.connect(sfxCtx.destination);
+    o.type = 'sine';
+    var start = t + i * 0.12;
+    o.frequency.setValueAtTime(f, start);
+    g.gain.setValueAtTime(0, t);
+    g.gain.linearRampToValueAtTime(0.2, start);
+    g.gain.setValueAtTime(0.2, start);
+    g.gain.exponentialRampToValueAtTime(0.001, start + 0.2);
+    o.start(start);
+    o.stop(start + 0.2);
+  });
+}
+
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
@@ -557,7 +696,260 @@ function showPage(name){
   if(name==='admin-dash'){ loadAdminGroups(); loadAdminGames(); }
   if(name==='standings') loadStandings();
   if(name==='setup') loadSetupGroups();
+  // start/stop bouncing balls on home page
+  if(name==='home'){ pbStartBalls(); } else { pbStopBalls(); }
 }
+
+/* ═══════════════════════════════════════════════════
+   BOUNCING PICKLEBALL MINI-GAME
+   ═══════════════════════════════════════════════════ */
+var pbBalls = [];
+var pbRAF = null;
+var pbRunning = false;
+var pbPaddleDragging = false;
+
+function pbMakeHolesHTML(){
+  var h = '<div class="pb-holes">';
+  for(var i = 0; i < 12; i++) h += '<span></span>';
+  h += '</div>';
+  return h;
+}
+
+function pbCreateBall(fromTop){
+  var el = document.createElement('div');
+  el.className = 'pb-ball';
+  el.innerHTML = pbMakeHolesHTML();
+  document.body.appendChild(el);
+  var sz = 48;
+  var speed = 2 + Math.random() * 1.5;
+  var angle = -Math.PI/2 + (Math.random() - 0.5) * 1.2; // mostly downward
+  var startX = 40 + Math.random() * (window.innerWidth - 80);
+  var startY = fromTop ? 60 : (60 + Math.random() * 100);
+  var ball = {
+    el: el,
+    x: startX,
+    y: startY,
+    vx: Math.cos(angle) * speed,
+    vy: Math.abs(Math.sin(angle)) * speed, // ensure going down initially
+    r: sz / 2
+  };
+  el.style.left = ball.x + 'px';
+  el.style.top = ball.y + 'px';
+  return ball;
+}
+
+function pbStartBalls(){
+  if(pbRunning) return;
+  pbRunning = true;
+  pbBalls.forEach(function(b){ if(b.el.parentNode) b.el.parentNode.removeChild(b.el); });
+  pbBalls = [];
+  var b = pbCreateBall(true);
+  if(b) pbBalls.push(b);
+  pbUpdateCount();
+  pbInitPaddle();
+  document.getElementById('pb-score-display').style.display = 'block';
+  pbRAF = requestAnimationFrame(pbLoop);
+}
+
+function pbStopBalls(){
+  pbRunning = false;
+  if(pbRAF){ cancelAnimationFrame(pbRAF); pbRAF = null; }
+  pbBalls.forEach(function(b){ if(b.el.parentNode) b.el.parentNode.removeChild(b.el); });
+  pbBalls = [];
+  document.getElementById('pb-score-display').style.display = 'none';
+}
+
+function pbUpdateCount(){
+  var c = document.getElementById('pb-ball-count');
+  if(c) c.textContent = pbBalls.length;
+}
+
+function pbInitPaddle(){
+  var paddle = document.getElementById('umpire-paddle');
+  if(!paddle || paddle._pbInit) return;
+  paddle._pbInit = true;
+  var startTouchX = 0, startPaddleX = 0;
+  paddle.addEventListener('pointerdown', function(e){
+    // only drag, don't navigate — navigation happens on quick tap via onclick
+    pbPaddleDragging = true;
+    startTouchX = e.clientX;
+    var r = paddle.getBoundingClientRect();
+    startPaddleX = r.left + r.width / 2;
+    paddle.setPointerCapture(e.pointerId);
+    e.preventDefault();
+  });
+  paddle.addEventListener('pointermove', function(e){
+    if(!pbPaddleDragging) return;
+    var dx = e.clientX - startTouchX;
+    var newX = startPaddleX + dx;
+    var half = paddle.offsetWidth / 2;
+    newX = Math.max(half, Math.min(window.innerWidth - half, newX));
+    paddle.style.left = newX + 'px';
+    e.preventDefault();
+  });
+  paddle.addEventListener('pointerup', function(e){
+    pbPaddleDragging = false;
+  });
+  paddle.addEventListener('pointercancel', function(){
+    pbPaddleDragging = false;
+  });
+}
+
+function pbReset(){
+  // remove all balls and restart with 1
+  pbBalls.forEach(function(b){ if(b.el.parentNode) b.el.parentNode.removeChild(b.el); });
+  pbBalls = [];
+  setTimeout(function(){
+    if(!pbRunning) return;
+    var b = pbCreateBall(true);
+    if(b) pbBalls.push(b);
+    pbUpdateCount();
+  }, 600);
+}
+
+function pbSpawnBall(){
+  if(pbBalls.length >= 5){
+    pbReset();
+  } else {
+    var nb = pbCreateBall(true);
+    if(nb) pbBalls.push(nb);
+    pbUpdateCount();
+  }
+}
+
+function pbLoop(){
+  if(!pbRunning) return;
+  var home = document.getElementById('pg-home');
+  if(!home || !home.classList.contains('active')){
+    pbStopBalls(); return;
+  }
+  var vw = window.innerWidth;
+  var vh = window.innerHeight;
+  var gravity = 0.06;
+
+  // get paddle rect
+  var paddle = document.getElementById('umpire-paddle');
+  var paddleR = paddle ? paddle.getBoundingClientRect() : null;
+
+  // get admin button rect
+  var adminBtn = document.getElementById('fab-admin-btn');
+  var adminR = adminBtn ? adminBtn.getBoundingClientRect() : null;
+
+  // get other buttons (standings, watch, hist)
+  var otherBtns = home.querySelectorAll('.start-btn:not(.umpire)');
+  var btnRects = [];
+  otherBtns.forEach(function(b){ btnRects.push({ el: b, r: b.getBoundingClientRect() }); });
+
+  var ballFell = false;
+
+  for(var i = pbBalls.length - 1; i >= 0; i--){
+    var b = pbBalls[i];
+    // gravity
+    b.vy += gravity;
+    b.x += b.vx;
+    b.y += b.vy;
+
+    var d = b.r * 2;
+
+    // bounce off walls (left, right, top)
+    if(b.x <= 0){ b.x = 0; b.vx = Math.abs(b.vx); }
+    if(b.x >= vw - d){ b.x = vw - d; b.vx = -Math.abs(b.vx); }
+    if(b.y <= 0){ b.y = 0; b.vy = Math.abs(b.vy); }
+
+    // BOTTOM = ball lost
+    if(b.y >= vh - d){
+      ballFell = true;
+      if(b.el.parentNode) b.el.parentNode.removeChild(b.el);
+      pbBalls.splice(i, 1);
+      continue;
+    }
+
+    var ballCX = b.x + b.r;
+    var ballCY = b.y + b.r;
+
+    // Paddle collision (umpire button)
+    if(paddleR && ballCX + b.r > paddleR.left && ballCX - b.r < paddleR.right &&
+       ballCY + b.r > paddleR.top && ballCY - b.r < paddleR.bottom){
+      // bounce up
+      b.vy = -Math.abs(b.vy) - 0.5;
+      b.y = paddleR.top - d;
+      // add slight horizontal variation based on where it hit
+      var hitPos = (ballCX - paddleR.left) / paddleR.width; // 0..1
+      b.vx = (hitPos - 0.5) * 5;
+      sfxBounce();
+      paddle.classList.remove('btn-hit');
+      void paddle.offsetWidth;
+      paddle.classList.add('btn-hit');
+    }
+
+    // Admin button collision — spawn extra ball
+    if(adminR){
+      var aCX = adminR.left + adminR.width / 2;
+      var aCY = adminR.top + adminR.height / 2;
+      var aR = adminR.width / 2 + b.r;
+      var dxA = ballCX - aCX;
+      var dyA = ballCY - aCY;
+      if(dxA * dxA + dyA * dyA < aR * aR){
+        // bounce off
+        var dist = Math.sqrt(dxA * dxA + dyA * dyA) || 1;
+        b.vx = (dxA / dist) * 3;
+        b.vy = (dyA / dist) * 3;
+        b.x += b.vx;
+        b.y += b.vy;
+        sfxBounce();
+        adminBtn.classList.remove('btn-hit');
+        void adminBtn.offsetWidth;
+        adminBtn.classList.add('btn-hit');
+        // spawn extra ball
+        pbSpawnBall();
+      }
+    }
+
+    // Other button collisions (bounce normally)
+    for(var j = 0; j < btnRects.length; j++){
+      var br = btnRects[j].r;
+      if(ballCX > br.left - b.r && ballCX < br.right + b.r &&
+         ballCY > br.top - b.r && ballCY < br.bottom + b.r){
+        var overlapL = (br.left) - (ballCX - b.r);
+        var overlapR = (ballCX + b.r) - (br.right);
+        var overlapT = (br.top) - (ballCY - b.r);
+        var overlapB = (ballCY + b.r) - (br.bottom);
+        var minO = Infinity, side = '';
+        if(overlapL > 0 && overlapL < minO){ minO = overlapL; side = 'left'; }
+        if(overlapR > 0 && overlapR < minO){ minO = overlapR; side = 'right'; }
+        if(overlapT > 0 && overlapT < minO){ minO = overlapT; side = 'top'; }
+        if(overlapB > 0 && overlapB < minO){ minO = overlapB; side = 'bottom'; }
+        if(side === 'left' || side === 'right') b.vx = -b.vx;
+        if(side === 'top' || side === 'bottom') b.vy = -b.vy;
+        if(side === 'left') b.x -= minO;
+        if(side === 'right') b.x += minO;
+        if(side === 'top') b.y -= minO;
+        if(side === 'bottom') b.y += minO;
+        var btnEl = btnRects[j].el;
+        btnEl.classList.remove('btn-hit');
+        void btnEl.offsetWidth;
+        btnEl.classList.add('btn-hit');
+        sfxBounce();
+        break;
+      }
+    }
+
+    b.el.style.left = b.x + 'px';
+    b.el.style.top = b.y + 'px';
+  }
+
+  // if any ball fell to bottom, reset everything
+  if(ballFell && pbBalls.length === 0){
+    sfxSideOut();
+    pbReset();
+  }
+  pbUpdateCount();
+
+  pbRAF = requestAnimationFrame(pbLoop);
+}
+
+// Start balls on initial load
+document.addEventListener('DOMContentLoaded', function(){ pbStartBalls(); });
 
 function updateRoleBadge(){
   const badge = document.getElementById('role-badge');
@@ -1576,6 +1968,36 @@ function backFromScore(){
 function render(){
   if(!G) return;
 
+  const live = G.status === 'live';
+  const tossNeeded = G.tossDecided === false && live;
+  const isOwner = G.deviceId === DEVICE_ID || isAdmin;
+  const showControls = isUmpire === true && isScoring === true && live && isOwner;
+
+  // ── Phase 1: Toss screen vs Main scoreboard ──
+  const tossScreen = document.getElementById('toss-screen');
+  const mainBoard = document.getElementById('main-scoreboard');
+
+  if(showControls && tossNeeded){
+    tossScreen.style.display = 'block';
+    mainBoard.style.display = 'none';
+    document.getElementById('ts-t1').textContent = G.t1;
+    document.getElementById('ts-t2').textContent = G.t2;
+    document.getElementById('toss-t1-name').textContent = G.t1;
+    document.getElementById('toss-t2-name').textContent = G.t2;
+    document.getElementById('ts-target').textContent = 'To ' + G.win;
+    var tsGrp = document.getElementById('ts-group-tag');
+    if(G.groupName){ tsGrp.textContent = G.groupName; tsGrp.style.display = 'inline-block'; }
+    else { tsGrp.style.display = 'none'; }
+    var tsUmp = document.getElementById('ts-umpire-info');
+    if(G.umpireName){ document.getElementById('ts-umpire-name').textContent = G.umpireName; tsUmp.style.display = 'block'; }
+    else { tsUmp.style.display = 'none'; }
+    return;
+  }
+
+  // ── Phase 2: Main scoreboard ──
+  tossScreen.style.display = 'none';
+  mainBoard.style.display = 'block';
+
   document.getElementById('s-t1').textContent = G.t1;
   document.getElementById('s-t2').textContent = G.t2;
   document.getElementById('s-p1').textContent = G.p1;
@@ -1590,7 +2012,6 @@ function render(){
     grpTag.style.display = 'none';
   }
 
-  // Umpire name
   const umpInfo = document.getElementById('s-umpire-info');
   if(G.umpireName){
     document.getElementById('s-umpire-name').textContent = G.umpireName;
@@ -1611,7 +2032,6 @@ function render(){
 
   const st = document.getElementById('s-status');
   const w = document.getElementById('s-winner');
-  const live = G.status === 'live';
 
   if(live){
     st.textContent = 'LIVE'; st.className = 'tag live';
@@ -1623,26 +2043,16 @@ function render(){
     w.classList.remove('hide');
   }
 
-  const isOwner = G.deviceId === DEVICE_ID || isAdmin;
-  const showControls = isUmpire === true && isScoring === true && live && isOwner;
   const winEligible = (G.p1 >= G.win || G.p2 >= G.win) && Math.abs(G.p1 - G.p2) >= 2;
-  const tossNeeded = G.tossDecided === false && live;
 
-  // Toss area
-  const tossArea = document.getElementById('toss-area');
-  if(tossArea){
-    tossArea.style.display = (showControls && tossNeeded) ? 'block' : 'none';
-    if(tossNeeded){
-      document.getElementById('toss-t1-name').textContent = G.t1;
-      document.getElementById('toss-t2-name').textContent = G.t2;
-    }
-  }
-
-  // Hide rally buttons during toss or when win reached; keep undo+end visible
-  const showRally = showControls && !tossNeeded && !winEligible;
+  // Rally buttons: hide when win reached
+  const showRally = showControls && !winEligible;
   document.getElementById('rally-btns').style.display = showRally ? 'flex' : 'none';
-  document.getElementById('sb-actions').style.display = (showControls && !tossNeeded) ? 'flex' : 'none';
+
+  // More drawer contents
+  document.getElementById('sb-actions').style.display = showControls ? 'flex' : 'none';
   document.getElementById('share-box').style.display = (isUmpire === true && isScoring === true && isOwner) ? 'block' : 'none';
+  document.getElementById('more-toggle-btn').style.display = 'block';
 
   // Re-service counter (Womens Double & Mix Double) — 4 players, 3 each
   const rsArea = document.getElementById('reservice-area');
@@ -1656,10 +2066,22 @@ function render(){
   const banner = document.getElementById('s-winner');
   if(live && winEligible){
     const leading = G.p1 > G.p2 ? G.t1 : G.t2;
-    banner.textContent = '🏆 ' + leading + ' has won! Umpire: press End Match to finalize.';
+    banner.textContent = '🏆 ' + leading + ' has won! Press End Match to finalize.';
     banner.classList.remove('hide');
   } else if(live){
     banner.classList.add('hide');
+  }
+}
+
+function toggleMoreDrawer(){
+  var d = document.getElementById('more-drawer');
+  var b = document.getElementById('more-toggle-btn');
+  if(d.classList.contains('open')){
+    d.classList.remove('open');
+    b.textContent = '▼ More Options';
+  } else {
+    d.classList.add('open');
+    b.textContent = '▲ Less';
   }
 }
 
@@ -1672,6 +2094,7 @@ function rallyPoint(){
   if(G.servingTeam === 1) G.p1++; else G.p2++;
   db.ref('games/' + G.code).set(G);
   render();
+  sfxPoint();
   if(navigator.vibrate) navigator.vibrate(30);
 }
 
@@ -1686,6 +2109,7 @@ function rallySideOut(){
   }
   db.ref('games/' + G.code).set(G);
   render();
+  sfxSideOut();
   if(navigator.vibrate) navigator.vibrate([30,50,30]);
 }
 
@@ -1713,6 +2137,7 @@ function endGame(){
   db.ref('games/' + G.code).set(G);
   localStorage.removeItem('pb_active_game');
   render();
+  sfxWin();
 }
 
 function copyCode(){
