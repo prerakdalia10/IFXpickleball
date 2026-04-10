@@ -175,6 +175,14 @@ input:focus,select:focus{border-color:var(--green)}
 .toss-team-btn{flex:1;padding:.7rem;border:none;border-radius:var(--r);font-weight:700;font-size:.85rem;cursor:pointer}
 .t1-toss{background:var(--green);color:#111}
 .t2-toss{background:var(--blue);color:#111}
+.reservice-bar{display:flex;align-items:center;justify-content:center;gap:.5rem;background:var(--card);border-radius:var(--r);padding:.5rem;margin-bottom:.8rem;font-size:.85rem}
+.reservice-bar .rs-label{color:var(--dim);font-weight:600}
+.reservice-bar .rs-count{color:var(--yellow);font-weight:800;font-size:1.1rem;min-width:1.5rem;text-align:center}
+.reservice-bar button{width:28px;height:28px;border-radius:50%;border:none;font-size:1rem;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.rs-plus{background:var(--yellow);color:#111}
+.rs-minus{background:var(--card2);color:var(--text)}
+.umpire-info{text-align:center;font-size:.75rem;color:var(--dim);margin-bottom:.5rem}
+.umpire-info span{color:var(--yellow);font-weight:600}
 @media(max-width:400px){
   .pts{font-size:3.5rem}
   .rally-btn{font-size:.95rem;padding:.9rem .3rem}
@@ -207,6 +215,8 @@ input:focus,select:focus{border-color:var(--green)}
   <h2>🔒 Umpire Login</h2>
   <div class="pw-box">
     <p style="color:var(--dim);margin-bottom:1rem">Enter the umpire password to access scoring controls.</p>
+    <label>Your Name</label>
+    <input type="text" id="umpire-name-input" placeholder="Enter your name" maxlength="40" style="letter-spacing:normal"/>
     <label>Password</label>
     <input type="password" id="pw-input" placeholder="Enter password" maxlength="30"/>
     <br>
@@ -221,6 +231,8 @@ input:focus,select:focus{border-color:var(--green)}
   <h2>👑 Super Admin Login</h2>
   <div class="pw-box">
     <p style="color:var(--dim);margin-bottom:1rem">Enter the admin password to manage groups and teams.</p>
+    <label>Your Name</label>
+    <input type="text" id="admin-name-input" placeholder="Enter your name" maxlength="40" style="letter-spacing:normal"/>
     <label>Password</label>
     <input type="password" id="admin-pw-input" placeholder="Enter admin password" maxlength="30"/>
     <br>
@@ -254,7 +266,7 @@ input:focus,select:focus{border-color:var(--green)}
   <button class="start-btn new" onclick="seedTournamentData()" style="font-size:.9rem;padding:.8rem">🌱 Seed All Tournament Teams &amp; Groups</button>
   <div id="seed-status" style="margin-bottom:1rem;font-size:.85rem"></div>
 
-  <div class="section-label">🎮 Manage Finished Games</div>
+  <div class="section-label">🎮 Manage All Games</div>
   <div id="admin-games-list">
     <div class="loading"><div class="spin"></div><br>Loading...</div>
   </div>
@@ -287,6 +299,13 @@ input:focus,select:focus{border-color:var(--green)}
         <div id="edit-t2-name" style="font-size:.85rem;font-weight:700;color:var(--blue);margin-bottom:.3rem"></div>
         <input type="number" id="edit-p2" min="0" max="99" style="text-align:center;font-size:1.3rem;font-weight:800;padding:.5rem"/>
       </div>
+    </div>
+    <div style="margin-bottom:.8rem;text-align:center">
+      <label style="font-size:.8rem">Status</label>
+      <select id="edit-status" style="font-size:.9rem">
+        <option value="live">Live</option>
+        <option value="finished">Finished</option>
+      </select>
     </div>
     <div style="display:flex;gap:.5rem">
       <button class="start-btn new" onclick="saveEditedGame()" style="font-size:.9rem;padding:.7rem;margin:0">💾 Save</button>
@@ -351,6 +370,8 @@ input:focus,select:focus{border-color:var(--green)}
     <span class="tag" id="s-group-tag" style="display:none;background:var(--purple);color:#fff"></span>
   </div>
 
+  <div class="umpire-info" id="s-umpire-info" style="display:none">🧑‍⚖️ Umpire: <span id="s-umpire-name"></span></div>
+
   <div id="toss-area" style="display:none">
     <div style="background:var(--card);border-radius:var(--r);padding:1rem;text-align:center;margin-bottom:1rem;border:2px solid var(--yellow)">
       <div style="font-size:1rem;font-weight:700;color:var(--yellow);margin-bottom:.8rem">🪙 Toss — Who serves first?</div>
@@ -371,6 +392,16 @@ input:focus,select:focus{border-color:var(--green)}
   <div class="serving-info">
     🏓 Serving: <span class="serve-team" id="s-serve-team">Team 1</span>
     &nbsp;·&nbsp; Server <span class="serve-num" id="s-serve-num">#2</span>
+  </div>
+
+  <div id="reservice-area" style="display:none">
+    <div class="reservice-bar">
+      <span class="rs-label">🔄 Re-serve:</span>
+      <button class="rs-minus" onclick="reserviceChange(-1)">−</button>
+      <span class="rs-count" id="rs-count">0</span>
+      <span style="color:var(--dim)">/3</span>
+      <button class="rs-plus" onclick="reserviceChange(1)">+</button>
+    </div>
   </div>
 
   <div class="score-zone">
@@ -486,6 +517,7 @@ let liveListRef = null;
 let standingsRef = null;
 let firstServer = 1;
 let cachedGroups = {};
+let umpireName = '';
 
 /* ── Device ID ── */
 function getDeviceId(){
@@ -532,8 +564,10 @@ function adminLogin(){
   if(pw === ADMIN_PASSWORD){
     isAdmin = true;
     isUmpire = true;
+    umpireName = document.getElementById('admin-name-input').value.trim() || 'Admin';
     document.getElementById('admin-pw-error').style.display = 'none';
     document.getElementById('admin-pw-input').value = '';
+    document.getElementById('admin-name-input').value = '';
     updateRoleBadge();
     showPage('admin-dash');
   } else {
@@ -872,10 +906,10 @@ function loadAdminGames(){
   const el = document.getElementById('admin-games-list');
   el.innerHTML = '<div class="loading"><div class="spin"></div><br>Loading games...</div>';
 
-  db.ref('games').orderByChild('status').equalTo('finished').once('value', snap => {
+  db.ref('games').once('value', snap => {
     const games = snap.val();
     if(!games){
-      el.innerHTML = '<p class="empty">No finished games yet.</p>';
+      el.innerHTML = '<p class="empty">No games yet.</p>';
       return;
     }
     let html = '';
@@ -883,13 +917,22 @@ function loadAdminGames(){
     sorted.forEach(g => {
       const d = new Date(g.date);
       const when = d.toLocaleDateString() + ' ' + d.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
-      const winner = g.p1 > g.p2 ? g.t1 : g.p2 > g.p1 ? g.t2 : 'Tied';
+      const isLiveGame = g.status === 'live';
+      const winner = !isLiveGame ? (g.p1 > g.p2 ? g.t1 : g.p2 > g.p1 ? g.t2 : 'Tied') : '';
       const grpLabel = g.groupName ? ' · ' + esc(g.groupName) : '';
+      const statusBadge = isLiveGame
+        ? '<span style="background:var(--green);color:#111;padding:.1rem .4rem;border-radius:999px;font-size:.65rem;font-weight:700;margin-right:.3rem">LIVE</span>'
+        : '<span style="background:var(--dim);color:#fff;padding:.1rem .4rem;border-radius:999px;font-size:.65rem;font-weight:700;margin-right:.3rem">DONE</span>';
+      const winnerText = winner ? ' · Winner: ' + esc(winner) : '';
+      const scoreBtn = isLiveGame
+        ? '<button style="padding:.35rem .5rem;border:none;border-radius:8px;cursor:pointer;font-size:.75rem;font-weight:700;background:var(--green);color:#111" onclick="adminEnterGame(\'' + g.code + '\')">▶</button>'
+        : '';
       html += '<div class="admin-game-card">'
-        + '<div class="ag-info"><div class="ag-teams">' + esc(g.t1) + ' vs ' + esc(g.t2) + '</div>'
-        + '<div class="ag-meta">' + when + grpLabel + ' · Winner: ' + esc(winner) + '</div></div>'
+        + '<div class="ag-info"><div class="ag-teams">' + statusBadge + esc(g.t1) + ' vs ' + esc(g.t2) + '</div>'
+        + '<div class="ag-meta">' + when + grpLabel + winnerText + '</div></div>'
         + '<div class="ag-score"><span style="color:var(--green)">' + g.p1 + '</span> – <span style="color:var(--blue)">' + g.p2 + '</span></div>'
         + '<div class="ag-btns">'
+        + scoreBtn
         + '<button class="ag-edit-btn" onclick="openEditGame(\'' + g.code + '\')">✏️</button>'
         + '<button class="ag-del-btn" onclick="adminDeleteGame(\'' + g.code + '\')">🗑</button>'
         + '</div></div>';
@@ -909,6 +952,7 @@ function openEditGame(code){
     document.getElementById('edit-t2-name').textContent = g.t2;
     document.getElementById('edit-p1').value = g.p1;
     document.getElementById('edit-p2').value = g.p2;
+    document.getElementById('edit-status').value = g.status || 'finished';
     document.getElementById('edit-game-modal').style.display = 'flex';
   });
 }
@@ -922,19 +966,27 @@ function saveEditedGame(){
   const code = document.getElementById('edit-game-code').value;
   const newP1 = parseInt(document.getElementById('edit-p1').value) || 0;
   const newP2 = parseInt(document.getElementById('edit-p2').value) || 0;
+  const newStatus = document.getElementById('edit-status').value;
   const gk = document.getElementById('edit-game-gk').value;
 
   db.ref('games/' + code).once('value', snap => {
     const g = snap.val();
     if(!g){ alert('Game not found.'); return; }
+    const wasFinished = g.status === 'finished';
     g.p1 = newP1;
     g.p2 = newP2;
+    g.status = newStatus;
     db.ref('games/' + code).set(g).then(() => {
-      // Update standings match record too
       if(gk){
-        db.ref('standings/' + gk + '/matches/' + code).update({ p1: newP1, p2: newP2 }).then(() => {
-          recalcGroupStandings(gk);
-        });
+        if(newStatus === 'finished'){
+          db.ref('standings/' + gk + '/matches/' + code).set({ t1:g.t1, t2:g.t2, p1:newP1, p2:newP2, date:g.date }).then(() => {
+            recalcGroupStandings(gk);
+          });
+        } else if(wasFinished && newStatus === 'live'){
+          db.ref('standings/' + gk + '/matches/' + code).remove().then(() => {
+            recalcGroupStandings(gk);
+          });
+        }
       }
       closeEditModal();
       loadAdminGames();
@@ -1012,8 +1064,10 @@ function umpireLogin(){
   const pw = document.getElementById('pw-input').value;
   if(pw === UMPIRE_PASSWORD){
     isUmpire = true;
+    umpireName = document.getElementById('umpire-name-input').value.trim() || 'Umpire';
     document.getElementById('pw-error').style.display = 'none';
     document.getElementById('pw-input').value = '';
+    document.getElementById('umpire-name-input').value = '';
     updateRoleBadge();
     showPage('umpire-dash');
   } else {
@@ -1115,6 +1169,23 @@ function randomToss(){
   }, 800);
 }
 
+/* ── Re-service counter ── */
+function reserviceChange(delta){
+  if(!G || G.status !== 'live' || !isScoring || (G.deviceId !== DEVICE_ID && !isAdmin)) return;
+  const cur = G.reserviceCount || 0;
+  const next = cur + delta;
+  if(next < 0 || next > 3) return;
+  G.reserviceCount = next;
+  db.ref('games/' + G.code).set(G);
+  render();
+}
+
+/* ── Admin enter live game ── */
+function adminEnterGame(code){
+  if(!isAdmin) return;
+  _openGameAsUmpire(code);
+}
+
 /* ═══════════════════════════════════════════════════
    FIXTURES: Auto-generated round-robin matches
    ═══════════════════════════════════════════════════ */
@@ -1212,11 +1283,14 @@ function startFixtureMatch(t1, t2, groupKey){
     p1: 0, p2: 0,
     servingTeam: 1, serverNum: 2,
     tossDecided: false,
+    reserviceCount: 0,
     status: 'live',
     date: new Date().toISOString(),
     deviceId: DEVICE_ID,
     groupKey: groupKey,
-    groupName: groupName
+    groupName: groupName,
+    category: (cachedGroups[groupKey] && cachedGroups[groupKey].category) ? cachedGroups[groupKey].category : '',
+    umpireName: umpireName
   };
 
   undoLog = [];
@@ -1267,11 +1341,14 @@ function startGame(){
     p1: 0, p2: 0,
     servingTeam: 1, serverNum: 2,
     tossDecided: false,
+    reserviceCount: 0,
     status: 'live',
     date: new Date().toISOString(),
     deviceId: DEVICE_ID,
     groupKey: groupKey || '',
-    groupName: groupName
+    groupName: groupName,
+    category: (groupKey && cachedGroups[groupKey] && cachedGroups[groupKey].category) ? cachedGroups[groupKey].category : '',
+    umpireName: umpireName
   };
 
   undoLog = [];
@@ -1453,6 +1530,15 @@ function render(){
     grpTag.style.display = 'none';
   }
 
+  // Umpire name
+  const umpInfo = document.getElementById('s-umpire-info');
+  if(G.umpireName){
+    document.getElementById('s-umpire-name').textContent = G.umpireName;
+    umpInfo.style.display = 'block';
+  } else {
+    umpInfo.style.display = 'none';
+  }
+
   const servingName = G.servingTeam === 1 ? G.t1 : G.t2;
   document.getElementById('s-serve-team').textContent = servingName;
   document.getElementById('s-serve-num').textContent = '#' + G.serverNum;
@@ -1498,6 +1584,17 @@ function render(){
   document.getElementById('sb-actions').style.display = (showControls && !tossNeeded) ? 'flex' : 'none';
   document.getElementById('share-box').style.display = (isUmpire === true && isScoring === true && isOwner) ? 'block' : 'none';
 
+  // Re-service counter (Womens Double & Mix Double)
+  const rsArea = document.getElementById('reservice-area');
+  const cat = (G.category || '').toLowerCase();
+  const showReservice = (cat.indexOf('womens') !== -1 || cat.indexOf('mix') !== -1) && live;
+  rsArea.style.display = showReservice ? 'block' : 'none';
+  if(showReservice){
+    document.getElementById('rs-count').textContent = G.reserviceCount || 0;
+    const rsBtns = rsArea.querySelectorAll('button');
+    rsBtns.forEach(function(b){ b.style.display = showControls ? 'flex' : 'none'; });
+  }
+
   const banner = document.getElementById('s-winner');
   if(live && winEligible){
     const leading = G.p1 > G.p2 ? G.t1 : G.t2;
@@ -1513,7 +1610,7 @@ function render(){
    ═══════════════════════════════════════════════════ */
 function rallyPoint(){
   if(!G || G.status !== 'live' || !isScoring || (G.deviceId !== DEVICE_ID && !isAdmin)) return;
-  undoLog.push({ p1:G.p1, p2:G.p2, servingTeam:G.servingTeam, serverNum:G.serverNum, status:G.status });
+  undoLog.push({ p1:G.p1, p2:G.p2, servingTeam:G.servingTeam, serverNum:G.serverNum, status:G.status, reserviceCount:G.reserviceCount||0 });
   if(G.servingTeam === 1) G.p1++; else G.p2++;
   db.ref('games/' + G.code).set(G);
   render();
@@ -1522,13 +1619,14 @@ function rallyPoint(){
 
 function rallySideOut(){
   if(!G || G.status !== 'live' || !isScoring || (G.deviceId !== DEVICE_ID && !isAdmin)) return;
-  undoLog.push({ p1:G.p1, p2:G.p2, servingTeam:G.servingTeam, serverNum:G.serverNum, status:G.status });
+  undoLog.push({ p1:G.p1, p2:G.p2, servingTeam:G.servingTeam, serverNum:G.serverNum, status:G.status, reserviceCount:G.reserviceCount||0 });
   if(G.serverNum === 1){
     G.serverNum = 2;
   } else {
     G.servingTeam = G.servingTeam === 1 ? 2 : 1;
     G.serverNum = 1;
   }
+  G.reserviceCount = 0;
   db.ref('games/' + G.code).set(G);
   render();
   if(navigator.vibrate) navigator.vibrate([30,50,30]);
@@ -1541,6 +1639,7 @@ function undo(){
   G.servingTeam = prev.servingTeam;
   G.serverNum = prev.serverNum;
   G.status = prev.status;
+  G.reserviceCount = prev.reserviceCount || 0;
   db.ref('games/' + G.code).set(G);
   render();
 }
@@ -1806,8 +1905,10 @@ function resumeActiveGame(){
       const pw = document.getElementById('pw-input').value;
       if(pw === UMPIRE_PASSWORD){
         isUmpire = true;
+        umpireName = document.getElementById('umpire-name-input').value.trim() || 'Umpire';
         document.getElementById('pw-error').style.display = 'none';
         document.getElementById('pw-input').value = '';
+        document.getElementById('umpire-name-input').value = '';
         updateRoleBadge();
         _openGameAsUmpire(activeCode);
         showPage('score');
