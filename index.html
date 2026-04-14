@@ -95,6 +95,92 @@ input:focus,select:focus{border-color:var(--yellow)}
 .winner{margin-top:.8rem;text-align:center;padding:1rem;border-radius:var(--r);font-size:1.2rem;font-weight:800;background:linear-gradient(180deg,#e8c547,#d4a843,#b8922e);color:#111;border:1px solid #a07828;box-shadow:0 4px 20px rgba(212,168,67,.3);animation:winPulse 1s ease-in-out infinite;text-shadow:0 1px 0 rgba(255,255,255,.2)}
 .winner.hide{display:none}
 @keyframes winPulse{0%,100%{box-shadow:0 4px 20px rgba(212,168,67,.25)}50%{box-shadow:0 4px 30px rgba(212,168,67,.45)}}
+.margin-box{text-align:center;background:var(--card);border-radius:var(--r);padding:.6rem;margin-bottom:.6rem;border:1px solid rgba(255,255,255,.06);font-size:.85rem}
+.margin-box .margin-val{font-size:1.4rem;font-weight:900;color:var(--yellow);margin:.2rem 0}
+.margin-box .margin-label{font-size:.72rem;color:var(--dim)}
+.margin-box.hide{display:none}
+
+/* ── Home More drawer ── */
+.home-more-toggle{width:70%;margin:0 auto .5rem;display:block;padding:.45rem .8rem;font-size:.85rem;font-weight:700;background:linear-gradient(180deg,#2a3f55,#1e3348);color:var(--dim);border:1px solid rgba(255,255,255,.08);border-radius:var(--r);cursor:pointer;text-align:center}
+.home-more-content{display:none;width:70%;margin:0 auto}
+.home-more-content.open{display:block}
+
+/* ── Court-based Scoring View ── */
+.court-wrap{position:relative;width:100%;height:calc(100vh - 10px);display:flex;flex-direction:column;overflow:hidden;border-radius:12px;user-select:none;-webkit-user-select:none;touch-action:manipulation}
+.court-topbar{display:flex;align-items:center;justify-content:center;gap:.5rem;padding:.35rem .5rem;background:rgba(0,0,0,.7);z-index:5;flex-shrink:0;flex-wrap:wrap}
+.court-body{display:flex;flex:1;position:relative;overflow:hidden}
+.court-half{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;position:relative;transition:filter .12s;overflow:hidden}
+.court-half:active{filter:brightness(1.25)}
+.court-half.left{background:linear-gradient(135deg,#1565C0 0%,#0D47A1 100%);border-right:2px solid rgba(255,255,255,.25)}
+.court-half.right{background:linear-gradient(225deg,#2E7D32 0%,#1B5E20 100%);border-left:2px solid rgba(255,255,255,.25)}
+/* NVZ (kitchen) zones */
+.court-half .nvz{position:absolute;top:0;bottom:0;width:22%;background:rgba(0,0,0,.12);border:1px dashed rgba(255,255,255,.15)}
+.court-half.left .nvz{right:0;border-right:none;border-left:1px dashed rgba(255,255,255,.25)}
+.court-half.right .nvz{left:0;border-left:none;border-right:1px dashed rgba(255,255,255,.25)}
+/* Horizontal center-line (service boxes) */
+.court-half::before{content:'';position:absolute;top:50%;left:8%;right:8%;height:1px;background:rgba(255,255,255,.12)}
+/* Serving glow */
+.court-half.serving{box-shadow:inset 0 0 50px rgba(255,215,0,.12)}
+/* Net */
+.court-net{position:absolute;left:50%;top:0;bottom:0;width:4px;background:linear-gradient(180deg,#fafafa,#bbb,#fafafa);z-index:3;transform:translateX(-50%);box-shadow:0 0 12px rgba(255,255,255,.25)}
+/* Score overlay on net */
+.court-score-overlay{position:absolute;top:.4rem;left:50%;transform:translateX(-50%);z-index:6;background:rgba(0,0,0,.78);border-radius:14px;padding:.25rem .9rem;text-align:center;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.12)}
+.court-call{font-size:1.3rem;font-weight:900;letter-spacing:2px;color:#fff;font-variant-numeric:tabular-nums}
+.court-call-label{font-size:.5rem;color:rgba(255,255,255,.4);letter-spacing:.5px}
+/* Team info on court */
+.ct-name{font-size:.85rem;font-weight:700;color:rgba(255,255,255,.85);text-shadow:0 2px 8px rgba(0,0,0,.5);margin-bottom:.2rem;max-width:90%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;z-index:1}
+.ct-score{font-size:5rem;font-weight:900;color:#fff;text-shadow:0 4px 25px rgba(0,0,0,.4);line-height:1;font-variant-numeric:tabular-nums;z-index:1}
+.ct-serve-badge{font-size:.65rem;font-weight:700;background:rgba(255,215,0,.9);color:#111;padding:.15rem .55rem;border-radius:999px;margin-top:.3rem;display:none;z-index:1}
+.court-half.serving .ct-serve-badge{display:inline-block}
+.ct-tap-hint{position:absolute;bottom:.4rem;font-size:.55rem;color:rgba(255,255,255,.25);letter-spacing:.5px;z-index:1;display:none}
+.ct-tap-hint.show{display:block}
+/* Corner more button */
+.court-more-btn{position:absolute;bottom:.5rem;right:.5rem;z-index:10;width:38px;height:38px;border-radius:50%;background:rgba(0,0,0,.55);border:1px solid rgba(255,255,255,.18);color:#fff;font-size:1.1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
+.court-more-btn:active{background:rgba(255,255,255,.2)}
+.court-more-menu{display:none;position:absolute;bottom:3rem;right:.5rem;z-index:10;background:rgba(12,25,42,.95);border-radius:12px;padding:.4rem;min-width:200px;border:1px solid rgba(255,255,255,.1);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+.court-more-menu.open{display:block}
+.court-more-menu button,.court-more-menu .cm-item{display:block;width:100%;text-align:left;padding:.55rem .7rem;font-size:.82rem;font-weight:600;background:none;border:none;color:#fff;cursor:pointer;border-radius:8px}
+.court-more-menu button:active,.court-more-menu .cm-item:active{background:rgba(255,255,255,.08)}
+.court-more-menu hr{border:none;border-top:1px solid rgba(255,255,255,.08);margin:.2rem 0}
+/* Winner overlay on court */
+.court-winner{display:none;position:absolute;top:0;left:0;right:0;bottom:0;z-index:8;background:rgba(0,0,0,.72);backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px);flex-direction:column;align-items:center;justify-content:center}
+.court-winner.show{display:flex}
+.court-winner-text{font-size:1.8rem;font-weight:900;color:#ffd700;text-shadow:0 2px 15px rgba(255,215,0,.5);text-align:center;padding:0 1rem;line-height:1.3}
+.court-winner-sub{font-size:.85rem;color:rgba(255,255,255,.6);margin-top:.5rem}
+/* Margin overlay */
+.court-margin{position:absolute;bottom:2.8rem;left:50%;transform:translateX(-50%);z-index:6;background:rgba(0,0,0,.6);border-radius:10px;padding:.2rem .7rem;text-align:center;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);white-space:nowrap;max-width:90%}
+.court-margin .margin-label{font-size:.55rem;color:rgba(255,255,255,.45)}
+.court-margin .margin-val{font-size:.7rem;font-weight:700;color:#ffd700}
+.court-margin.hide{display:none}
+/* Landscape hint */
+.landscape-hint{display:none;text-align:center;padding:1.5rem;color:var(--dim);font-size:.85rem}
+@media (orientation:portrait){.landscape-hint{display:block}.court-wrap{height:calc(100vh - 80px)}}
+/* Tap ripple */
+.ct-ripple{position:absolute;border-radius:50%;background:rgba(255,255,255,.25);transform:scale(0);animation:ctRipple .5s ease-out forwards;pointer-events:none;z-index:4}
+@keyframes ctRipple{to{transform:scale(4);opacity:0}}
+/* Umpire info bar on court */
+.court-umpire{position:absolute;top:.35rem;left:.5rem;z-index:6;font-size:.6rem;color:rgba(255,255,255,.4);background:rgba(0,0,0,.4);padding:.15rem .5rem;border-radius:8px}
+
+/* ── Position Calculator ── */
+.calc-card{background:var(--card);border-radius:var(--r);padding:1rem;margin-bottom:1rem;border:1px solid rgba(255,255,255,.06)}
+.calc-card h3{font-size:.95rem;margin-bottom:.6rem;color:var(--yellow)}
+.calc-result{background:var(--card);border-radius:var(--r);padding:1rem;margin-top:1rem;border:1px solid rgba(255,255,255,.06)}
+.calc-result h3{font-size:.95rem;margin-bottom:.6rem;color:var(--green)}
+.calc-result .scenario{background:var(--card2);border-radius:var(--r);padding:.8rem;margin-bottom:.6rem;border-left:3px solid var(--yellow)}
+.calc-result .scenario .sc-title{font-weight:700;font-size:.9rem;margin-bottom:.3rem}
+.calc-result .scenario .sc-detail{font-size:.82rem;color:var(--dim);line-height:1.5}
+.calc-result .scenario .sc-verdict{font-size:.85rem;font-weight:700;margin-top:.4rem;padding:.4rem .6rem;border-radius:8px;display:inline-block}
+.sc-qualify{background:rgba(67,160,71,.2);color:var(--green)}
+.sc-noqualify{background:rgba(198,40,40,.2);color:var(--red)}
+.sc-maybe{background:rgba(212,168,67,.2);color:var(--yellow)}
+.calc-summary{background:linear-gradient(180deg,var(--card),#0e2030);border-radius:var(--r);padding:1rem;margin-top:1rem;border:2px solid var(--yellow);text-align:center}
+.calc-summary .big-num{font-size:2.5rem;font-weight:900;color:var(--yellow);margin:.3rem 0}
+.calc-summary .big-label{font-size:.85rem;color:var(--dim)}
+.current-standing{background:var(--card2);border-radius:var(--r);padding:.7rem;margin-bottom:1rem;font-size:.85rem}
+.current-standing table{width:100%;border-collapse:collapse;margin-top:.4rem}
+.current-standing th{background:var(--card);color:var(--dim);padding:.3rem;font-size:.7rem;text-align:center}
+.current-standing td{padding:.3rem;font-size:.8rem;text-align:center;border-bottom:1px solid var(--card)}
+.current-standing .hl{background:rgba(212,168,67,.15);font-weight:700}
 
 /* ── Game cards ── */
 .game-card{background:var(--card);border-radius:var(--r);padding:.8rem 1rem;margin-bottom:.6rem;display:flex;justify-content:space-between;align-items:center;cursor:pointer;transition:transform .15s,box-shadow .15s;position:relative;border:1px solid rgba(255,255,255,.05)}
@@ -251,7 +337,11 @@ input:focus,select:focus{border-color:var(--yellow)}
   <div style="height:30vh"></div>
   <button class="start-btn standings" onclick="showPage('standings')" style="padding:.45rem .8rem;font-size:.85rem;width:70%;margin:0 auto .5rem;display:block">📊 Points Table</button>
   <button class="start-btn watch" onclick="showPage('live-list')" style="padding:.45rem .8rem;font-size:.85rem;width:70%;margin:0 auto .5rem;display:block">👀 Live Scores</button>
-  <button class="start-btn hist" onclick="showPage('history');loadHistory()" style="padding:.45rem .8rem;font-size:.85rem;width:70%;margin:0 auto .5rem;display:block">📋 Past Games</button>
+  <button class="home-more-toggle" onclick="toggleHomeMore()">▼ More</button>
+  <div class="home-more-content" id="home-more-content">
+    <button class="start-btn hist" onclick="showPage('history');loadHistory()" style="padding:.45rem .8rem;font-size:.85rem;width:100%;margin:0 auto .5rem;display:block">📋 Past Games</button>
+    <button class="start-btn standings" onclick="showPage('pos-calc');initCalc()" style="padding:.45rem .8rem;font-size:.85rem;width:100%;margin:0 auto .5rem;display:block">🧮 Position Calculator</button>
+  </div>
   <div style="flex:1"></div>
   <button class="start-btn umpire" id="umpire-paddle" onclick="showPage('umpire-login')" style="position:fixed;bottom:100px;left:50%;transform:translateX(-50%);width:200px;z-index:998;touch-action:none">🔒 Umpire Login</button>
 </div>
@@ -449,73 +539,75 @@ input:focus,select:focus{border-color:var(--yellow)}
     </div>
   </div>
 
-  <!-- MAIN SCOREBOARD — shown after toss / for spectators -->
+  <!-- MAIN SCOREBOARD — Court View -->
   <div id="main-scoreboard" style="display:none">
-    <div class="sb-header">
-      <span class="tag">Doubles</span>
-      <span class="tag" id="s-target">To 11</span>
-      <span class="tag live" id="s-status">LIVE</span>
-      <span class="tag" id="s-group-tag" style="display:none;background:var(--purple);color:#fff"></span>
-    </div>
-
-    <div class="umpire-info" id="s-umpire-info" style="display:none">🧑‍⚖️ Umpire: <span id="s-umpire-name"></span></div>
-
-    <div class="score-call">
-      <div class="call" id="s-call">0 – 0 – 2</div>
-      <div class="call-label">Serving team – Receiving team – Server #</div>
-    </div>
-
-    <div class="serving-info">
-      🏓 Serving: <span class="serve-team" id="s-serve-team">Team 1</span>
-      &nbsp;·&nbsp; Server <span class="serve-num" id="s-serve-num">#2</span>
-    </div>
-
-    <div class="score-zone">
-      <div class="team-box t1 serving" id="box-t1">
-        <div class="serve-badge">SERVING</div>
-        <div class="tname" id="s-t1">Team 1</div>
-        <div class="pts" id="s-p1">0</div>
+    <div class="court-wrap">
+      <!-- Top bar with tags -->
+      <div class="court-topbar">
+        <span class="tag">Doubles</span>
+        <span class="tag" id="s-target">To 11</span>
+        <span class="tag live" id="s-status">LIVE</span>
+        <span class="tag" id="s-group-tag" style="display:none;background:var(--purple);color:#fff"></span>
       </div>
-      <div class="team-box t2" id="box-t2">
-        <div class="serve-badge">SERVING</div>
-        <div class="tname" id="s-t2">Team 2</div>
-        <div class="pts" id="s-p2">0</div>
-      </div>
-    </div>
-
-    <div class="rally-btns" id="rally-btns" style="display:none">
-      <button class="rally-btn btn-point" onclick="rallyPoint()">✅ POINT<br><small>(serving team scores)</small></button>
-      <button class="rally-btn btn-sideout" onclick="rallySideOut()">🔄 SIDE OUT<br><small>(rally lost by server)</small></button>
-    </div>
-
-    <div class="winner hide" id="s-winner"></div>
-
-    <!-- More toggle -->
-    <button class="more-toggle" id="more-toggle-btn" onclick="toggleMoreDrawer()">▼ More Options</button>
-    <div class="more-drawer" id="more-drawer">
-      <div class="actions" id="sb-actions" style="display:none;margin-bottom:.5rem">
-        <button class="btn-undo" onclick="undo()">↩ Undo</button>
-        <button class="btn-end" onclick="endGame()">🏁 End Match</button>
-      </div>
-
-      <div id="reservice-area" style="display:none">
-        <div class="rs-panel">
-          <div class="rs-panel-title">🔄 Re-serve Tracker (3 per player)</div>
-          <div class="rs-grid" id="rs-grid"></div>
+      <!-- Court body -->
+      <div class="court-body">
+        <!-- Left half (Team 1) -->
+        <div class="court-half left serving" id="box-t1" onclick="courtTap(1)">
+          <div class="nvz"></div>
+          <div class="ct-name" id="s-t1">Team 1</div>
+          <div class="ct-score" id="s-p1">0</div>
+          <div class="ct-serve-badge" id="ct-serve1">🏓 SERVING #<span id="ct-snum1">2</span></div>
+          <div class="ct-tap-hint" id="ct-hint1">TAP THIS SIDE</div>
+        </div>
+        <!-- Net -->
+        <div class="court-net"></div>
+        <!-- Score overlay -->
+        <div class="court-score-overlay">
+          <div class="court-call" id="s-call">0 – 0 – 2</div>
+          <div class="court-call-label">serving – receiving – server#</div>
+        </div>
+        <!-- Umpire info -->
+        <div class="court-umpire" id="s-umpire-info" style="display:none">🧑‍⚖️ <span id="s-umpire-name"></span></div>
+        <!-- Right half (Team 2) -->
+        <div class="court-half right" id="box-t2" onclick="courtTap(2)">
+          <div class="nvz"></div>
+          <div class="ct-name" id="s-t2">Team 2</div>
+          <div class="ct-score" id="s-p2">0</div>
+          <div class="ct-serve-badge" id="ct-serve2">🏓 SERVING #<span id="ct-snum2">2</span></div>
+          <div class="ct-tap-hint" id="ct-hint2">TAP THIS SIDE</div>
+        </div>
+        <!-- Winner overlay -->
+        <div class="court-winner" id="s-winner">
+          <div class="court-winner-text" id="s-winner-text"></div>
+          <div class="court-winner-sub" id="s-winner-sub"></div>
+        </div>
+        <!-- Margin overlay -->
+        <div class="court-margin hide" id="margin-box">
+          <div class="margin-label" id="margin-label"></div>
+          <div class="margin-val" id="margin-val"></div>
+        </div>
+        <!-- Corner More button -->
+        <div class="court-more-btn" id="court-more-btn" onclick="toggleCourtMore()">⋮</div>
+        <div class="court-more-menu" id="court-more-menu">
+          <button id="cm-undo" onclick="undo();toggleCourtMore()" style="display:none">↩ Undo Last</button>
+          <button id="cm-end" onclick="endGame();toggleCourtMore()" style="display:none">🏁 End Match</button>
+          <div id="reservice-area" style="display:none">
+            <div class="rs-panel" style="margin:.3rem 0">
+              <div class="rs-panel-title" style="font-size:.75rem">🔄 Re-serve Tracker</div>
+              <div class="rs-grid" id="rs-grid"></div>
+            </div>
+          </div>
+          <div id="share-box" style="display:none;padding:.3rem .7rem">
+            <div style="font-size:.75rem;color:var(--dim);margin-bottom:.3rem">📡 Game Code:</div>
+            <input type="text" id="share-code" readonly style="width:100%;margin-bottom:.3rem;text-align:center;font-size:.8rem;padding:.3rem;border-radius:6px;background:var(--card);border:1px solid rgba(255,255,255,.1);color:#fff"/>
+            <button onclick="copyCode()" style="width:100%;padding:.35rem;font-size:.75rem;border:none;border-radius:6px;background:rgba(255,255,255,.1);color:#fff;cursor:pointer">📋 Copy Code</button>
+          </div>
+          <hr>
+          <button onclick="backFromScore()">← Back to Menu</button>
         </div>
       </div>
-
-      <div class="share-box" id="share-box" style="display:none">
-        <p>📡 Game Code for spectators:</p>
-        <input type="text" id="share-code" readonly/>
-        <br>
-        <button class="copy-btn" onclick="copyCode()">Copy Game Code</button>
-      </div>
-
-      <div style="text-align:center">
-        <button class="back-btn" onclick="backFromScore()">← Back</button>
-      </div>
     </div>
+    <div class="landscape-hint">📱 Rotate your phone to landscape for the best court view</div>
   </div>
 
 </div>
@@ -532,6 +624,54 @@ input:focus,select:focus{border-color:var(--yellow)}
   <div id="live-games-area">
     <div class="loading"><div class="spin"></div><br>Loading live games...</div>
   </div>
+</div>
+
+<!-- PAGE: POSITION CALCULATOR -->
+<div class="page" id="pg-pos-calc">
+  <button class="back-btn" onclick="showPage('home')">← Back</button>
+  <h2>🧮 Position Calculator</h2>
+  <p style="color:var(--dim);margin-bottom:1rem;font-size:.85rem">Find out what score your team needs to finish at the desired position in the group.</p>
+
+  <div class="calc-card">
+    <h3>1. Select Group</h3>
+    <select id="calc-group" onchange="onCalcGroupSelect()">
+      <option value="">-- Select Group --</option>
+    </select>
+  </div>
+
+  <div class="calc-card" id="calc-step2" style="display:none">
+    <h3>2. Your Team</h3>
+    <select id="calc-team" onchange="onCalcTeamSelect()">
+      <option value="">-- Select Team --</option>
+    </select>
+  </div>
+
+  <div class="calc-card" id="calc-step3" style="display:none">
+    <h3>3. Match Against</h3>
+    <select id="calc-opponent" onchange="onCalcOpponentSelect()">
+      <option value="">-- Select Opponent --</option>
+    </select>
+  </div>
+
+  <div class="calc-card" id="calc-step4" style="display:none">
+    <h3>4. Target Position</h3>
+    <select id="calc-target-pos">
+      <option value="1">1st (Top of Group)</option>
+      <option value="2" selected>2nd (Qualify)</option>
+    </select>
+    <div style="margin-top:.5rem">
+      <label>Game plays to</label>
+      <select id="calc-win-score">
+        <option value="11" selected>11</option>
+        <option value="15">15</option>
+        <option value="21">21</option>
+      </select>
+    </div>
+    <button class="start-btn new" onclick="runCalc()" style="margin-top:.5rem">Calculate →</button>
+  </div>
+
+  <div id="calc-current" class="current-standing" style="display:none"></div>
+  <div id="calc-result-area"></div>
 </div>
 
 <!-- PAGE: STANDINGS -->
@@ -1994,7 +2134,7 @@ function render(){
     return;
   }
 
-  // ── Phase 2: Main scoreboard ──
+  // ── Phase 2: Court-based scoreboard ──
   tossScreen.style.display = 'none';
   mainBoard.style.display = 'block';
 
@@ -2020,41 +2160,81 @@ function render(){
     umpInfo.style.display = 'none';
   }
 
-  const servingName = G.servingTeam === 1 ? G.t1 : G.t2;
-  document.getElementById('s-serve-team').textContent = servingName;
-  document.getElementById('s-serve-num').textContent = '#' + G.serverNum;
+  // Serving indicators on court halves
   document.getElementById('box-t1').classList.toggle('serving', G.servingTeam === 1);
   document.getElementById('box-t2').classList.toggle('serving', G.servingTeam === 2);
+  document.getElementById('ct-snum1').textContent = G.serverNum;
+  document.getElementById('ct-snum2').textContent = G.serverNum;
 
+  // Score call on net overlay
   const sScore = G.servingTeam === 1 ? G.p1 : G.p2;
   const rScore = G.servingTeam === 1 ? G.p2 : G.p1;
   document.getElementById('s-call').textContent = sScore + ' – ' + rScore + ' – ' + G.serverNum;
 
   const st = document.getElementById('s-status');
   const w = document.getElementById('s-winner');
+  const wText = document.getElementById('s-winner-text');
+  const wSub = document.getElementById('s-winner-sub');
+
+  // Win margin box
+  const mBox = document.getElementById('margin-box');
+  const mLabel = document.getElementById('margin-label');
+  const mVal = document.getElementById('margin-val');
+  const diff = Math.abs(G.p1 - G.p2);
+  const maxScore = Math.max(G.p1, G.p2);
+  const leading = G.p1 > G.p2 ? G.t1 : G.p2 > G.p1 ? G.t2 : null;
 
   if(live){
     st.textContent = 'LIVE'; st.className = 'tag live';
-    w.classList.add('hide');
+    w.classList.remove('show');
+
+    if(diff === 0){
+      mLabel.textContent = 'Game is tied';
+      const need = G.win - maxScore;
+      mVal.textContent = need > 0 ? (need + ' more point' + (need > 1 ? 's' : '') + ' each to reach ' + G.win) : 'Next point with 2-pt lead wins!';
+      mBox.classList.remove('hide');
+    } else {
+      const trailer = G.p1 < G.p2 ? G.t1 : G.t2;
+      const trailScore = Math.min(G.p1, G.p2);
+      const needToTie = maxScore - trailScore;
+      const needToWin = Math.max(G.win - trailScore, maxScore + 2 - trailScore);
+      mLabel.textContent = leading + ' leads by ' + diff;
+      mVal.textContent = trailer + ' needs ' + needToTie + ' to tie, ' + needToWin + ' to win';
+      mBox.classList.remove('hide');
+    }
   } else {
     st.textContent = 'FINISHED'; st.className = 'tag'; st.style.background='var(--red)'; st.style.color='#fff';
     const winner = G.p1 > G.p2 ? G.t1 : G.p2 > G.p1 ? G.t2 : 'Tied';
-    w.textContent = winner === 'Tied' ? 'Game Tied!' : '🏆 ' + winner + ' Wins!';
-    w.classList.remove('hide');
+    wText.textContent = winner === 'Tied' ? 'Game Tied!' : '🏆 ' + winner + ' Wins!';
+    wSub.textContent = G.p1 + ' – ' + G.p2;
+    w.classList.add('show');
+
+    if(diff > 0){
+      mLabel.textContent = '🏆 Won by margin of';
+      mVal.textContent = diff + ' point' + (diff > 1 ? 's' : '') + ' (' + G.p1 + ' – ' + G.p2 + ')';
+      mBox.classList.remove('hide');
+    } else {
+      mBox.classList.add('hide');
+    }
   }
 
   const winEligible = (G.p1 >= G.win || G.p2 >= G.win) && Math.abs(G.p1 - G.p2) >= 2;
 
-  // Rally buttons: hide when win reached
-  const showRally = showControls && !winEligible;
-  document.getElementById('rally-btns').style.display = showRally ? 'flex' : 'none';
+  // Tap hints (visible only for scoring umpire)
+  var hint1 = document.getElementById('ct-hint1');
+  var hint2 = document.getElementById('ct-hint2');
+  if(showControls && !winEligible){
+    hint1.classList.add('show'); hint2.classList.add('show');
+  } else {
+    hint1.classList.remove('show'); hint2.classList.remove('show');
+  }
 
-  // More drawer contents
-  document.getElementById('sb-actions').style.display = showControls ? 'flex' : 'none';
+  // Court more menu: show undo/end for umpire
+  document.getElementById('cm-undo').style.display = showControls ? 'block' : 'none';
+  document.getElementById('cm-end').style.display = showControls ? 'block' : 'none';
   document.getElementById('share-box').style.display = (isUmpire === true && isScoring === true && isOwner) ? 'block' : 'none';
-  document.getElementById('more-toggle-btn').style.display = 'block';
 
-  // Re-service counter (Womens Double & Mix Double) — 4 players, 3 each
+  // Re-service counter
   const rsArea = document.getElementById('reservice-area');
   const cat = (G.category || '').toLowerCase();
   const showReservice = (cat.indexOf('womens') !== -1 || cat.indexOf('mix') !== -1) && live;
@@ -2063,25 +2243,42 @@ function render(){
     renderReserviceGrid(showControls);
   }
 
-  const banner = document.getElementById('s-winner');
+  // Win-eligible banner
   if(live && winEligible){
-    const leading = G.p1 > G.p2 ? G.t1 : G.t2;
-    banner.textContent = '🏆 ' + leading + ' has won! Press End Match to finalize.';
-    banner.classList.remove('hide');
-  } else if(live){
-    banner.classList.add('hide');
+    const lead = G.p1 > G.p2 ? G.t1 : G.t2;
+    wText.textContent = '🏆 ' + lead + ' has won!';
+    wSub.textContent = showControls ? 'Tap ⋮ → End Match to finalize' : G.p1 + ' – ' + G.p2;
+    w.classList.add('show');
   }
 }
 
-function toggleMoreDrawer(){
-  var d = document.getElementById('more-drawer');
-  var b = document.getElementById('more-toggle-btn');
-  if(d.classList.contains('open')){
-    d.classList.remove('open');
-    b.textContent = '▼ More Options';
+function toggleCourtMore(){
+  var m = document.getElementById('court-more-menu');
+  m.classList.toggle('open');
+}
+
+function courtTap(team){
+  if(!G || G.status !== 'live' || !isScoring || (G.deviceId !== DEVICE_ID && !isAdmin)) return;
+  var winEligible = (G.p1 >= G.win || G.p2 >= G.win) && Math.abs(G.p1 - G.p2) >= 2;
+  if(winEligible) return;
+  // Ripple effect
+  var half = team === 1 ? document.getElementById('box-t1') : document.getElementById('box-t2');
+  var ripple = document.createElement('div');
+  ripple.className = 'ct-ripple';
+  var sz = Math.max(half.offsetWidth, half.offsetHeight);
+  ripple.style.width = sz + 'px';
+  ripple.style.height = sz + 'px';
+  ripple.style.left = '50%';
+  ripple.style.top = '50%';
+  ripple.style.marginLeft = (-sz/2) + 'px';
+  ripple.style.marginTop = (-sz/2) + 'px';
+  half.appendChild(ripple);
+  setTimeout(function(){ ripple.remove(); }, 500);
+  // Scoring logic: tap serving side = point, tap non-serving side = side out
+  if(team === G.servingTeam){
+    rallyPoint();
   } else {
-    d.classList.add('open');
-    b.textContent = '▲ Less';
+    rallySideOut();
   }
 }
 
@@ -2409,6 +2606,414 @@ function resumeActiveGame(){
 }
 
 document.addEventListener('dblclick', function(e){ e.preventDefault(); }, {passive:false});
+
+/* ═══════════════════════════════════════════════════
+   HOME – More drawer toggle
+   ═══════════════════════════════════════════════════ */
+function toggleHomeMore(){
+  var c = document.getElementById('home-more-content');
+  var b = document.querySelector('.home-more-toggle');
+  c.classList.toggle('open');
+  b.textContent = c.classList.contains('open') ? '▲ More' : '▼ More';
+}
+
+/* ═══════════════════════════════════════════════════
+   POSITION CALCULATOR
+   ═══════════════════════════════════════════════════ */
+var calcGroupsCache = {};
+var calcStandingsCache = {};
+
+function initCalc(){
+  document.getElementById('calc-result-area').innerHTML = '';
+  document.getElementById('calc-current').style.display = 'none';
+  document.getElementById('calc-step2').style.display = 'none';
+  document.getElementById('calc-step3').style.display = 'none';
+  document.getElementById('calc-step4').style.display = 'none';
+
+  db.ref('groups').once('value', snap => {
+    calcGroupsCache = snap.val() || {};
+    var sel = document.getElementById('calc-group');
+    sel.innerHTML = '<option value="">-- Select Group --</option>';
+    Object.entries(calcGroupsCache).forEach(function(e){
+      var gk = e[0], g = e[1];
+      var cat = g.category ? ' (' + g.category + ')' : '';
+      sel.innerHTML += '<option value="'+gk+'">'+esc(g.name + cat)+'</option>';
+    });
+  });
+}
+
+function onCalcGroupSelect(){
+  var gk = document.getElementById('calc-group').value;
+  document.getElementById('calc-result-area').innerHTML = '';
+  document.getElementById('calc-current').style.display = 'none';
+  document.getElementById('calc-step3').style.display = 'none';
+  document.getElementById('calc-step4').style.display = 'none';
+  if(!gk){ document.getElementById('calc-step2').style.display = 'none'; return; }
+
+  var g = calcGroupsCache[gk];
+  var teamNames = g.teams ? Object.values(g.teams) : [];
+  var sel = document.getElementById('calc-team');
+  sel.innerHTML = '<option value="">-- Select Team --</option>';
+  teamNames.forEach(function(tn){ sel.innerHTML += '<option value="'+esc(tn)+'">'+esc(tn)+'</option>'; });
+  document.getElementById('calc-step2').style.display = 'block';
+}
+
+function onCalcTeamSelect(){
+  var gk = document.getElementById('calc-group').value;
+  var myTeam = document.getElementById('calc-team').value;
+  document.getElementById('calc-result-area').innerHTML = '';
+  document.getElementById('calc-current').style.display = 'none';
+  document.getElementById('calc-step4').style.display = 'none';
+  if(!myTeam){ document.getElementById('calc-step3').style.display = 'none'; return; }
+
+  // Load standings + matches to find remaining opponents
+  db.ref('standings/' + gk).once('value', snap => {
+    calcStandingsCache = snap.val() || {};
+    var matches = calcStandingsCache.matches || {};
+    var doneSet = {};
+    Object.values(matches).forEach(function(m){
+      var k = [m.t1, m.t2].sort().join('|||');
+      doneSet[k] = true;
+    });
+
+    var g = calcGroupsCache[gk];
+    var teamNames = g.teams ? Object.values(g.teams) : [];
+    var remaining = [];
+    teamNames.forEach(function(tn){
+      if(tn === myTeam) return;
+      var k = [myTeam, tn].sort().join('|||');
+      if(!doneSet[k]) remaining.push(tn);
+    });
+
+    var sel = document.getElementById('calc-opponent');
+    sel.innerHTML = '<option value="">-- Select Opponent --</option>';
+    if(remaining.length === 0){
+      sel.innerHTML = '<option value="">No remaining matches</option>';
+    } else {
+      remaining.forEach(function(tn){ sel.innerHTML += '<option value="'+esc(tn)+'">'+esc(tn)+'</option>'; });
+    }
+    document.getElementById('calc-step3').style.display = 'block';
+  });
+}
+
+function onCalcOpponentSelect(){
+  var opp = document.getElementById('calc-opponent').value;
+  document.getElementById('calc-result-area').innerHTML = '';
+  document.getElementById('calc-current').style.display = 'none';
+  if(!opp){ document.getElementById('calc-step4').style.display = 'none'; return; }
+  document.getElementById('calc-step4').style.display = 'block';
+}
+
+function calcSortTeams(teamStats){
+  return Object.entries(teamStats).sort(function(a,b){
+    if(b[1].won !== a[1].won) return b[1].won - a[1].won;
+    if(a[1].pa !== b[1].pa) return a[1].pa - b[1].pa;
+    return b[1].pf - a[1].pf;
+  });
+}
+
+function calcGetPosition(sorted, teamName){
+  for(var i = 0; i < sorted.length; i++){
+    if(sorted[i][0] === teamName) return i + 1;
+  }
+  return sorted.length;
+}
+
+function runCalc(){
+  var gk = document.getElementById('calc-group').value;
+  var myTeam = document.getElementById('calc-team').value;
+  var opponent = document.getElementById('calc-opponent').value;
+  var targetPos = parseInt(document.getElementById('calc-target-pos').value);
+  var winScore = parseInt(document.getElementById('calc-win-score').value);
+
+  if(!gk || !myTeam || !opponent) return;
+
+  var g = calcGroupsCache[gk];
+  var teamNames = g.teams ? Object.values(g.teams) : [];
+  var matches = (calcStandingsCache && calcStandingsCache.matches) ? calcStandingsCache.matches : {};
+
+  // Build current stats from matches
+  var baseStats = {};
+  teamNames.forEach(function(tn){
+    baseStats[tn] = { played:0, won:0, lost:0, pf:0, pa:0 };
+  });
+  var doneSet = {};
+  Object.values(matches).forEach(function(m){
+    if(!baseStats[m.t1]) baseStats[m.t1] = { played:0, won:0, lost:0, pf:0, pa:0 };
+    if(!baseStats[m.t2]) baseStats[m.t2] = { played:0, won:0, lost:0, pf:0, pa:0 };
+    baseStats[m.t1].played++; baseStats[m.t2].played++;
+    baseStats[m.t1].pf += m.p1; baseStats[m.t1].pa += m.p2;
+    baseStats[m.t2].pf += m.p2; baseStats[m.t2].pa += m.p1;
+    if(m.p1 > m.p2){ baseStats[m.t1].won++; baseStats[m.t2].lost++; }
+    else if(m.p2 > m.p1){ baseStats[m.t2].won++; baseStats[m.t1].lost++; }
+    var k = [m.t1, m.t2].sort().join('|||');
+    doneSet[k] = true;
+  });
+
+  // Show current standings
+  var curSorted = calcSortTeams(JSON.parse(JSON.stringify(baseStats)));
+  var curPos = calcGetPosition(curSorted, myTeam);
+  var curHtml = '<b>Current Standings (before your match):</b><table><tr><th>Pos</th><th>Team</th><th>W</th><th>L</th><th>PF</th><th>PA</th></tr>';
+  curSorted.forEach(function(e, i){
+    var cls = e[0] === myTeam ? ' class="hl"' : '';
+    curHtml += '<tr'+cls+'><td>'+(i+1)+'</td><td style="text-align:left">'+esc(e[0])+'</td><td>'+e[1].won+'</td><td>'+e[1].lost+'</td><td>'+e[1].pf+'</td><td>'+e[1].pa+'</td></tr>';
+  });
+  curHtml += '</table>';
+  var curEl = document.getElementById('calc-current');
+  curEl.innerHTML = curHtml;
+  curEl.style.display = 'block';
+
+  // Find ALL remaining matches (not just ours)
+  var allRemaining = [];
+  for(var i = 0; i < teamNames.length; i++){
+    for(var j = i+1; j < teamNames.length; j++){
+      var k = [teamNames[i], teamNames[j]].sort().join('|||');
+      if(!doneSet[k]) allRemaining.push({ t1:teamNames[i], t2:teamNames[j] });
+    }
+  }
+
+  // Separate our match from other remaining matches
+  var ourMatch = null;
+  var otherRemaining = [];
+  allRemaining.forEach(function(m){
+    var k = [m.t1, m.t2].sort().join('|||');
+    var ourK = [myTeam, opponent].sort().join('|||');
+    if(k === ourK) ourMatch = m;
+    else otherRemaining.push(m);
+  });
+
+  if(!ourMatch){
+    document.getElementById('calc-result-area').innerHTML = '<div class="calc-result"><p style="color:var(--red)">This match has already been played or these teams are not in the same group.</p></div>';
+    return;
+  }
+
+  // Strategy: simulate our match with varying margins
+  // For other remaining matches, test worst-case (outcomes that hurt our team's position the most)
+  var resultHtml = '';
+  var minWinMargin = -1;
+  var bestScore = '';
+
+  // Test our team winning with margins from 1 upward
+  // Also test losing scenario
+  var scenarios = [];
+
+  // Scenario: Our team wins by margin 1,2,3...up to winScore-0
+  for(var margin = 1; margin <= winScore; margin++){
+    var myPF = winScore;
+    var myPA = winScore - margin;
+    if(myPA < 0) myPA = 0;
+    scenarios.push({ myPF: myPF, myPA: myPA, label: myTeam + ' wins ' + myPF + '-' + myPA });
+  }
+  // Also test: narrower wins like e.g. 12-10, 13-11 etc.
+  // And losing scenario
+  for(var margin = 1; margin <= winScore; margin++){
+    var myPF2 = winScore - margin;
+    if(myPF2 < 0) myPF2 = 0;
+    var myPA2 = winScore;
+    scenarios.push({ myPF: myPF2, myPA: myPA2, label: opponent + ' wins ' + myPA2 + '-' + myPF2 });
+  }
+
+  // For each scenario, simulate worst-case for other remaining matches
+  function simulateWorstCase(stats, myTeam, targetPos, otherMatches){
+    // For each other remaining match, try all possible outcomes and find worst position for myTeam
+    if(otherMatches.length === 0){
+      var sorted = calcSortTeams(stats);
+      return calcGetPosition(sorted, myTeam);
+    }
+
+    // With many remaining matches, full enumeration explodes. Limit to reasonable count.
+    // Heuristic: for each match, try 3 outcomes: t1 wins big, t2 wins big, close game
+    // Then take worst-case for myTeam
+    var worstPos = 1;
+    var m = otherMatches[0];
+    var rest = otherMatches.slice(1);
+
+    // Outcomes to try: t1 wins winScore-0, t2 wins winScore-0, t1 wins winScore-(winScore-1)
+    var outcomes = [
+      { w: m.t1, l: m.t2, wf: winScore, lf: 0 },
+      { w: m.t2, l: m.t1, wf: winScore, lf: 0 },
+      { w: m.t1, l: m.t2, wf: winScore, lf: winScore - 1 },
+      { w: m.t2, l: m.t1, wf: winScore, lf: winScore - 1 }
+    ];
+
+    outcomes.forEach(function(o){
+      var s2 = JSON.parse(JSON.stringify(stats));
+      if(!s2[o.w]) s2[o.w] = { played:0, won:0, lost:0, pf:0, pa:0 };
+      if(!s2[o.l]) s2[o.l] = { played:0, won:0, lost:0, pf:0, pa:0 };
+      s2[o.w].played++; s2[o.l].played++;
+      s2[o.w].won++; s2[o.l].lost++;
+      s2[o.w].pf += o.wf; s2[o.w].pa += o.lf;
+      s2[o.l].pf += o.lf; s2[o.l].pa += o.wf;
+      var pos = simulateWorstCase(s2, myTeam, targetPos, rest);
+      if(pos > worstPos) worstPos = pos;
+    });
+
+    return worstPos;
+  }
+
+  function simulateBestCase(stats, myTeam, targetPos, otherMatches){
+    if(otherMatches.length === 0){
+      var sorted = calcSortTeams(stats);
+      return calcGetPosition(sorted, myTeam);
+    }
+    var bestPos = 999;
+    var m = otherMatches[0];
+    var rest = otherMatches.slice(1);
+    var outcomes = [
+      { w: m.t1, l: m.t2, wf: winScore, lf: 0 },
+      { w: m.t2, l: m.t1, wf: winScore, lf: 0 },
+      { w: m.t1, l: m.t2, wf: winScore, lf: winScore - 1 },
+      { w: m.t2, l: m.t1, wf: winScore, lf: winScore - 1 }
+    ];
+    outcomes.forEach(function(o){
+      var s2 = JSON.parse(JSON.stringify(stats));
+      if(!s2[o.w]) s2[o.w] = { played:0, won:0, lost:0, pf:0, pa:0 };
+      if(!s2[o.l]) s2[o.l] = { played:0, won:0, lost:0, pf:0, pa:0 };
+      s2[o.w].played++; s2[o.l].played++;
+      s2[o.w].won++; s2[o.l].lost++;
+      s2[o.w].pf += o.wf; s2[o.w].pa += o.lf;
+      s2[o.l].pf += o.lf; s2[o.l].pa += o.wf;
+      var pos = simulateBestCase(s2, myTeam, targetPos, rest);
+      if(pos < bestPos) bestPos = pos;
+    });
+    return bestPos;
+  }
+
+  // Limit other remaining matches to avoid combinatorial explosion
+  var otherToSim = otherRemaining.length > 4 ? otherRemaining.slice(0, 4) : otherRemaining;
+
+  var foundMinWin = -1;
+  var foundScore = '';
+  var verdicts = [];
+
+  // Check: if our team wins with each margin, what's the worst-case position?
+  for(var margin = winScore; margin >= 1; margin--){
+    var myPF = winScore;
+    var myPA = winScore - margin;
+    if(myPA < 0) myPA = 0;
+
+    var simStats = JSON.parse(JSON.stringify(baseStats));
+    // Apply our match result
+    if(!simStats[myTeam]) simStats[myTeam] = { played:0, won:0, lost:0, pf:0, pa:0 };
+    if(!simStats[opponent]) simStats[opponent] = { played:0, won:0, lost:0, pf:0, pa:0 };
+    simStats[myTeam].played++; simStats[opponent].played++;
+    simStats[myTeam].won++; simStats[opponent].lost++;
+    simStats[myTeam].pf += myPF; simStats[myTeam].pa += myPA;
+    simStats[opponent].pf += myPA; simStats[opponent].pa += myPF;
+
+    var worstPos = simulateWorstCase(simStats, myTeam, targetPos, otherToSim);
+    var bestPos = simulateBestCase(simStats, myTeam, targetPos, otherToSim);
+
+    verdicts.push({
+      margin: margin,
+      score: myPF + '-' + myPA,
+      worstPos: worstPos,
+      bestPos: bestPos
+    });
+  }
+
+  // Also check losing scenario
+  var loseStats = JSON.parse(JSON.stringify(baseStats));
+  if(!loseStats[myTeam]) loseStats[myTeam] = { played:0, won:0, lost:0, pf:0, pa:0 };
+  if(!loseStats[opponent]) loseStats[opponent] = { played:0, won:0, lost:0, pf:0, pa:0 };
+  loseStats[myTeam].played++; loseStats[opponent].played++;
+  loseStats[opponent].won++; loseStats[myTeam].lost++;
+  loseStats[myTeam].pf += 0; loseStats[myTeam].pa += winScore;
+  loseStats[opponent].pf += winScore; loseStats[opponent].pa += 0;
+  var loseWorst = simulateWorstCase(loseStats, myTeam, targetPos, otherToSim);
+  var loseBest = simulateBestCase(loseStats, myTeam, targetPos, otherToSim);
+
+  // Find minimum margin that GUARANTEES target position (worst-case <= target)
+  var guaranteed = null;
+  for(var v = verdicts.length - 1; v >= 0; v--){
+    if(verdicts[v].worstPos <= targetPos){
+      guaranteed = verdicts[v];
+      break;
+    }
+  }
+
+  // Find minimum margin that makes target POSSIBLE (best-case <= target)
+  var possible = null;
+  for(var v = verdicts.length - 1; v >= 0; v--){
+    if(verdicts[v].bestPos <= targetPos){
+      possible = verdicts[v];
+      break;
+    }
+  }
+
+  // Build result HTML
+  var rHtml = '<div class="calc-result">';
+  rHtml += '<h3>📊 Calculation Results</h3>';
+
+  var posLabel = targetPos === 1 ? '1st place' : '2nd place (qualify)';
+
+  if(otherRemaining.length === 0){
+    // Only our match remains – results are deterministic
+    rHtml += '<div class="scenario"><div class="sc-title">Only your match remains in the group</div>';
+    if(guaranteed){
+      rHtml += '<div class="sc-detail">Win by at least <b>' + guaranteed.margin + '</b> points to finish <b>' + posLabel + '</b>.</div>';
+      rHtml += '<div class="sc-verdict sc-qualify">✅ Win ' + guaranteed.score + ' or better → ' + posLabel + ' guaranteed</div>';
+    } else if(possible){
+      rHtml += '<div class="sc-detail">Even winning may not be enough depending on point difference. Win by at least <b>' + possible.margin + '</b> points for a chance.</div>';
+      rHtml += '<div class="sc-verdict sc-maybe">⚠️ Cannot guarantee ' + posLabel + '</div>';
+    }
+
+    // Check if losing still qualifies
+    if(loseBest <= targetPos){
+      rHtml += '<div class="sc-detail" style="margin-top:.5rem">Even if you <b>lose</b>, you can still finish at position ' + loseBest + '.</div>';
+    }
+    rHtml += '</div>';
+
+  } else {
+    // Other matches remain too
+    rHtml += '<div class="scenario"><div class="sc-title">⭐ Guaranteed ' + posLabel + '</div>';
+    if(guaranteed){
+      rHtml += '<div class="sc-detail">If ' + esc(myTeam) + ' beats ' + esc(opponent) + ' by at least <b>' + guaranteed.margin + '</b> points (' + guaranteed.score + '), you finish at position <b>' + targetPos + ' or better</b> no matter what happens in other matches.</div>';
+      rHtml += '<div class="sc-verdict sc-qualify">✅ Win by ' + guaranteed.margin + '+ → ' + posLabel + ' LOCKED</div>';
+    } else {
+      rHtml += '<div class="sc-detail">Unfortunately, winning alone <b>cannot guarantee</b> ' + posLabel + '. It depends on other match results too.</div>';
+      rHtml += '<div class="sc-verdict sc-noqualify">❌ No margin guarantees ' + posLabel + '</div>';
+    }
+    rHtml += '</div>';
+
+    rHtml += '<div class="scenario"><div class="sc-title">🎯 Minimum to have a chance</div>';
+    if(possible){
+      rHtml += '<div class="sc-detail">Win by at least <b>' + possible.margin + '</b> points (' + possible.score + ') and if other results go your way, you can finish at position <b>' + targetPos + '</b>.</div>';
+      rHtml += '<div class="sc-verdict sc-maybe">⚠️ Win by ' + possible.margin + '+ → ' + posLabel + ' possible (depends on other results)</div>';
+    } else {
+      rHtml += '<div class="sc-detail">Even winning this match cannot put you at position ' + targetPos + '.</div>';
+      rHtml += '<div class="sc-verdict sc-noqualify">❌ Position ' + targetPos + ' not achievable</div>';
+    }
+    rHtml += '</div>';
+
+    // Losing scenario
+    rHtml += '<div class="scenario"><div class="sc-title">📉 If you lose</div>';
+    if(loseBest <= targetPos){
+      rHtml += '<div class="sc-detail">Even if you lose, with favorable other results you could still finish at position ' + loseBest + '.</div>';
+      rHtml += '<div class="sc-verdict sc-maybe">⚠️ Qualification still possible even with a loss</div>';
+    } else {
+      rHtml += '<div class="sc-detail">A loss means you cannot finish at position ' + targetPos + ' or better.</div>';
+      rHtml += '<div class="sc-verdict sc-noqualify">❌ Must win to have any chance</div>';
+    }
+    rHtml += '</div>';
+
+    if(otherRemaining.length > 0){
+      rHtml += '<div style="font-size:.8rem;color:var(--dim);margin-top:.5rem">ℹ️ ' + otherRemaining.length + ' other match(es) still remaining in this group. Calculations account for all possible outcomes.</div>';
+    }
+  }
+
+  rHtml += '</div>';
+
+  // Summary card
+  if(guaranteed){
+    rHtml += '<div class="calc-summary"><div class="big-label">Minimum win margin needed for</div><div style="font-size:1.1rem;font-weight:700;color:var(--blue)">' + posLabel + '</div><div class="big-num">' + guaranteed.margin + '</div><div class="big-label">Win ' + guaranteed.score + ' or better</div></div>';
+  } else if(possible){
+    rHtml += '<div class="calc-summary"><div class="big-label">Win by at least</div><div class="big-num">' + possible.margin + '</div><div class="big-label">' + possible.score + ' — but depends on other results</div></div>';
+  }
+
+  document.getElementById('calc-result-area').innerHTML = rHtml;
+}
+
 </script>
 </body>
 </html>
