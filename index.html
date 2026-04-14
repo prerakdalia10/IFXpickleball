@@ -13,6 +13,7 @@ header h1{font-size:1.3rem;letter-spacing:.8px;text-shadow:0 1px 3px rgba(0,0,0,
 h2{margin-bottom:1rem}
 .page{display:none;max-width:500px;margin:0 auto;padding:1rem}
 .page.active{display:block}
+#pg-score.active{padding:0;max-width:100%}
 
 /* Court background for home */
 #pg-home{position:relative;overflow:hidden}
@@ -155,6 +156,16 @@ input:focus,select:focus{border-color:var(--yellow)}
 /* Landscape hint */
 .landscape-hint{display:none;text-align:center;padding:1.5rem;color:var(--dim);font-size:.85rem}
 @media (orientation:portrait){.landscape-hint{display:block}.court-wrap{height:calc(100vh - 80px)}}
+/* Responsive court scaling */
+@media (max-width:400px){.ct-score{font-size:3.5rem}.ct-name{font-size:.72rem}.court-call{font-size:1rem}.ct-serve-badge{font-size:.55rem}.court-more-btn{width:32px;height:32px;font-size:.9rem}}
+@media (min-width:401px) and (max-width:600px){.ct-score{font-size:4.2rem}.ct-name{font-size:.8rem}}
+@media (min-width:601px){.ct-score{font-size:5.5rem}.ct-name{font-size:1rem}.court-call{font-size:1.6rem}}
+/* Swap animation */
+.court-half.swapping{transition:transform .35s cubic-bezier(.4,0,.2,1)}
+/* Drag handle for sides swap */
+.ct-swap-handle{position:absolute;bottom:2.5rem;z-index:7;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.18);border-radius:12px;padding:.2rem .5rem;font-size:.6rem;color:rgba(255,255,255,.5);cursor:grab;touch-action:none;-webkit-user-select:none;user-select:none}
+.ct-swap-handle:active{cursor:grabbing;background:rgba(255,255,255,.22)}
+.ct-swap-handle.dragging{opacity:.6;transform:scale(1.1)}
 /* Tap ripple */
 .ct-ripple{position:absolute;border-radius:50%;background:rgba(255,255,255,.25);transform:scale(0);animation:ctRipple .5s ease-out forwards;pointer-events:none;z-index:4}
 @keyframes ctRipple{to{transform:scale(4);opacity:0}}
@@ -408,6 +419,15 @@ input:focus,select:focus{border-color:var(--yellow)}
   <button class="start-btn new" onclick="seedTournamentData()" style="font-size:.9rem;padding:.8rem">🌱 Seed All Tournament Teams &amp; Groups</button>
   <div id="seed-status" style="margin-bottom:1rem;font-size:.85rem"></div>
 
+  <div class="section-label">🔀 Swap Groups</div>
+  <div style="display:flex;gap:.5rem;margin-bottom:.5rem;flex-wrap:wrap">
+    <select id="swap-grp-a" style="flex:1;min-width:100px"><option value="">Group 1</option></select>
+    <span style="align-self:center;font-weight:700;color:var(--yellow)">⇄</span>
+    <select id="swap-grp-b" style="flex:1;min-width:100px"><option value="">Group 2</option></select>
+    <button class="start-btn umpire" onclick="swapGroups()" style="width:auto;padding:.5rem 1rem;margin:0;font-size:.8rem">Swap</button>
+  </div>
+  <div id="swap-status" style="margin-bottom:1rem;font-size:.85rem"></div>
+
   <div class="section-label">🎮 Manage All Games</div>
   <div id="admin-games-list">
     <div class="loading"><div class="spin"></div><br>Loading...</div>
@@ -558,6 +578,7 @@ input:focus,select:focus{border-color:var(--yellow)}
           <div class="ct-score" id="s-p1">0</div>
           <div class="ct-serve-badge" id="ct-serve1">🏓 SERVING #<span id="ct-snum1">2</span></div>
           <div class="ct-tap-hint" id="ct-hint1">TAP THIS SIDE</div>
+          <div class="ct-swap-handle" id="swap-handle-1">⇄ drag</div>
         </div>
         <!-- Net -->
         <div class="court-net"></div>
@@ -575,6 +596,7 @@ input:focus,select:focus{border-color:var(--yellow)}
           <div class="ct-score" id="s-p2">0</div>
           <div class="ct-serve-badge" id="ct-serve2">🏓 SERVING #<span id="ct-snum2">2</span></div>
           <div class="ct-tap-hint" id="ct-hint2">TAP THIS SIDE</div>
+          <div class="ct-swap-handle" id="swap-handle-2">⇄ drag</div>
         </div>
         <!-- Winner overlay -->
         <div class="court-winner" id="s-winner">
@@ -591,6 +613,7 @@ input:focus,select:focus{border-color:var(--yellow)}
         <div class="court-more-menu" id="court-more-menu">
           <button id="cm-undo" onclick="undo();toggleCourtMore()" style="display:none">↩ Undo Last</button>
           <button id="cm-end" onclick="endGame();toggleCourtMore()" style="display:none">🏁 End Match</button>
+          <button onclick="swapCourtSides();toggleCourtMore()">⇄ Swap Sides</button>
           <div id="reservice-area" style="display:none">
             <div class="rs-panel" style="margin:.3rem 0">
               <div class="rs-panel-title" style="font-size:.75rem">🔄 Re-serve Tracker</div>
@@ -833,7 +856,7 @@ function showPage(name){
   document.getElementById('pg-'+name).classList.add('active');
   if(name==='umpire-dash') loadUmpireGames();
   if(name==='live-list') loadLiveGamesList();
-  if(name==='admin-dash'){ loadAdminGroups(); loadAdminGames(); }
+  if(name==='admin-dash'){ loadAdminGroups(); loadAdminGames(); populateSwapDropdowns(); }
   if(name==='standings') loadStandings();
   if(name==='setup') loadSetupGroups();
   // start/stop bouncing balls on home page
@@ -1194,7 +1217,7 @@ function loadAdminGroups(){
     let html = '';
     Object.entries(groups).forEach(([key, g]) => {
       const catTag = g.category ? '<span class="category-tag">'+esc(g.category)+'</span>' : '';
-      html += '<div class="grp-card"><h3>'+esc(g.name)+catTag+'</h3><div class="team-list">';
+      html += '<div class="grp-card"><h3>'+esc(g.name)+catTag+' <span class="edit-team-btn" onclick="editGroupName(\''+key+'\',\''+esc(g.name).replace(/'/g,"\\\'")+'\')">✎</span></h3><div class="team-list">';
       if(g.teams){
         Object.entries(g.teams).forEach(([tk, tn]) => {
           html += '<span class="team-chip">'+esc(tn)+'<span class="edit-team-btn" onclick="editTeamName(\''+key+'\',\''+tk+'\',\''+esc(tn).replace(/'/g,"\\'")+'\')">✎</span><span class="del-team-btn" onclick="removeTeamFromGroup(\''+key+'\',\''+tk+'\')"> ✕</span></span>';
@@ -1449,6 +1472,59 @@ function seedTournamentData(){
 }
 
 /* ═══════════════════════════════════════════════════
+   ADMIN: SWAP GROUPS
+   ═══════════════════════════════════════════════════ */
+function populateSwapDropdowns(){
+  db.ref('groups').once('value', function(snap){
+    var groups = snap.val() || {};
+    var opts = '<option value="">-- Pick --</option>';
+    Object.entries(groups).forEach(function(e){
+      var cat = e[1].category ? ' ('+e[1].category+')' : '';
+      opts += '<option value="'+e[0]+'">'+e[1].name+cat+'</option>';
+    });
+    document.getElementById('swap-grp-a').innerHTML = opts;
+    document.getElementById('swap-grp-b').innerHTML = opts;
+  });
+}
+
+function swapGroups(){
+  if(!isAdmin) return;
+  var ka = document.getElementById('swap-grp-a').value;
+  var kb = document.getElementById('swap-grp-b').value;
+  if(!ka || !kb || ka === kb){ alert('Select two different groups.'); return; }
+  if(!confirm('Swap players between these two groups? Group names & categories stay, only teams & standings move.')) return;
+  var sts = document.getElementById('swap-status');
+  sts.innerHTML = '<span style="color:var(--yellow)">⏳ Swapping players...</span>';
+
+  // Read both groups + standings
+  Promise.all([
+    db.ref('groups/'+ka).once('value'),
+    db.ref('groups/'+kb).once('value'),
+    db.ref('standings/'+ka).once('value'),
+    db.ref('standings/'+kb).once('value')
+  ]).then(function(snaps){
+    var gA = snaps[0].val();
+    var gB = snaps[1].val();
+    var sA = snaps[2].val();
+    var sB = snaps[3].val();
+    var updates = {};
+    // Swap only teams — keep name and category in place
+    updates['groups/'+ka+'/teams'] = gB.teams || null;
+    updates['groups/'+kb+'/teams'] = gA.teams || null;
+    // Swap standings (match results & team stats belong to the players)
+    updates['standings/'+ka] = sB || null;
+    updates['standings/'+kb] = sA || null;
+    return db.ref().update(updates);
+  }).then(function(){
+    sts.innerHTML = '<span style="color:var(--green)">✅ Players swapped successfully! Group names unchanged.</span>';
+    loadAdminGroups();
+    populateSwapDropdowns();
+  }).catch(function(err){
+    sts.innerHTML = '<span style="color:var(--red)">❌ Error: '+esc(err.message)+'</span>';
+  });
+}
+
+/* ═══════════════════════════════════════════════════
    ADMIN: MANAGE FINISHED GAMES
    ═══════════════════════════════════════════════════ */
 function loadAdminGames(){
@@ -1597,6 +1673,16 @@ function recalcGroupStandings(gk){
 /* ═══════════════════════════════════════════════════
    ADMIN: EDIT TEAM NAME
    ═══════════════════════════════════════════════════ */
+function editGroupName(groupKey, oldName){
+  if(!isAdmin) return;
+  var newName = prompt('Edit group name:', oldName);
+  if(!newName || newName.trim() === '' || newName.trim() === oldName) return;
+  db.ref('groups/' + groupKey + '/name').set(newName.trim()).then(function(){
+    loadAdminGroups();
+    populateSwapDropdowns();
+  });
+}
+
 function editTeamName(groupKey, teamKey, oldName){
   if(!isAdmin) return;
   const newName = prompt('Edit team name:', oldName);
@@ -2257,6 +2343,60 @@ function toggleCourtMore(){
   m.classList.toggle('open');
 }
 
+/* ── Swap court sides (visual only — left↔right) ── */
+var courtSidesSwapped = false;
+function swapCourtSides(){
+  courtSidesSwapped = !courtSidesSwapped;
+  var body = document.querySelector('.court-body');
+  var left = document.getElementById('box-t1');
+  var right = document.getElementById('box-t2');
+  if(courtSidesSwapped){
+    left.classList.remove('left'); left.classList.add('right');
+    right.classList.remove('right'); right.classList.add('left');
+    body.insertBefore(right, left);
+  } else {
+    left.classList.remove('right'); left.classList.add('left');
+    right.classList.remove('left'); right.classList.add('right');
+    body.insertBefore(left, right);
+  }
+  // Move net and overlays after reorder
+  var net = document.querySelector('.court-net');
+  body.insertBefore(net, body.children[1]);
+}
+
+/* ── Drag handle to swap sides ── */
+(function(){
+  var dragTeam = 0;
+  function onStart(e){
+    e.preventDefault(); e.stopPropagation();
+    var t = e.currentTarget;
+    dragTeam = t.id === 'swap-handle-1' ? 1 : 2;
+    t.classList.add('dragging');
+    document.addEventListener('touchend', onEnd, {once:true});
+    document.addEventListener('mouseup', onEnd, {once:true});
+  }
+  function onEnd(e){
+    document.querySelectorAll('.ct-swap-handle').forEach(function(h){ h.classList.remove('dragging'); });
+    // Check if release was on opposite half
+    var x = e.changedTouches ? e.changedTouches[0].clientX : e.clientX;
+    var mid = window.innerWidth / 2;
+    var releasedOnLeft = x < mid;
+    var t1OnLeft = !courtSidesSwapped;
+    if(dragTeam === 1 && (t1OnLeft ? !releasedOnLeft : releasedOnLeft)){
+      swapCourtSides();
+    } else if(dragTeam === 2 && (t1OnLeft ? releasedOnLeft : !releasedOnLeft)){
+      swapCourtSides();
+    }
+    dragTeam = 0;
+  }
+  document.addEventListener('DOMContentLoaded', function(){
+    var h1 = document.getElementById('swap-handle-1');
+    var h2 = document.getElementById('swap-handle-2');
+    if(h1){ h1.addEventListener('touchstart', onStart, {passive:false}); h1.addEventListener('mousedown', onStart); }
+    if(h2){ h2.addEventListener('touchstart', onStart, {passive:false}); h2.addEventListener('mousedown', onStart); }
+  });
+})();
+
 function courtTap(team){
   if(!G || G.status !== 'live' || !isScoring || (G.deviceId !== DEVICE_ID && !isAdmin)) return;
   var winEligible = (G.p1 >= G.win || G.p2 >= G.win) && Math.abs(G.p1 - G.p2) >= 2;
@@ -2491,18 +2631,83 @@ function saveToHistory(){
 }
 
 function loadHistory(){
-  const h = getHistory();
   const el = document.getElementById('hist-list');
-  if(!h.length){ el.innerHTML = '<p class="empty">No games yet.</p>'; return; }
-  el.innerHTML = h.map((g,i) => {
-    const d = new Date(g.date);
-    const when = d.toLocaleDateString() + ' ' + d.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
-    const winner = g.p1 > g.p2 ? g.t1 : g.p2 > g.p1 ? g.t2 : 'Tied';
-    const delBtn = isUmpire ? '<button class="del-btn" title="Delete" onclick="deleteGame('+i+')">✕</button>' : '';
-    const grpLabel = g.groupName ? ' · '+esc(g.groupName) : '';
-    return '<div class="game-card" style="cursor:default">'+delBtn+'<div><div class="teams">'+esc(g.t1)+' vs '+esc(g.t2)+'</div><div class="meta">Doubles · To '+g.win+' · '+when+' · Winner: '+esc(winner)+grpLabel+'</div></div><div class="fscore"><span class="s1">'+g.p1+'</span> – <span class="s2">'+g.p2+'</span></div></div>';
-  }).join('');
-  document.getElementById('clear-hist-btn').style.display = isUmpire ? 'block' : 'none';
+  el.innerHTML = '<div class="loading"><div class="spin"></div><br>Loading past matches...</div>';
+
+  // Load all matches from Firebase standings (all groups)
+  Promise.all([
+    db.ref('groups').once('value'),
+    db.ref('standings').once('value')
+  ]).then(function(snaps){
+    var groups = snaps[0].val() || {};
+    var standings = snaps[1].val() || {};
+    var allMatches = [];
+
+    Object.entries(standings).forEach(function(e){
+      var gk = e[0], st = e[1];
+      var grp = groups[gk];
+      var grpName = grp ? grp.name : gk;
+      var matches = st.matches || {};
+      Object.values(matches).forEach(function(m){
+        allMatches.push({
+          t1: m.t1, t2: m.t2, p1: m.p1, p2: m.p2,
+          date: m.date || null, code: m.code || '',
+          groupName: grpName, win: Math.max(m.p1, m.p2),
+          source: 'firebase'
+        });
+      });
+    });
+
+    // Also merge local-only games (those not already in Firebase)
+    var fbCodes = {};
+    allMatches.forEach(function(m){ if(m.code) fbCodes[m.code] = true; });
+    var localH = getHistory();
+    localH.forEach(function(g){
+      if(g.code && fbCodes[g.code]) return; // already in Firebase
+      allMatches.push({
+        t1: g.t1, t2: g.t2, p1: g.p1, p2: g.p2,
+        date: g.date, code: g.code || '', groupName: g.groupName || '',
+        win: g.win || Math.max(g.p1, g.p2), source: 'local'
+      });
+    });
+
+    // Sort by date descending
+    allMatches.sort(function(a,b){
+      var da = a.date ? new Date(a.date) : new Date(0);
+      var db2 = b.date ? new Date(b.date) : new Date(0);
+      return db2 - da;
+    });
+
+    if(!allMatches.length){
+      el.innerHTML = '<p class="empty">No past matches yet.</p>';
+      return;
+    }
+
+    el.innerHTML = allMatches.map(function(g, i){
+      var when = '';
+      if(g.date){
+        var d = new Date(g.date);
+        when = d.toLocaleDateString() + ' ' + d.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+      }
+      var winner = g.p1 > g.p2 ? g.t1 : g.p2 > g.p1 ? g.t2 : 'Tied';
+      var grpLabel = g.groupName ? ' · '+esc(g.groupName) : '';
+      return '<div class="game-card" style="cursor:default"><div><div class="teams">'+esc(g.t1)+' vs '+esc(g.t2)+'</div><div class="meta">'+when+' · Winner: '+esc(winner)+grpLabel+'</div></div><div class="fscore"><span class="s1">'+g.p1+'</span> – <span class="s2">'+g.p2+'</span></div></div>';
+    }).join('');
+
+    document.getElementById('clear-hist-btn').style.display = isUmpire ? 'block' : 'none';
+  }).catch(function(){
+    // Fallback to local
+    var h = getHistory();
+    if(!h.length){ el.innerHTML = '<p class="empty">No games yet.</p>'; return; }
+    el.innerHTML = h.map(function(g,i){
+      var d = new Date(g.date);
+      var when = d.toLocaleDateString() + ' ' + d.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+      var winner = g.p1 > g.p2 ? g.t1 : g.p2 > g.p1 ? g.t2 : 'Tied';
+      var grpLabel = g.groupName ? ' · '+esc(g.groupName) : '';
+      return '<div class="game-card" style="cursor:default"><div><div class="teams">'+esc(g.t1)+' vs '+esc(g.t2)+'</div><div class="meta">Doubles · To '+g.win+' · '+when+' · Winner: '+esc(winner)+grpLabel+'</div></div><div class="fscore"><span class="s1">'+g.p1+'</span> – <span class="s2">'+g.p2+'</span></div></div>';
+    }).join('');
+    document.getElementById('clear-hist-btn').style.display = isUmpire ? 'block' : 'none';
+  });
 }
 
 function deleteGame(index){
