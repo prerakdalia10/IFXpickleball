@@ -193,6 +193,36 @@ input:focus,select:focus{border-color:var(--yellow)}
 .current-standing td{padding:.3rem;font-size:.8rem;text-align:center;border-bottom:1px solid var(--card)}
 .current-standing .hl{background:rgba(212,168,67,.15);font-weight:700}
 
+/* ── Knockout Bracket ── */
+.ko-category{margin-bottom:2rem}
+.ko-category h3{font-size:1rem;color:var(--yellow);margin-bottom:.8rem;border-bottom:1px solid rgba(212,168,67,.15);padding-bottom:.3rem}
+.ko-round{margin-bottom:1.2rem}
+.ko-round-title{font-size:.85rem;font-weight:700;color:var(--green);margin-bottom:.5rem;text-transform:uppercase;letter-spacing:.5px}
+.ko-match{background:var(--card);border-radius:var(--r);padding:.7rem .8rem;margin-bottom:.5rem;border:1px solid rgba(255,255,255,.06);position:relative}
+.ko-match.ko-live{border-color:var(--green);box-shadow:0 0 12px rgba(67,160,71,.15)}
+.ko-match.ko-done{opacity:.75}
+.ko-teams{display:flex;justify-content:space-between;align-items:center}
+.ko-team{flex:1;text-align:center}
+.ko-team-name{font-size:.8rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ko-team-name.winner{color:var(--yellow);font-weight:800}
+.ko-team-name.tbd{color:var(--dim);font-style:italic}
+.ko-vs{color:var(--dim);font-size:.7rem;font-weight:700;padding:0 .3rem}
+.ko-score{text-align:center;margin-top:.3rem;font-size:.75rem;color:var(--dim)}
+.ko-sets{display:flex;justify-content:center;gap:.3rem;margin-top:.3rem}
+.ko-set{background:var(--card2);border-radius:6px;padding:.15rem .4rem;font-size:.7rem;font-weight:600}
+.ko-set .set-w{color:var(--green)}
+.ko-set .set-l{color:var(--red)}
+.ko-badge{position:absolute;top:.4rem;right:.5rem;font-size:.6rem;font-weight:700;padding:.1rem .4rem;border-radius:999px}
+.ko-badge.live-badge{background:var(--green);color:#111;animation:pulse 1.5s infinite}
+.ko-badge.done-badge{background:var(--dim);color:#111}
+/* Set indicator on court */
+.court-sets{position:absolute;top:2.5rem;left:50%;transform:translateX(-50%);z-index:6;display:flex;gap:.25rem;align-items:center}
+.court-set-pill{background:rgba(0,0,0,.5);border-radius:8px;padding:.15rem .4rem;font-size:.6rem;font-weight:700;color:rgba(255,255,255,.5);border:1px solid rgba(255,255,255,.1)}
+.court-set-pill.active{border-color:var(--yellow);color:var(--yellow);background:rgba(212,168,67,.15)}
+.court-set-pill .sw{color:var(--green)}.court-set-pill .sl{color:var(--red)}
+.court-set-wins{position:absolute;top:.25rem;z-index:2;font-size:.7rem;font-weight:800;color:rgba(255,255,255,.6)}
+.court-set-wins.sw1{left:.5rem}.court-set-wins.sw2{right:.5rem}
+
 /* ── Game cards ── */
 .game-card{background:var(--card);border-radius:var(--r);padding:.8rem 1rem;margin-bottom:.6rem;display:flex;justify-content:space-between;align-items:center;cursor:pointer;transition:transform .15s,box-shadow .15s;position:relative;border:1px solid rgba(255,255,255,.05)}
 .game-card:hover{transform:translateY(-2px);box-shadow:0 4px 20px rgba(0,0,0,.3)}
@@ -352,6 +382,7 @@ input:focus,select:focus{border-color:var(--yellow)}
   <div class="home-more-content" id="home-more-content">
     <button class="start-btn hist" onclick="showPage('history');loadHistory()" style="padding:.45rem .8rem;font-size:.85rem;width:100%;margin:0 auto .5rem;display:block">📋 Past Games</button>
     <button class="start-btn standings" onclick="showPage('pos-calc');initCalc()" style="padding:.45rem .8rem;font-size:.85rem;width:100%;margin:0 auto .5rem;display:block">🧮 Position Calculator</button>
+    <button class="start-btn new" onclick="showPage('knockout');loadKnockout()" style="padding:.45rem .8rem;font-size:.85rem;width:100%;margin:0 auto .5rem;display:block">🏆 Knockout Bracket</button>
   </div>
   <div style="flex:1"></div>
   <button class="start-btn umpire" id="umpire-paddle" onclick="showPage('umpire-login')" style="position:fixed;bottom:100px;left:50%;transform:translateX(-50%);width:200px;z-index:998;touch-action:none">🔒 Umpire Login</button>
@@ -428,7 +459,11 @@ input:focus,select:focus{border-color:var(--yellow)}
   </div>
   <div id="swap-status" style="margin-bottom:1rem;font-size:.85rem"></div>
 
-  <div class="section-label">🎮 Manage All Games</div>
+  <div class="section-label">� Knockout Stage</div>
+  <button class="start-btn umpire" onclick="generateKnockout()" style="font-size:.9rem;padding:.8rem">🏆 Generate Knockout Bracket (Top 2 per Group)</button>
+  <div id="ko-gen-status" style="margin-bottom:1rem;font-size:.85rem"></div>
+
+  <div class="section-label">�🎮 Manage All Games</div>
   <div id="admin-games-list">
     <div class="loading"><div class="spin"></div><br>Loading...</div>
   </div>
@@ -575,6 +610,7 @@ input:focus,select:focus{border-color:var(--yellow)}
         <div class="court-half left serving" id="box-t1" onclick="courtTap(1)">
           <div class="nvz"></div>
           <div class="ct-name" id="s-t1">Team 1</div>
+          <div class="court-set-wins sw1" id="ct-sw1" style="display:none">Sets: 0</div>
           <div class="ct-score" id="s-p1">0</div>
           <div class="ct-serve-badge" id="ct-serve1">🏓 SERVING #<span id="ct-snum1">2</span></div>
           <div class="ct-tap-hint" id="ct-hint1">TAP THIS SIDE</div>
@@ -587,12 +623,19 @@ input:focus,select:focus{border-color:var(--yellow)}
           <div class="court-call" id="s-call">0 – 0 – 2</div>
           <div class="court-call-label">serving – receiving – server#</div>
         </div>
+        <!-- Set indicator (knockout only) -->
+        <div class="court-sets" id="court-sets" style="display:none">
+          <div class="court-set-pill active" id="csp-1">Set 1</div>
+          <div class="court-set-pill" id="csp-2">Set 2</div>
+          <div class="court-set-pill" id="csp-3">Set 3</div>
+        </div>
         <!-- Umpire info -->
         <div class="court-umpire" id="s-umpire-info" style="display:none">🧑‍⚖️ <span id="s-umpire-name"></span></div>
         <!-- Right half (Team 2) -->
         <div class="court-half right" id="box-t2" onclick="courtTap(2)">
           <div class="nvz"></div>
           <div class="ct-name" id="s-t2">Team 2</div>
+          <div class="court-set-wins sw2" id="ct-sw2" style="display:none">Sets: 0</div>
           <div class="ct-score" id="s-p2">0</div>
           <div class="ct-serve-badge" id="ct-serve2">🏓 SERVING #<span id="ct-snum2">2</span></div>
           <div class="ct-tap-hint" id="ct-hint2">TAP THIS SIDE</div>
@@ -695,6 +738,16 @@ input:focus,select:focus{border-color:var(--yellow)}
 
   <div id="calc-current" class="current-standing" style="display:none"></div>
   <div id="calc-result-area"></div>
+</div>
+
+<!-- PAGE: KNOCKOUT BRACKET -->
+<div class="page" id="pg-knockout">
+  <button class="back-btn" onclick="showPage('home')">← Back</button>
+  <h2>🏆 Knockout Bracket</h2>
+  <p style="color:var(--dim);margin-bottom:1rem;font-size:.85rem">Best of 3 sets · Each set to 11 points</p>
+  <div id="ko-bracket-area">
+    <div class="loading"><div class="spin"></div><br>Loading bracket...</div>
+  </div>
 </div>
 
 <!-- PAGE: STANDINGS -->
@@ -858,6 +911,7 @@ function showPage(name){
   if(name==='live-list') loadLiveGamesList();
   if(name==='admin-dash'){ loadAdminGroups(); loadAdminGames(); populateSwapDropdowns(); }
   if(name==='standings') loadStandings();
+  if(name==='knockout') loadKnockout();
   if(name==='setup') loadSetupGroups();
   // start/stop bouncing balls on home page
   if(name==='home'){ pbStartBalls(); } else { pbStopBalls(); }
@@ -2026,7 +2080,11 @@ function startGame(){
     groupKey: groupKey || '',
     groupName: groupName,
     category: (groupKey && cachedGroups[groupKey] && cachedGroups[groupKey].category) ? cachedGroups[groupKey].category : '',
-    umpireName: umpireName
+    umpireName: umpireName,
+    knockout: false,
+    sets: [],
+    currentSet: 1,
+    setWins1: 0, setWins2: 0
   };
 
   undoLog = [];
@@ -2257,6 +2315,38 @@ function render(){
   const rScore = G.servingTeam === 1 ? G.p2 : G.p1;
   document.getElementById('s-call').textContent = sScore + ' – ' + rScore + ' – ' + G.serverNum;
 
+  // Set indicators (knockout mode)
+  var isKO = G.knockout === true;
+  var courtSetsEl = document.getElementById('court-sets');
+  var sw1El = document.getElementById('ct-sw1');
+  var sw2El = document.getElementById('ct-sw2');
+  if(isKO){
+    courtSetsEl.style.display = 'flex';
+    sw1El.style.display = 'block'; sw2El.style.display = 'block';
+    var sw1 = G.setWins1 || 0, sw2 = G.setWins2 || 0;
+    sw1El.textContent = 'Sets: ' + sw1;
+    sw2El.textContent = 'Sets: ' + sw2;
+    var sets = G.sets || [];
+    var curSet = G.currentSet || 1;
+    for(var si = 1; si <= 3; si++){
+      var pill = document.getElementById('csp-' + si);
+      if(si < curSet && sets[si-1]){
+        var s = sets[si-1];
+        pill.innerHTML = '<span class="sw">' + s.p1 + '</span>-<span class="sl">' + s.p2 + '</span>';
+        pill.classList.remove('active');
+      } else if(si === curSet){
+        pill.textContent = 'Set ' + si;
+        pill.classList.add('active');
+      } else {
+        pill.textContent = 'Set ' + si;
+        pill.classList.remove('active');
+      }
+    }
+  } else {
+    courtSetsEl.style.display = 'none';
+    sw1El.style.display = 'none'; sw2El.style.display = 'none';
+  }
+
   const st = document.getElementById('s-status');
   const w = document.getElementById('s-winner');
   const wText = document.getElementById('s-winner-text');
@@ -2304,7 +2394,14 @@ function render(){
     }
   }
 
-  const winEligible = (G.p1 >= G.win || G.p2 >= G.win) && Math.abs(G.p1 - G.p2) >= 2;
+  // For knockout: match won when a team wins 2 sets
+  // For league: single game to win points
+  var winEligible;
+  if(isKO){
+    winEligible = ((G.setWins1||0) >= 2 || (G.setWins2||0) >= 2);
+  } else {
+    winEligible = (G.p1 >= G.win || G.p2 >= G.win) && Math.abs(G.p1 - G.p2) >= 2;
+  }
 
   // Tap hints (visible only for scoring umpire)
   var hint1 = document.getElementById('ct-hint1');
@@ -2331,9 +2428,17 @@ function render(){
 
   // Win-eligible banner
   if(live && winEligible){
-    const lead = G.p1 > G.p2 ? G.t1 : G.t2;
-    wText.textContent = '🏆 ' + lead + ' has won!';
-    wSub.textContent = showControls ? 'Tap ⋮ → End Match to finalize' : G.p1 + ' – ' + G.p2;
+    var lead;
+    if(isKO){
+      lead = (G.setWins1||0) >= 2 ? G.t1 : G.t2;
+      wText.textContent = '🏆 ' + lead + ' wins the match!';
+      var setsStr = (G.sets||[]).map(function(s){ return s.p1+'-'+s.p2; }).join(', ');
+      wSub.textContent = showControls ? 'Sets: ' + setsStr + ' · Tap ⋮ → End Match' : 'Sets: ' + setsStr;
+    } else {
+      lead = G.p1 > G.p2 ? G.t1 : G.t2;
+      wText.textContent = '🏆 ' + lead + ' has won!';
+      wSub.textContent = showControls ? 'Tap ⋮ → End Match to finalize' : G.p1 + ' – ' + G.p2;
+    }
     w.classList.add('show');
   }
 }
@@ -2399,7 +2504,12 @@ function swapCourtSides(){
 
 function courtTap(team){
   if(!G || G.status !== 'live' || !isScoring || (G.deviceId !== DEVICE_ID && !isAdmin)) return;
-  var winEligible = (G.p1 >= G.win || G.p2 >= G.win) && Math.abs(G.p1 - G.p2) >= 2;
+  var winEligible;
+  if(G.knockout){
+    winEligible = ((G.setWins1||0) >= 2 || (G.setWins2||0) >= 2);
+  } else {
+    winEligible = (G.p1 >= G.win || G.p2 >= G.win) && Math.abs(G.p1 - G.p2) >= 2;
+  }
   if(winEligible) return;
   // Ripple effect
   var half = team === 1 ? document.getElementById('box-t1') : document.getElementById('box-t2');
@@ -2427,8 +2537,31 @@ function courtTap(team){
    ═══════════════════════════════════════════════════ */
 function rallyPoint(){
   if(!G || G.status !== 'live' || !isScoring || (G.deviceId !== DEVICE_ID && !isAdmin)) return;
-  undoLog.push({ p1:G.p1, p2:G.p2, servingTeam:G.servingTeam, serverNum:G.serverNum, status:G.status, rsP1:G.rsP1||0, rsP2:G.rsP2||0, rsP3:G.rsP3||0, rsP4:G.rsP4||0 });
+  undoLog.push({ p1:G.p1, p2:G.p2, servingTeam:G.servingTeam, serverNum:G.serverNum, status:G.status, rsP1:G.rsP1||0, rsP2:G.rsP2||0, rsP3:G.rsP3||0, rsP4:G.rsP4||0, sets:JSON.stringify(G.sets||[]), currentSet:G.currentSet||1, setWins1:G.setWins1||0, setWins2:G.setWins2||0 });
   if(G.servingTeam === 1) G.p1++; else G.p2++;
+
+  // Check if set is won (knockout best-of-3)
+  if(G.knockout){
+    var setWon = (G.p1 >= G.win || G.p2 >= G.win) && Math.abs(G.p1 - G.p2) >= 2;
+    if(setWon){
+      if(!G.sets) G.sets = [];
+      G.sets.push({ p1: G.p1, p2: G.p2 });
+      if(G.p1 > G.p2) G.setWins1 = (G.setWins1||0) + 1;
+      else G.setWins2 = (G.setWins2||0) + 1;
+
+      // Check if match is won (best of 3 = first to 2)
+      if((G.setWins1||0) >= 2 || (G.setWins2||0) >= 2){
+        // Match over — don't reset, let endGame handle it
+      } else {
+        // Start next set
+        G.currentSet = (G.currentSet||1) + 1;
+        G.p1 = 0; G.p2 = 0;
+        G.servingTeam = G.servingTeam === 1 ? 2 : 1; // alternate serve start
+        G.serverNum = 2; // start with server #2 per pickleball rules
+      }
+    }
+  }
+
   db.ref('games/' + G.code).set(G);
   render();
   sfxPoint();
@@ -2437,7 +2570,7 @@ function rallyPoint(){
 
 function rallySideOut(){
   if(!G || G.status !== 'live' || !isScoring || (G.deviceId !== DEVICE_ID && !isAdmin)) return;
-  undoLog.push({ p1:G.p1, p2:G.p2, servingTeam:G.servingTeam, serverNum:G.serverNum, status:G.status, rsP1:G.rsP1||0, rsP2:G.rsP2||0, rsP3:G.rsP3||0, rsP4:G.rsP4||0 });
+  undoLog.push({ p1:G.p1, p2:G.p2, servingTeam:G.servingTeam, serverNum:G.serverNum, status:G.status, rsP1:G.rsP1||0, rsP2:G.rsP2||0, rsP3:G.rsP3||0, rsP4:G.rsP4||0, sets:JSON.stringify(G.sets||[]), currentSet:G.currentSet||1, setWins1:G.setWins1||0, setWins2:G.setWins2||0 });
   if(G.serverNum === 1){
     G.serverNum = 2;
   } else {
@@ -2461,6 +2594,12 @@ function undo(){
   G.rsP2 = prev.rsP2 || 0;
   G.rsP3 = prev.rsP3 || 0;
   G.rsP4 = prev.rsP4 || 0;
+  if(prev.sets !== undefined){
+    try { G.sets = JSON.parse(prev.sets); } catch(e){ G.sets = []; }
+    G.currentSet = prev.currentSet || 1;
+    G.setWins1 = prev.setWins1 || 0;
+    G.setWins2 = prev.setWins2 || 0;
+  }
   db.ref('games/' + G.code).set(G);
   render();
 }
@@ -2470,7 +2609,12 @@ function endGame(){
   if(!confirm('End this game?')) return;
   G.status = 'finished';
   saveToHistory();
-  updateStandings(G);
+  if(G.knockout){
+    // Update knockout bracket with result + advance winner
+    updateKnockoutResult(G);
+  } else {
+    updateStandings(G);
+  }
   db.ref('games/' + G.code).set(G);
   localStorage.removeItem('pb_active_game');
   render();
@@ -3217,6 +3361,346 @@ function runCalc(){
   }
 
   document.getElementById('calc-result-area').innerHTML = rHtml;
+}
+
+/* ═══════════════════════════════════════════════════
+   KNOCKOUT BRACKET
+   ═══════════════════════════════════════════════════ */
+
+/*
+  Firebase structure:
+  knockout/{category}/rounds: [{name:"Quarterfinal",matches:[{id,t1,t2,code,winner,sets},...]},...}]
+  Example categories: "Mens Double", "Womens Double", "Mix Double"
+*/
+
+function getRoundName(totalTeams, roundIdx, totalRounds){
+  var left = totalRounds - roundIdx;
+  if(left === 0) return 'Final';
+  if(left === 1) return 'Semifinal';
+  if(left === 2) return 'Quarterfinal';
+  return 'Round ' + (roundIdx + 1);
+}
+
+function generateKnockout(){
+  if(!isAdmin) return;
+  var sts = document.getElementById('ko-gen-status');
+  sts.innerHTML = '<span style="color:var(--yellow)">⏳ Generating bracket...</span>';
+
+  Promise.all([
+    db.ref('groups').once('value'),
+    db.ref('standings').once('value')
+  ]).then(function(snaps){
+    var groups = snaps[0].val() || {};
+    var standings = snaps[1].val() || {};
+
+    // Group by category
+    var cats = {}; // { "Mens Double": [{team,groupName},...], ... }
+    Object.entries(groups).forEach(function(e){
+      var gk = e[0], g = e[1];
+      var cat = g.category || 'Other';
+      if(!cats[cat]) cats[cat] = [];
+
+      var teamStats = (standings[gk] && standings[gk].teams) ? standings[gk].teams : {};
+      // Include teams from group definition
+      if(g.teams){
+        Object.values(g.teams).forEach(function(tn){
+          if(!teamStats[tn]) teamStats[tn] = { played:0, won:0, lost:0, pf:0, pa:0 };
+        });
+      }
+
+      // Sort by standings rules
+      var sorted = Object.entries(teamStats).sort(function(a,b){
+        if(b[1].won !== a[1].won) return b[1].won - a[1].won;
+        if(a[1].pa !== b[1].pa) return a[1].pa - b[1].pa;
+        return b[1].pf - a[1].pf;
+      });
+
+      // Top 2 qualify
+      if(sorted.length >= 1) cats[cat].push({ team: sorted[0][0], pos: 1, group: g.name });
+      if(sorted.length >= 2) cats[cat].push({ team: sorted[1][0], pos: 2, group: g.name });
+    });
+
+    var updates = {};
+    Object.entries(cats).forEach(function(ce){
+      var cat = ce[0], qualifiers = ce[1];
+      var n = qualifiers.length;
+      if(n < 2){ return; }
+
+      // Seed: 1st of Group A vs 2nd of Group B, etc. (cross-seeding)
+      // Separate 1st place and 2nd place finishers
+      var firsts = qualifiers.filter(function(q){ return q.pos === 1; });
+      var seconds = qualifiers.filter(function(q){ return q.pos === 2; });
+
+      // Pair: 1st from one group vs 2nd from another (reverse order for cross matching)
+      var matches = [];
+      var used2 = {};
+      firsts.forEach(function(f){
+        // Find a 2nd place from a different group
+        for(var i = seconds.length - 1; i >= 0; i--){
+          if(!used2[i] && seconds[i].group !== f.group){
+            matches.push({ t1: f.team, t2: seconds[i].team, t1seed: f.group + ' #1', t2seed: seconds[i].group + ' #2' });
+            used2[i] = true;
+            break;
+          }
+        }
+      });
+
+      // If any leftover 2nd place (same group pairing as fallback)
+      seconds.forEach(function(s, i){
+        if(!used2[i]){
+          // Find unmatched 1st
+          var paired = matches.map(function(m){ return m.t1; });
+          for(var j = 0; j < firsts.length; j++){
+            if(paired.indexOf(firsts[j].team) === -1){
+              matches.push({ t1: firsts[j].team, t2: s.team, t1seed: firsts[j].group + ' #1', t2seed: s.group + ' #2' });
+              break;
+            }
+          }
+        }
+      });
+
+      // If odd qualifiers, handle bye
+      if(n === 3){
+        // 1 gets a bye: best 1st place goes to next round
+        if(matches.length < 2){
+          matches = [{ t1: qualifiers[0].team, t2: qualifiers[1].team }];
+        }
+      }
+
+      // Build rounds
+      var totalRounds = Math.ceil(Math.log2(Math.max(matches.length * 2, 2)));
+      // Pad to power of 2
+      var targetMatches = Math.pow(2, totalRounds - 1);
+      while(matches.length < targetMatches && matches.length > 0){
+        // Add bye matches
+        matches.push({ t1: 'BYE', t2: 'BYE' });
+      }
+
+      var rounds = [];
+      // First round
+      var r1 = { name: getRoundName(n, 0, totalRounds), matches: [] };
+      matches.forEach(function(m, i){
+        r1.matches.push({
+          id: 'm' + i,
+          t1: m.t1, t2: m.t2,
+          t1seed: m.t1seed || '', t2seed: m.t2seed || '',
+          winner: '', code: '', sets: [],
+          setWins1: 0, setWins2: 0
+        });
+      });
+      rounds.push(r1);
+
+      // Subsequent rounds (empty — will be filled as matches complete)
+      var prevCount = r1.matches.length;
+      var rIdx = 1;
+      while(prevCount > 1){
+        var nextCount = Math.ceil(prevCount / 2);
+        var rnd = { name: getRoundName(n, rIdx, totalRounds), matches: [] };
+        for(var j = 0; j < nextCount; j++){
+          rnd.matches.push({
+            id: 'm' + j,
+            t1: 'TBD', t2: 'TBD',
+            winner: '', code: '', sets: [],
+            setWins1: 0, setWins2: 0
+          });
+        }
+        rounds.push(rnd);
+        prevCount = nextCount;
+        rIdx++;
+      }
+
+      var catKey = cat.replace(/[^a-zA-Z0-9]/g, '_');
+      updates['knockout/' + catKey + '/category'] = cat;
+      updates['knockout/' + catKey + '/rounds'] = rounds;
+    });
+
+    if(Object.keys(updates).length === 0){
+      sts.innerHTML = '<span style="color:var(--red)">❌ No groups with 2+ teams found.</span>';
+      return;
+    }
+
+    if(!confirm('Generate knockout brackets? This will overwrite existing brackets.')) {
+      sts.innerHTML = '';
+      return;
+    }
+
+    db.ref().update(updates).then(function(){
+      sts.innerHTML = '<span style="color:var(--green)">✅ Knockout brackets generated!</span>';
+    }).catch(function(err){
+      sts.innerHTML = '<span style="color:var(--red)">❌ Error: ' + esc(err.message) + '</span>';
+    });
+  });
+}
+
+function loadKnockout(){
+  var el = document.getElementById('ko-bracket-area');
+  el.innerHTML = '<div class="loading"><div class="spin"></div><br>Loading bracket...</div>';
+
+  db.ref('knockout').once('value', function(snap){
+    var data = snap.val();
+    if(!data){
+      el.innerHTML = '<p class="empty">No knockout bracket yet. Admin needs to generate it.</p>';
+      return;
+    }
+
+    var html = '';
+    Object.entries(data).forEach(function(e){
+      var catKey = e[0], catData = e[1];
+      var catName = catData.category || catKey;
+      var rounds = catData.rounds || [];
+
+      html += '<div class="ko-category"><h3>' + esc(catName) + '</h3>';
+
+      rounds.forEach(function(rnd, ri){
+        html += '<div class="ko-round"><div class="ko-round-title">' + esc(rnd.name) + '</div>';
+        (rnd.matches || []).forEach(function(m, mi){
+          var isDone = m.winner && m.winner !== '';
+          var isLive = m.code && !isDone;
+          var cls = isDone ? 'ko-done' : (isLive ? 'ko-live' : '');
+
+          html += '<div class="ko-match ' + cls + '">';
+
+          if(isLive) html += '<span class="ko-badge live-badge">LIVE</span>';
+          else if(isDone) html += '<span class="ko-badge done-badge">DONE</span>';
+
+          var t1cls = m.t1 === 'TBD' ? 'tbd' : (m.winner === m.t1 ? 'winner' : '');
+          var t2cls = m.t2 === 'TBD' ? 'tbd' : (m.winner === m.t2 ? 'winner' : '');
+
+          html += '<div class="ko-teams">';
+          html += '<div class="ko-team"><div class="ko-team-name ' + t1cls + '">' + esc(m.t1) + '</div></div>';
+          html += '<div class="ko-vs">vs</div>';
+          html += '<div class="ko-team"><div class="ko-team-name ' + t2cls + '">' + esc(m.t2) + '</div></div>';
+          html += '</div>';
+
+          // Show sets if available
+          var sets = m.sets || [];
+          if(sets.length > 0){
+            html += '<div class="ko-sets">';
+            sets.forEach(function(s, si){
+              html += '<div class="ko-set"><span class="set-w">' + s.p1 + '</span>-<span class="set-l">' + s.p2 + '</span></div>';
+            });
+            html += '</div>';
+          }
+
+          // Start match button (for umpires)
+          if(isUmpire && !isDone && !isLive && m.t1 !== 'TBD' && m.t2 !== 'TBD'){
+            html += '<div style="text-align:center;margin-top:.4rem"><button class="start-btn new" style="width:auto;padding:.3rem .8rem;font-size:.75rem;margin:0" onclick="startKnockoutMatch(\'' + catKey + '\',' + ri + ',' + mi + ')">▶ Start Match</button></div>';
+          }
+
+          // Watch live button
+          if(isLive && m.code){
+            html += '<div style="text-align:center;margin-top:.4rem"><button class="start-btn watch" style="width:auto;padding:.3rem .8rem;font-size:.75rem;margin:0" onclick="watchByCodeDirect(\'' + esc(m.code) + '\')">👀 Watch Live</button></div>';
+          }
+
+          html += '</div>';
+        });
+        html += '</div>';
+      });
+      html += '</div>';
+    });
+
+    el.innerHTML = html;
+  });
+}
+
+function startKnockoutMatch(catKey, roundIdx, matchIdx){
+  if(!isUmpire) return;
+  // Read the bracket match info
+  db.ref('knockout/' + catKey + '/rounds/' + roundIdx + '/matches/' + matchIdx).once('value', function(snap){
+    var m = snap.val();
+    if(!m || m.t1 === 'TBD' || m.t2 === 'TBD'){ alert('Teams not yet decided for this match.'); return; }
+    if(m.winner){ alert('This match is already completed.'); return; }
+
+    var code = genCode();
+    var catData = null;
+
+    db.ref('knockout/' + catKey + '/category').once('value', function(catSnap){
+      var category = catSnap.val() || '';
+
+      G = {
+        code: code, t1: m.t1, t2: m.t2, win: 11,
+        p1: 0, p2: 0,
+        servingTeam: 1, serverNum: 2,
+        tossDecided: false,
+        rsP1: 0, rsP2: 0, rsP3: 0, rsP4: 0,
+        status: 'live',
+        date: new Date().toISOString(),
+        deviceId: DEVICE_ID,
+        groupKey: '',
+        groupName: '',
+        category: category,
+        umpireName: umpireName,
+        knockout: true,
+        sets: [],
+        currentSet: 1,
+        setWins1: 0, setWins2: 0,
+        koCatKey: catKey,
+        koRoundIdx: roundIdx,
+        koMatchIdx: matchIdx
+      };
+
+      undoLog = [];
+      isScoring = true;
+      currentGameCode = code;
+
+      // Save game code to bracket
+      db.ref('knockout/' + catKey + '/rounds/' + roundIdx + '/matches/' + matchIdx + '/code').set(code);
+
+      db.ref('games/' + code).set(G);
+      localStorage.setItem('pb_active_game', code);
+      document.getElementById('share-code').value = code;
+
+      if(watchRef) watchRef.off();
+      watchRef = db.ref('games/' + code);
+      watchRef.on('value', function(snap2){
+        var data = snap2.val();
+        if(data){ G = data; render(); }
+      });
+
+      render();
+      showPage('score');
+    });
+  });
+}
+
+function updateKnockoutResult(game){
+  if(!game.koCatKey) return;
+  var catKey = game.koCatKey;
+  var ri = game.koRoundIdx;
+  var mi = game.koMatchIdx;
+
+  // Determine winner
+  var winner = '';
+  if(game.knockout){
+    winner = (game.setWins1||0) >= 2 ? game.t1 : (game.setWins2||0) >= 2 ? game.t2 : (game.p1 > game.p2 ? game.t1 : game.t2);
+  } else {
+    winner = game.p1 > game.p2 ? game.t1 : game.t2;
+  }
+
+  var updates = {};
+  updates['knockout/' + catKey + '/rounds/' + ri + '/matches/' + mi + '/winner'] = winner;
+  updates['knockout/' + catKey + '/rounds/' + ri + '/matches/' + mi + '/sets'] = game.sets || [];
+  updates['knockout/' + catKey + '/rounds/' + ri + '/matches/' + mi + '/setWins1'] = game.setWins1 || 0;
+  updates['knockout/' + catKey + '/rounds/' + ri + '/matches/' + mi + '/setWins2'] = game.setWins2 || 0;
+
+  // Advance winner to next round
+  var nextRi = ri + 1;
+  var nextMi = Math.floor(mi / 2);
+  var slot = mi % 2 === 0 ? 't1' : 't2';
+
+  // Check if next round exists
+  db.ref('knockout/' + catKey + '/rounds/' + nextRi).once('value', function(snap){
+    if(snap.exists()){
+      updates['knockout/' + catKey + '/rounds/' + nextRi + '/matches/' + nextMi + '/' + slot] = winner;
+    }
+    db.ref().update(updates);
+  });
+}
+
+function watchByCodeDirect(code){
+  document.getElementById('watch-code').value = code;
+  showPage('live-list');
+  setTimeout(function(){ watchByCode(); }, 300);
 }
 
 </script>
