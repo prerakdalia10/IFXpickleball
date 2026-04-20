@@ -215,6 +215,27 @@ input:focus,select:focus{border-color:var(--yellow)}
 .ko-badge{position:absolute;top:.4rem;right:.5rem;font-size:.6rem;font-weight:700;padding:.1rem .4rem;border-radius:999px}
 .ko-badge.live-badge{background:var(--green);color:#111;animation:pulse 1.5s infinite}
 .ko-badge.done-badge{background:var(--dim);color:#111}
+/* Admin knockout card */
+.ako-cat{margin-bottom:1.5rem}
+.ako-cat h4{font-size:.9rem;color:var(--yellow);margin-bottom:.5rem;border-bottom:1px solid rgba(212,168,67,.12);padding-bottom:.2rem}
+.ako-round-label{font-size:.75rem;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:.4px;margin:.6rem 0 .3rem}
+.ako-card{background:var(--card);border-radius:var(--r);padding:.6rem .7rem;margin-bottom:.45rem;border:1px solid rgba(255,255,255,.06);position:relative}
+.ako-card.ako-live{border-color:var(--green)}
+.ako-card.ako-done{opacity:.7}
+.ako-row{display:flex;align-items:center;gap:.4rem;flex-wrap:wrap}
+.ako-team-input{flex:1;min-width:60px;padding:.3rem .4rem;font-size:.78rem;background:var(--card2);border:1px solid rgba(255,255,255,.1);border-radius:6px;color:var(--text);font-weight:600}
+.ako-vs{color:var(--dim);font-size:.7rem;font-weight:700;flex-shrink:0}
+.ako-btns{display:flex;gap:.3rem;margin-top:.35rem;flex-wrap:wrap}
+.ako-btns button{padding:.25rem .55rem;border:none;border-radius:6px;cursor:pointer;font-size:.7rem;font-weight:700}
+.ako-btn-save{background:var(--green);color:#111}
+.ako-btn-start{background:var(--blue);color:#fff}
+.ako-btn-reset{background:var(--yellow);color:#111}
+.ako-btn-del{background:var(--red);color:#fff}
+.ako-status{font-size:.65rem;font-weight:700;padding:.1rem .35rem;border-radius:999px;display:inline-block;margin-left:.3rem}
+.ako-status.live{background:var(--green);color:#111}
+.ako-status.done{background:var(--dim);color:#111}
+.ako-status.pending{background:var(--card2);color:var(--dim)}
+.ako-sets-info{font-size:.7rem;color:var(--dim);margin-top:.2rem}
 /* Set indicator on court */
 .court-sets{position:absolute;top:2.5rem;left:50%;transform:translateX(-50%);z-index:6;display:flex;gap:.25rem;align-items:center}
 .court-set-pill{background:rgba(0,0,0,.5);border-radius:8px;padding:.15rem .4rem;font-size:.6rem;font-weight:700;color:rgba(255,255,255,.5);border:1px solid rgba(255,255,255,.1)}
@@ -459,11 +480,16 @@ input:focus,select:focus{border-color:var(--yellow)}
   </div>
   <div id="swap-status" style="margin-bottom:1rem;font-size:.85rem"></div>
 
-  <div class="section-label">� Knockout Stage</div>
+  <div class="section-label">&#x1F3C6; Knockout Stage</div>
   <button class="start-btn umpire" onclick="generateKnockout()" style="font-size:.9rem;padding:.8rem">🏆 Generate Knockout Bracket (Top 2 per Group)</button>
   <div id="ko-gen-status" style="margin-bottom:1rem;font-size:.85rem"></div>
 
-  <div class="section-label">�🎮 Manage All Games</div>
+  <div class="section-label">&#x1F3C6; Manage Knockout Matches</div>
+  <div id="admin-ko-area">
+    <div class="loading"><div class="spin"></div><br>Loading knockout data...</div>
+  </div>
+
+  <div class="section-label">&#x1F3AE; Manage All Games</div>
   <div id="admin-games-list">
     <div class="loading"><div class="spin"></div><br>Loading...</div>
   </div>
@@ -519,6 +545,12 @@ input:focus,select:focus{border-color:var(--yellow)}
   <div>
     <div class="section-label">Live Games (tap to score)</div>
     <div id="umpire-game-list"></div>
+  </div>
+  <div>
+    <div class="section-label">🏆 Knockout Fixtures</div>
+    <div id="umpire-ko-area">
+      <p class="empty">Loading...</p>
+    </div>
   </div>
 </div>
 
@@ -907,9 +939,9 @@ const DEVICE_ID = getDeviceId();
 function showPage(name){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.getElementById('pg-'+name).classList.add('active');
-  if(name==='umpire-dash') loadUmpireGames();
+  if(name==='umpire-dash'){ loadUmpireGames(); loadUmpireKnockout(); }
   if(name==='live-list') loadLiveGamesList();
-  if(name==='admin-dash'){ loadAdminGroups(); loadAdminGames(); populateSwapDropdowns(); }
+  if(name==='admin-dash'){ loadAdminGroups(); loadAdminGames(); populateSwapDropdowns(); loadAdminKnockout(); }
   if(name==='standings') loadStandings();
   if(name==='knockout') loadKnockout();
   if(name==='setup') loadSetupGroups();
@@ -3701,6 +3733,319 @@ function watchByCodeDirect(code){
   document.getElementById('watch-code').value = code;
   showPage('live-list');
   setTimeout(function(){ watchByCode(); }, 300);
+}
+
+/* ═══════════════════════════════════════════════════
+   ADMIN KNOCKOUT MANAGEMENT
+   ═══════════════════════════════════════════════════ */
+
+function loadAdminKnockout(){
+  if(!isAdmin) return;
+  var el = document.getElementById('admin-ko-area');
+  if(!el) return;
+  el.innerHTML = '<div class="loading"><div class="spin"></div><br>Loading knockout data...</div>';
+
+  db.ref('knockout').once('value', function(snap){
+    var data = snap.val();
+    if(!data){
+      el.innerHTML = '<p class="empty">No knockout bracket generated yet. Use the button above to generate.</p>';
+      return;
+    }
+
+    var html = '';
+    Object.entries(data).forEach(function(e){
+      var catKey = e[0], catData = e[1];
+      var catName = catData.category || catKey;
+      var rounds = catData.rounds || [];
+
+      html += '<div class="ako-cat"><h4>' + esc(catName) + '</h4>';
+
+      rounds.forEach(function(rnd, ri){
+        html += '<div class="ako-round-label">' + esc(rnd.name) + '</div>';
+        (rnd.matches || []).forEach(function(m, mi){
+          var isDone = m.winner && m.winner !== '';
+          var isLive = m.code && !isDone;
+          var cls = isDone ? 'ako-done' : (isLive ? 'ako-live' : '');
+          var statusCls = isDone ? 'done' : (isLive ? 'live' : 'pending');
+          var statusText = isDone ? 'DONE' : (isLive ? 'LIVE' : 'PENDING');
+
+          var inputId1 = 'ako-t1-' + catKey + '-' + ri + '-' + mi;
+          var inputId2 = 'ako-t2-' + catKey + '-' + ri + '-' + mi;
+
+          html += '<div class="ako-card ' + cls + '">';
+          html += '<span class="ako-status ' + statusCls + '">' + statusText + '</span>';
+
+          // Editable team name inputs
+          html += '<div class="ako-row">';
+          html += '<input class="ako-team-input" id="' + inputId1 + '" value="' + esc(m.t1) + '" placeholder="Team 1"/>';
+          html += '<span class="ako-vs">vs</span>';
+          html += '<input class="ako-team-input" id="' + inputId2 + '" value="' + esc(m.t2) + '" placeholder="Team 2"/>';
+          html += '</div>';
+
+          // Sets info
+          var sets = m.sets || [];
+          if(sets.length > 0){
+            var setsStr = sets.map(function(s){ return s.p1 + '-' + s.p2; }).join(', ');
+            html += '<div class="ako-sets-info">Sets: ' + setsStr;
+            if(m.winner) html += ' · Winner: <b>' + esc(m.winner) + '</b>';
+            html += '</div>';
+          } else if(m.winner){
+            html += '<div class="ako-sets-info">Winner: <b>' + esc(m.winner) + '</b></div>';
+          }
+
+          // Action buttons
+          html += '<div class="ako-btns">';
+          html += '<button class="ako-btn-save" onclick="adminKoSaveTeams(\'' + catKey + '\',' + ri + ',' + mi + ')">💾 Save Names</button>';
+
+          if(!isDone && !isLive && m.t1 !== 'TBD' && m.t2 !== 'TBD'){
+            html += '<button class="ako-btn-start" onclick="startKnockoutMatch(\'' + catKey + '\',' + ri + ',' + mi + ')">▶ Start</button>';
+          }
+
+          if(isLive && m.code){
+            html += '<button class="ako-btn-start" onclick="adminEnterGame(\'' + esc(m.code) + '\')">📺 Open Live</button>';
+          }
+
+          if(isDone){
+            html += '<button class="ako-btn-reset" onclick="adminKoResetMatch(\'' + catKey + '\',' + ri + ',' + mi + ')">↩ Reset</button>';
+          }
+
+          html += '<button class="ako-btn-del" onclick="adminKoDeleteMatch(\'' + catKey + '\',' + ri + ',' + mi + ')">🗑</button>';
+          html += '</div>';
+
+          html += '</div>';
+        });
+      });
+
+      // Delete entire category bracket
+      html += '<button class="ako-btn-del" onclick="adminKoDeleteCategory(\'' + catKey + '\',\'' + esc(catName).replace(/'/g, "\\'") + '\')" style="margin-top:.5rem;width:100%;padding:.4rem">🗑 Delete ' + esc(catName) + ' Bracket</button>';
+      html += '</div>';
+    });
+
+    el.innerHTML = html;
+  });
+}
+
+function adminKoSaveTeams(catKey, ri, mi){
+  if(!isAdmin) return;
+  var id1 = 'ako-t1-' + catKey + '-' + ri + '-' + mi;
+  var id2 = 'ako-t2-' + catKey + '-' + ri + '-' + mi;
+  var t1 = document.getElementById(id1).value.trim();
+  var t2 = document.getElementById(id2).value.trim();
+  if(!t1 || !t2){ alert('Both team names are required.'); return; }
+
+  var basePath = 'knockout/' + catKey + '/rounds/' + ri + '/matches/' + mi;
+  var updates = {};
+  updates[basePath + '/t1'] = t1;
+  updates[basePath + '/t2'] = t2;
+
+  db.ref().update(updates).then(function(){
+    // Also update the game if it exists (live game)
+    db.ref(basePath + '/code').once('value', function(snap){
+      var code = snap.val();
+      if(code){
+        db.ref('games/' + code).once('value', function(gs){
+          var g = gs.val();
+          if(g){
+            g.t1 = t1;
+            g.t2 = t2;
+            db.ref('games/' + code).set(g);
+          }
+        });
+      }
+    });
+    loadAdminKnockout();
+  });
+}
+
+function adminKoResetMatch(catKey, ri, mi){
+  if(!isAdmin) return;
+  if(!confirm('Reset this match? This will clear the result and remove the winner advancement.')) return;
+
+  var basePath = 'knockout/' + catKey + '/rounds/' + ri + '/matches/' + mi;
+
+  db.ref(basePath).once('value', function(snap){
+    var m = snap.val();
+    if(!m) return;
+
+    var updates = {};
+    updates[basePath + '/winner'] = '';
+    updates[basePath + '/code'] = '';
+    updates[basePath + '/sets'] = [];
+    updates[basePath + '/setWins1'] = 0;
+    updates[basePath + '/setWins2'] = 0;
+
+    // Clear from next round too (set back to TBD)
+    var nextRi = ri + 1;
+    var nextMi = Math.floor(mi / 2);
+    var slot = mi % 2 === 0 ? 't1' : 't2';
+
+    db.ref('knockout/' + catKey + '/rounds/' + nextRi).once('value', function(nsnap){
+      if(nsnap.exists()){
+        var nextMatch = nsnap.val().matches && nsnap.val().matches[nextMi];
+        if(nextMatch){
+          // Only reset to TBD if that match hasn't started
+          if(!nextMatch.code && !nextMatch.winner){
+            updates['knockout/' + catKey + '/rounds/' + nextRi + '/matches/' + nextMi + '/' + slot] = 'TBD';
+          }
+        }
+      }
+
+      // Delete the associated game if exists
+      if(m.code){
+        db.ref('games/' + m.code).remove();
+      }
+
+      db.ref().update(updates).then(function(){
+        loadAdminKnockout();
+      });
+    });
+  });
+}
+
+function adminKoDeleteMatch(catKey, ri, mi){
+  if(!isAdmin) return;
+  if(!confirm('Delete this knockout match slot? Teams will be set to TBD.')) return;
+
+  var basePath = 'knockout/' + catKey + '/rounds/' + ri + '/matches/' + mi;
+  db.ref(basePath).once('value', function(snap){
+    var m = snap.val();
+    if(!m) return;
+
+    // Delete associated game
+    if(m.code) db.ref('games/' + m.code).remove();
+
+    var updates = {};
+    updates[basePath + '/t1'] = 'TBD';
+    updates[basePath + '/t2'] = 'TBD';
+    updates[basePath + '/winner'] = '';
+    updates[basePath + '/code'] = '';
+    updates[basePath + '/sets'] = [];
+    updates[basePath + '/setWins1'] = 0;
+    updates[basePath + '/setWins2'] = 0;
+
+    db.ref().update(updates).then(function(){
+      loadAdminKnockout();
+    });
+  });
+}
+
+function adminKoDeleteCategory(catKey, catName){
+  if(!isAdmin) return;
+  if(!confirm('Delete the entire ' + catName + ' knockout bracket? This cannot be undone.')) return;
+
+  // Remove all associated games first
+  db.ref('knockout/' + catKey + '/rounds').once('value', function(snap){
+    var rounds = snap.val() || [];
+    var promises = [];
+    rounds.forEach(function(rnd){
+      (rnd.matches || []).forEach(function(m){
+        if(m.code) promises.push(db.ref('games/' + m.code).remove());
+      });
+    });
+
+    Promise.all(promises).then(function(){
+      return db.ref('knockout/' + catKey).remove();
+    }).then(function(){
+      loadAdminKnockout();
+    });
+  });
+}
+
+/* ═══════════════════════════════════════════════════
+   UMPIRE KNOCKOUT FIXTURES
+   ═══════════════════════════════════════════════════ */
+
+function loadUmpireKnockout(){
+  if(!isUmpire) return;
+  var el = document.getElementById('umpire-ko-area');
+  if(!el) return;
+  el.innerHTML = '<div class="loading"><div class="spin"></div><br>Loading...</div>';
+
+  db.ref('knockout').once('value', function(snap){
+    var data = snap.val();
+    if(!data){
+      el.innerHTML = '<p class="empty">No knockout bracket yet.</p>';
+      return;
+    }
+
+    var html = '';
+    var hasAny = false;
+
+    Object.entries(data).forEach(function(e){
+      var catKey = e[0], catData = e[1];
+      var catName = catData.category || catKey;
+      var rounds = catData.rounds || [];
+      var catHtml = '';
+      var catHasMatches = false;
+
+      rounds.forEach(function(rnd, ri){
+        (rnd.matches || []).forEach(function(m, mi){
+          var isDone = m.winner && m.winner !== '';
+          var isLive = m.code && !isDone;
+          var isMine = false;
+
+          // Check if this live game belongs to this umpire's device
+          if(isLive){
+            // Show live matches this umpire can open
+            catHasMatches = true;
+            catHtml += '<div class="ko-match ko-live" style="margin-bottom:.4rem">';
+            catHtml += '<span class="ko-badge live-badge">LIVE</span>';
+            catHtml += '<div class="ko-teams">';
+            catHtml += '<div class="ko-team"><div class="ko-team-name">' + esc(m.t1) + '</div></div>';
+            catHtml += '<div class="ko-vs">vs</div>';
+            catHtml += '<div class="ko-team"><div class="ko-team-name">' + esc(m.t2) + '</div></div>';
+            catHtml += '</div>';
+            catHtml += '<div style="text-align:center;margin-top:.3rem;font-size:.7rem;color:var(--dim)">' + esc(rnd.name) + '</div>';
+            catHtml += '<div style="text-align:center;margin-top:.3rem"><button class="start-btn watch" style="width:auto;padding:.25rem .7rem;font-size:.75rem;margin:0" onclick="umpireOpenGame(\'' + esc(m.code) + '\')">📺 Open</button></div>';
+            catHtml += '</div>';
+          } else if(!isDone && m.t1 !== 'TBD' && m.t2 !== 'TBD'){
+            // Pending match ready to start
+            catHasMatches = true;
+            catHtml += '<div class="ko-match" style="margin-bottom:.4rem">';
+            catHtml += '<div class="ko-teams">';
+            catHtml += '<div class="ko-team"><div class="ko-team-name">' + esc(m.t1) + '</div></div>';
+            catHtml += '<div class="ko-vs">vs</div>';
+            catHtml += '<div class="ko-team"><div class="ko-team-name">' + esc(m.t2) + '</div></div>';
+            catHtml += '</div>';
+            catHtml += '<div style="text-align:center;margin-top:.3rem;font-size:.7rem;color:var(--dim)">' + esc(rnd.name) + '</div>';
+            catHtml += '<div style="text-align:center;margin-top:.3rem"><button class="start-btn new" style="width:auto;padding:.25rem .7rem;font-size:.75rem;margin:0" onclick="startKnockoutMatch(\'' + catKey + '\',' + ri + ',' + mi + ')">▶ Start Match</button></div>';
+            catHtml += '</div>';
+          } else if(isDone){
+            // Completed match - show briefly
+            catHasMatches = true;
+            var wCls1 = m.winner === m.t1 ? 'winner' : '';
+            var wCls2 = m.winner === m.t2 ? 'winner' : '';
+            catHtml += '<div class="ko-match ko-done" style="margin-bottom:.4rem">';
+            catHtml += '<span class="ko-badge done-badge">DONE</span>';
+            catHtml += '<div class="ko-teams">';
+            catHtml += '<div class="ko-team"><div class="ko-team-name ' + wCls1 + '">' + esc(m.t1) + '</div></div>';
+            catHtml += '<div class="ko-vs">vs</div>';
+            catHtml += '<div class="ko-team"><div class="ko-team-name ' + wCls2 + '">' + esc(m.t2) + '</div></div>';
+            catHtml += '</div>';
+            var sets = m.sets || [];
+            if(sets.length > 0){
+              catHtml += '<div class="ko-sets">';
+              sets.forEach(function(s){ catHtml += '<div class="ko-set"><span class="set-w">' + s.p1 + '</span>-<span class="set-l">' + s.p2 + '</span></div>'; });
+              catHtml += '</div>';
+            }
+            catHtml += '<div style="text-align:center;margin-top:.2rem;font-size:.7rem;color:var(--dim)">' + esc(rnd.name) + '</div>';
+            catHtml += '</div>';
+          }
+        });
+      });
+
+      if(catHasMatches){
+        hasAny = true;
+        html += '<div class="ko-category"><h3 style="font-size:.9rem">' + esc(catName) + '</h3>' + catHtml + '</div>';
+      }
+    });
+
+    if(!hasAny){
+      el.innerHTML = '<p class="empty">No knockout matches available yet.</p>';
+    } else {
+      el.innerHTML = html;
+    }
+  });
 }
 
 </script>
