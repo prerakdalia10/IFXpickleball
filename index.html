@@ -219,7 +219,9 @@ input:focus,select:focus{border-color:var(--yellow)}
 /* Admin knockout card */
 .ako-cat{margin-bottom:1.5rem}
 .ako-cat h4{font-size:.9rem;color:var(--yellow);margin-bottom:.5rem;border-bottom:1px solid rgba(212,168,67,.12);padding-bottom:.2rem}
-.ako-round-label{font-size:.75rem;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:.4px;margin:.6rem 0 .3rem}
+.ako-round-label{font-size:.75rem;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:.4px;margin:.6rem 0 .3rem;display:flex;align-items:center;gap:.4rem}
+.ako-round-input{flex:1;padding:.2rem .4rem;font-size:.75rem;font-weight:700;background:var(--card2);border:1px solid rgba(255,255,255,.1);border-radius:5px;color:var(--green);text-transform:uppercase;letter-spacing:.4px}
+.ako-round-save{padding:.15rem .45rem;border:none;border-radius:5px;cursor:pointer;font-size:.65rem;font-weight:700;background:var(--green);color:#111}
 .ako-card{background:var(--card);border-radius:var(--r);padding:.6rem .7rem;margin-bottom:.45rem;border:1px solid rgba(255,255,255,.06);position:relative}
 .ako-card.ako-live{border-color:var(--green)}
 .ako-card.ako-done{opacity:.7}
@@ -3767,7 +3769,8 @@ function loadAdminKnockout(){
       html += '<div class="ako-cat"><h4>' + esc(catName) + '</h4>';
 
       rounds.forEach(function(rnd, ri){
-        html += '<div class="ako-round-label">' + esc(rnd.name) + '</div>';
+        var roundNameId = 'ako-rname-' + catKey + '-' + ri;
+        html += '<div class="ako-round-label"><input class="ako-round-input" id="' + roundNameId + '" value="' + esc(rnd.name) + '" placeholder="Round name"/><button class="ako-round-save" onclick="adminKoSaveRoundName(\'' + catKey + '\',' + ri + ')">✓</button></div>';
         (rnd.matches || []).forEach(function(m, mi){
           var isDone = m.winner && m.winner !== '';
           var isLive = m.code && !isDone;
@@ -3851,6 +3854,11 @@ function adminKoSaveTeams(catKey, ri, mi){
   updates[basePath + '/t2'] = t2;
   updates[basePath + '/title'] = title;
 
+  // Also save round name if changed
+  var roundNameId = 'ako-rname-' + catKey + '-' + ri;
+  var rnEl = document.getElementById(roundNameId);
+  if(rnEl){ updates['knockout/' + catKey + '/rounds/' + ri + '/name'] = rnEl.value.trim() || 'Round'; }
+
   db.ref().update(updates).then(function(){
     // Also update the game if it exists (live game)
     db.ref(basePath + '/code').once('value', function(snap){
@@ -3866,6 +3874,16 @@ function adminKoSaveTeams(catKey, ri, mi){
         });
       }
     });
+    loadAdminKnockout();
+  });
+}
+
+function adminKoSaveRoundName(catKey, ri){
+  if(!isAdmin) return;
+  var el = document.getElementById('ako-rname-' + catKey + '-' + ri);
+  if(!el) return;
+  var name = el.value.trim() || 'Round';
+  db.ref('knockout/' + catKey + '/rounds/' + ri + '/name').set(name).then(function(){
     loadAdminKnockout();
   });
 }
