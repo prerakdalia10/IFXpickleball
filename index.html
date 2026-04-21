@@ -215,6 +215,7 @@ input:focus,select:focus{border-color:var(--yellow)}
 .ko-badge{position:absolute;top:.4rem;right:.5rem;font-size:.6rem;font-weight:700;padding:.1rem .4rem;border-radius:999px}
 .ko-badge.live-badge{background:var(--green);color:#111;animation:pulse 1.5s infinite}
 .ko-badge.done-badge{background:var(--dim);color:#111}
+.ko-match-title{font-size:.72rem;font-weight:700;color:var(--yellow);text-align:center;margin-bottom:.25rem;letter-spacing:.3px}
 /* Admin knockout card */
 .ako-cat{margin-bottom:1.5rem}
 .ako-cat h4{font-size:.9rem;color:var(--yellow);margin-bottom:.5rem;border-bottom:1px solid rgba(212,168,67,.12);padding-bottom:.2rem}
@@ -224,6 +225,8 @@ input:focus,select:focus{border-color:var(--yellow)}
 .ako-card.ako-done{opacity:.7}
 .ako-row{display:flex;align-items:center;gap:.4rem;flex-wrap:wrap}
 .ako-team-input{flex:1;min-width:60px;padding:.3rem .4rem;font-size:.78rem;background:var(--card2);border:1px solid rgba(255,255,255,.1);border-radius:6px;color:var(--text);font-weight:600}
+.ako-title-input{width:100%;padding:.25rem .4rem;font-size:.72rem;background:var(--card2);border:1px solid rgba(255,255,255,.08);border-radius:5px;color:var(--yellow);font-weight:700;margin-bottom:.3rem;text-align:center}
+.ako-title-input::placeholder{color:var(--dim);font-weight:400;font-style:italic}
 .ako-vs{color:var(--dim);font-size:.7rem;font-weight:700;flex-shrink:0}
 .ako-btns{display:flex;gap:.3rem;margin-top:.35rem;flex-wrap:wrap}
 .ako-btns button{padding:.25rem .55rem;border:none;border-radius:6px;cursor:pointer;font-size:.7rem;font-weight:700}
@@ -3595,6 +3598,9 @@ function loadKnockout(){
           if(isLive) html += '<span class="ko-badge live-badge">LIVE</span>';
           else if(isDone) html += '<span class="ko-badge done-badge">DONE</span>';
 
+          // Match title
+          if(m.title) html += '<div class="ko-match-title">' + esc(m.title) + '</div>';
+
           var t1cls = m.t1 === 'TBD' ? 'tbd' : (m.winner === m.t1 ? 'winner' : '');
           var t2cls = m.t2 === 'TBD' ? 'tbd' : (m.winner === m.t2 ? 'winner' : '');
 
@@ -3771,9 +3777,13 @@ function loadAdminKnockout(){
 
           var inputId1 = 'ako-t1-' + catKey + '-' + ri + '-' + mi;
           var inputId2 = 'ako-t2-' + catKey + '-' + ri + '-' + mi;
+          var titleId = 'ako-title-' + catKey + '-' + ri + '-' + mi;
 
           html += '<div class="ako-card ' + cls + '">';
           html += '<span class="ako-status ' + statusCls + '">' + statusText + '</span>';
+
+          // Editable match title
+          html += '<input class="ako-title-input" id="' + titleId + '" value="' + esc(m.title || '') + '" placeholder="Match title (e.g. QF1, Semi Final, Final)"/>';
 
           // Editable team name inputs
           html += '<div class="ako-row">';
@@ -3795,7 +3805,7 @@ function loadAdminKnockout(){
 
           // Action buttons
           html += '<div class="ako-btns">';
-          html += '<button class="ako-btn-save" onclick="adminKoSaveTeams(\'' + catKey + '\',' + ri + ',' + mi + ')">💾 Save Names</button>';
+          html += '<button class="ako-btn-save" onclick="adminKoSaveTeams(\'' + catKey + '\',' + ri + ',' + mi + ')">💾 Save</button>';
 
           if(!isDone && !isLive && m.t1 !== 'TBD' && m.t2 !== 'TBD'){
             html += '<button class="ako-btn-start" onclick="startKnockoutMatch(\'' + catKey + '\',' + ri + ',' + mi + ')">▶ Start</button>';
@@ -3829,14 +3839,17 @@ function adminKoSaveTeams(catKey, ri, mi){
   if(!isAdmin) return;
   var id1 = 'ako-t1-' + catKey + '-' + ri + '-' + mi;
   var id2 = 'ako-t2-' + catKey + '-' + ri + '-' + mi;
+  var titleId = 'ako-title-' + catKey + '-' + ri + '-' + mi;
   var t1 = document.getElementById(id1).value.trim();
   var t2 = document.getElementById(id2).value.trim();
+  var title = document.getElementById(titleId).value.trim();
   if(!t1 || !t2){ alert('Both team names are required.'); return; }
 
   var basePath = 'knockout/' + catKey + '/rounds/' + ri + '/matches/' + mi;
   var updates = {};
   updates[basePath + '/t1'] = t1;
   updates[basePath + '/t2'] = t2;
+  updates[basePath + '/title'] = title;
 
   db.ref().update(updates).then(function(){
     // Also update the game if it exists (live game)
@@ -3990,6 +4003,7 @@ function loadUmpireKnockout(){
             catHasMatches = true;
             catHtml += '<div class="ko-match ko-live" style="margin-bottom:.4rem">';
             catHtml += '<span class="ko-badge live-badge">LIVE</span>';
+            if(m.title) catHtml += '<div class="ko-match-title">' + esc(m.title) + '</div>';
             catHtml += '<div class="ko-teams">';
             catHtml += '<div class="ko-team"><div class="ko-team-name">' + esc(m.t1) + '</div></div>';
             catHtml += '<div class="ko-vs">vs</div>';
@@ -4002,6 +4016,7 @@ function loadUmpireKnockout(){
             // Pending match ready to start
             catHasMatches = true;
             catHtml += '<div class="ko-match" style="margin-bottom:.4rem">';
+            if(m.title) catHtml += '<div class="ko-match-title">' + esc(m.title) + '</div>';
             catHtml += '<div class="ko-teams">';
             catHtml += '<div class="ko-team"><div class="ko-team-name">' + esc(m.t1) + '</div></div>';
             catHtml += '<div class="ko-vs">vs</div>';
@@ -4017,6 +4032,7 @@ function loadUmpireKnockout(){
             var wCls2 = m.winner === m.t2 ? 'winner' : '';
             catHtml += '<div class="ko-match ko-done" style="margin-bottom:.4rem">';
             catHtml += '<span class="ko-badge done-badge">DONE</span>';
+            if(m.title) catHtml += '<div class="ko-match-title">' + esc(m.title) + '</div>';
             catHtml += '<div class="ko-teams">';
             catHtml += '<div class="ko-team"><div class="ko-team-name ' + wCls1 + '">' + esc(m.t1) + '</div></div>';
             catHtml += '<div class="ko-vs">vs</div>';
