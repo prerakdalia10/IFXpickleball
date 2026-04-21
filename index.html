@@ -3411,11 +3411,7 @@ function runCalc(){
 */
 
 function getRoundName(totalTeams, roundIdx, totalRounds){
-  var left = totalRounds - roundIdx;
-  if(left === 0) return 'Final';
-  if(left === 1) return 'Semifinal';
-  if(left === 2) return 'Quarterfinal';
-  return 'Round ' + (roundIdx + 1);
+  return '';
 }
 
 function generateKnockout(){
